@@ -1,0 +1,20 @@
+{
+  "name": "spendable-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Spendable - AI-powered personal financial liquidity intelligence for Upay customers",
+  "scripts": {
+    "dev:docker": "docker compose up -d postgres",
+    "dev:backend": "cd backend && ..\\venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --port 8000",
+    "dev:frontend": "pnpm --prefix frontend dev",
+    "dev": "docker compose up -d postgres && concurrently -n \"BACKEND,FRONTEND\" -c \"yellow,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+    "build": "pnpm --prefix frontend build",
+    "test": "venv\\Scripts\\pytest.exe backend\\tests",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
