@@ -58,6 +58,8 @@ header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .logo-icon {
@@ -72,6 +74,8 @@ header {
   font-weight: 800;
   font-size: 1.25rem;
   box-shadow: 0 0 20px rgba(0, 229, 163, 0.3);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .logo-img {
@@ -79,6 +83,8 @@ header {
   height: 42px;
   object-fit: contain;
   filter: drop-shadow(0 0 12px rgba(0, 229, 163, 0.4));
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .brand-name {
@@ -89,6 +95,8 @@ header {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .badge {
@@ -364,7 +372,19 @@ header {
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.35rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.footer-logo-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 229, 163, 0.4));
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .footer-title {
@@ -372,6 +392,8 @@ header {
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--text-main);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .footer-tag {

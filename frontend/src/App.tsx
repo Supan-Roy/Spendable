@@ -196,7 +196,10 @@ function App() {
       <footer className="site-footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <span className="footer-title">Spendable</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', justifyContent: 'center' }}>
+              <img src="/logo.svg" alt="Spendable Logo" className="footer-logo-img" />
+              <span className="footer-title">Spendable</span>
+            </div>
             <span className="footer-tag">Predictive Liquidity Intelligence</span>
           </div>
 
