@@ -39,5 +39,9 @@ Thumbs.db
 *.swp
 *.swo
 
-# Docker / Database persistent data
-pgdata/
+# Synthetic generated data
+synthetic_data/
+synthetic_output/
+backend/synthetic_data/
+backend/synthetic_output/
+
