@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, ShieldCheck, Cpu, Database, HelpCircle, Layers, Server, Mail, Heart } from 'lucide-react'
+import { Activity, ShieldCheck, Cpu, Database, Layers, Server, Mail, Heart, Wallet, ArrowRight } from 'lucide-react'
 
 interface HealthState {
   status: string
@@ -38,6 +38,7 @@ function App() {
   const [health, setHealth] = useState<HealthState | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [userBalance, setUserBalance] = useState<string>('')
 
   const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
   const currentYear = new Date().getFullYear()
@@ -72,7 +73,7 @@ function App() {
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span className="badge badge-track">Liquidity Intelligence Engine</span>
-          <span className="badge badge-status">Foundation Ready</span>
+          <span className="badge badge-status">Foundation Active</span>
         </div>
       </header>
 
@@ -81,20 +82,40 @@ function App() {
           <div className="hero-tagline">"Know what you can safely spend."</div>
           <h1>Predictive Personal Liquidity Intelligence</h1>
           <p>
-            Your account balance tells you how much money you have. Spendable tells you how much of it you can realistically afford to spend.
+            Your account balance tells you how much money you have. Spendable tells you how much of it you can realistically afford to spend after upcoming commitments and expected outflows.
           </p>
 
-          <div className="question-box">
-            <HelpCircle color="#00e5a3" size={24} />
-            <div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Core Product Inquiry</div>
-              <div className="amount">"I have ৳18,400. How much of it is actually safe for me to spend?"</div>
+          <div className="interactive-calculator">
+            <div className="calc-header">
+              <Wallet color="#00e5a3" size={20} />
+              <span>Simulate Account Runway</span>
             </div>
+            <div className="calc-input-row">
+              <div className="input-wrapper">
+                <span className="currency-symbol">৳</span>
+                <input
+                  type="number"
+                  className="balance-input"
+                  placeholder="Enter observable balance..."
+                  value={userBalance}
+                  onChange={(e) => setUserBalance(e.target.value)}
+                />
+              </div>
+              <button className="calc-btn" onClick={() => {}}>
+                <span>Analyze Runway</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
+            {userBalance && (
+              <div className="calc-preview-msg">
+                Estimated observable input: <strong>৳{Number(userBalance).toLocaleString()}</strong>. Analytical calculation pipeline ready for model deployment.
+              </div>
+            )}
           </div>
 
-          <div style={{ fontSize: '0.875rem', color: 'var(--accent-warning)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ fontSize: '0.875rem', color: 'var(--accent-warning)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
             <Layers size={16} />
-            <span>Initial foundation workspace initialized. Predictive engines and ML models will be integrated incrementally.</span>
+            <span>Clean system skeleton active. Database schemas, prediction pipelines, and LLM integrations will be connected incrementally.</span>
           </div>
         </section>
 
@@ -102,22 +123,22 @@ function App() {
           <div className="card">
             <div className="card-title">
               <Server size={20} color="#3b82f6" />
-              <span>Backend API & DB Connectivity</span>
+              <span>System Health & API Connectivity</span>
             </div>
 
             {loading ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Checking backend health...</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Connecting to backend service...</div>
             ) : error ? (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                   <span className="status-dot offline"></span>
-                  <span style={{ fontWeight: 600 }}>Backend Connection Unreachable</span>
+                  <span style={{ fontWeight: 600 }}>Backend Service Offline</span>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Target: <code>{backendUrl}/api/v1/health</code>
+                  Target Endpoint: <code>{backendUrl}/api/v1/health</code>
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#ef4444', marginTop: '0.5rem' }}>
-                  Start backend with <code>pnpm run dev</code> or Docker Compose.
+                  Start backend using <code>pnpm run dev</code> or Docker Compose.
                 </div>
               </div>
             ) : (
@@ -125,13 +146,13 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span className={`status-dot ${health?.status === 'healthy' ? 'healthy' : 'degraded'}`}></span>
                   <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>
-                    Backend State: {health?.status}
+                    System Status: {health?.status}
                   </span>
                 </div>
                 <table className="meta-table">
                   <tbody>
                     <tr>
-                      <td>Application</td>
+                      <td>Application Engine</td>
                       <td>{health?.app_name} ({health?.version})</td>
                     </tr>
                     <tr>
@@ -139,11 +160,11 @@ function App() {
                       <td>{health?.environment}</td>
                     </tr>
                     <tr>
-                      <td>PostgreSQL Readiness</td>
-                      <td>{health?.database.connected ? 'Connected' : 'Ready (Pending Container DB Startup)'}</td>
+                      <td>Database Readiness</td>
+                      <td>{health?.database.connected ? 'Connected' : 'Ready'}</td>
                     </tr>
                     <tr>
-                      <td>AI Integration Target</td>
+                      <td>AI Engine Readiness</td>
                       <td>{health?.services.ai_integration}</td>
                     </tr>
                   </tbody>
@@ -155,25 +176,25 @@ function App() {
           <div className="card">
             <div className="card-title">
               <ShieldCheck size={20} color="#00e5a3" />
-              <span>Architectural Principles</span>
+              <span>Core Architectural Guarantees</span>
             </div>
             <ul className="principle-list">
               <li className="principle-item">
                 <Cpu size={18} color="#00e5a3" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <strong>LLM vs Financial Engine Separation:</strong> The LLM never invents financial math. Structured financial engine owns math; LLM provides explanations.
+                  <strong>Engine vs LLM Separation:</strong> Deterministic calculations are handled by the analytical engine; LLM provides natural language insights.
                 </div>
               </li>
               <li className="principle-item">
                 <Activity size={18} color="#3b82f6" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <strong>Critical Data Honesty:</strong> System relies on observable account activity and clearly distinguishes Observed vs Inferred vs Predicted states.
+                  <strong>Data Transparency:</strong> Distinguishes verified Observed account facts from Inferred patterns and Predicted projections.
                 </div>
               </li>
               <li className="principle-item">
                 <Database size={18} color="#8b5cf6" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <strong>Modular Architecture:</strong> Clean, decoupled foundation built to seamlessly scale and integrate future capabilities.
+                  <strong>Clean Extensibility:</strong> Modular codebase designed for high-performance iteration and easy deployment.
                 </div>
               </li>
             </ul>

@@ -151,22 +151,104 @@ header {
   margin-bottom: 2rem;
 }
 
-.question-box {
-  background: rgba(10, 13, 20, 0.7);
-  border: 1px dashed rgba(0, 229, 163, 0.4);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+/* Interactive Calculator Container */
+.interactive-calculator {
+  background: rgba(10, 13, 20, 0.75);
+  border: 1px solid rgba(0, 229, 163, 0.25);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  max-width: 680px;
 }
 
-.question-box .amount {
+.calc-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.85rem;
+}
+
+.calc-input-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.input-wrapper {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  background: rgba(18, 24, 36, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0 1rem;
+  transition: border-color 0.2s;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--accent-cyan);
+}
+
+.currency-symbol {
   font-family: var(--font-mono);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
+  color: var(--accent-cyan);
+  margin-right: 0.5rem;
+}
+
+.balance-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
   color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  padding: 0.75rem 0;
+}
+
+.balance-input::placeholder {
+  color: var(--text-muted);
+}
+
+.calc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--accent-cyan), #00b380);
+  color: #040910;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.calc-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 229, 163, 0.3);
+}
+
+.calc-preview-msg {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: rgba(0, 229, 163, 0.05);
+  border: 1px solid rgba(0, 229, 163, 0.15);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.calc-preview-msg strong {
+  color: var(--accent-cyan);
 }
 
 .grid-2 {
