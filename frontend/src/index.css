@@ -85,6 +85,8 @@ header {
   filter: drop-shadow(0 0 12px rgba(0, 229, 163, 0.4));
   user-select: none;
   -webkit-user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .brand-name {
@@ -385,6 +387,8 @@ header {
   filter: drop-shadow(0 0 8px rgba(0, 229, 163, 0.4));
   user-select: none;
   -webkit-user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .footer-title {

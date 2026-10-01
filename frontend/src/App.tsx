@@ -63,7 +63,7 @@ function App() {
     <div className="container">
       <header>
         <div className="logo-group">
-          <img src="/logo.svg" alt="Spendable Logo" className="logo-img" />
+          <img src="/logo.svg" alt="Spendable Logo" className="logo-img" draggable={false} />
           <div>
             <div className="brand-name">SPENDABLE</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -197,7 +197,7 @@ function App() {
         <div className="footer-content">
           <div className="footer-brand">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', justifyContent: 'center' }}>
-              <img src="/logo.svg" alt="Spendable Logo" className="footer-logo-img" />
+              <img src="/logo.svg" alt="Spendable Logo" className="footer-logo-img" draggable={false} />
               <span className="footer-title">Spendable</span>
             </div>
             <span className="footer-tag">Predictive Liquidity Intelligence</span>
