@@ -1,225 +1,246 @@
-import { useEffect, useState } from 'react'
-import { Activity, ShieldCheck, Cpu, Database, Server, Mail, Heart, Wallet, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { TrendingUp, Receipt, Sliders, HelpCircle, ArrowRight, Shield, Info, X } from 'lucide-react'
 
-interface HealthState {
-  status: string
-  timestamp: string
-  app_name: string
-  version: string
-  environment: string
-  database: {
-    connected: boolean
-    status: string
-  }
-  services: {
-    api: string
-    database_readiness: string
-    ai_integration: string
-  }
-}
-
-// Minimal Brand Icon Components
-const LinkedInIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect x="2" y="9" width="4" height="12"/>
-    <circle cx="4" cy="4" r="2"/>
-  </svg>
-)
-
-const GitHubIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-    <path d="M9 18c-4.51 2-5-2-7-2"/>
-  </svg>
-)
+type TabType = 'overview' | 'activity' | 'forecast' | 'simulate'
 
 function App() {
-  const [health, setHealth] = useState<HealthState | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [userBalance, setUserBalance] = useState<string>('')
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
+  const [showCalculationInfo, setShowCalculationInfo] = useState<boolean>(false)
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
   const currentYear = new Date().getFullYear()
-
-  useEffect(() => {
-    fetch(`${backendUrl}/api/v1/health`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then((data) => {
-        setHealth(data)
-        setLoading(false)
-      })
-      .catch((err) => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [backendUrl])
 
   return (
     <div className="container">
-      <header>
-        <div className="logo-group">
-          <img src="/logo.svg" alt="Spendable Logo" className="logo-img" draggable={false} />
-          <div>
-            <div className="brand-name">SPENDABLE</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Personal Liquidity Intelligence Platform
-            </div>
+      {/* Top Application Header */}
+      <header className="app-header">
+        <div className="header-left">
+          <div className="logo-group">
+            <img src="/logo.svg" alt="Spendable Logo" className="logo-img" draggable={false} />
+            <span className="brand-name">SPENDABLE</span>
           </div>
+
+          <nav className="top-nav">
+            <button
+              className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'activity' ? 'active' : ''}`}
+              onClick={() => setActiveTab('activity')}
+            >
+              Activity
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'forecast' ? 'active' : ''}`}
+              onClick={() => setActiveTab('forecast')}
+            >
+              Forecast
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'simulate' ? 'active' : ''}`}
+              onClick={() => setActiveTab('simulate')}
+            >
+              Simulate
+            </button>
+          </nav>
+        </div>
+
+        <div className="header-right">
+          <span className="account-badge">
+            <span className="badge-dot"></span>
+            Account Not Connected
+          </span>
         </div>
       </header>
 
-      <main>
-        <section className="hero">
-          <div className="hero-tagline">"Know what you can safely spend."</div>
-          <h1>Predictive Personal Liquidity Intelligence</h1>
-          <p>
-            Your account balance tells you how much money you have. Spendable tells you how much of it you can realistically afford to spend after upcoming commitments and expected outflows.
-          </p>
-
-          <div className="interactive-calculator">
-            <div className="calc-header">
-              <Wallet color="#00e5a3" size={20} />
-              <span>Simulate Account Runway</span>
-            </div>
-            <div className="calc-input-row">
-              <div className="input-wrapper">
-                <span className="currency-symbol">৳</span>
-                <input
-                  type="number"
-                  className="balance-input"
-                  placeholder="Enter observable balance..."
-                  value={userBalance}
-                  onChange={(e) => setUserBalance(e.target.value)}
-                />
+      {/* Main Product Application Shell */}
+      <main className="main-content">
+        {activeTab === 'overview' && (
+          <div className="tab-pane">
+            <div className="welcome-banner">
+              <div>
+                <h2>Good evening</h2>
+                <p className="subtitle">Know what you can safely spend.</p>
               </div>
-              <button className="calc-btn" onClick={() => {}}>
-                <span>Analyze Runway</span>
+            </div>
+
+            {/* Central Spendable Amount Card */}
+            <section className="spendable-hero-card">
+              <div className="spendable-card-header">
+                <span className="card-label">YOU CAN SAFELY SPEND</span>
+                <button
+                  className="info-trigger-btn"
+                  onClick={() => setShowCalculationInfo(true)}
+                  title="How is this calculated?"
+                >
+                  <HelpCircle size={16} />
+                  <span>How is this calculated?</span>
+                </button>
+              </div>
+
+              <div className="spendable-value-display">
+                <span className="currency-symbol">৳</span>
+                <span className="empty-value">—</span>
+              </div>
+
+              <div className="spendable-status-bar">
+                <span className="status-indicator"></span>
+                <span>Waiting for financial activity</span>
+              </div>
+            </section>
+
+            {/* Financial Summary Grid (4 Visual Slots) */}
+            <section className="summary-grid">
+              <div className="summary-card">
+                <div className="summary-label">Current Balance</div>
+                <div className="summary-value">—</div>
+                <div className="summary-hint">Observable wallet total</div>
+              </div>
+
+              <div className="summary-card">
+                <div className="summary-label">Upcoming Outflows</div>
+                <div className="summary-value">—</div>
+                <div className="summary-hint">Detected commitments</div>
+              </div>
+
+              <div className="summary-card">
+                <div className="summary-label">Expected Inflows</div>
+                <div className="summary-value">—</div>
+                <div className="summary-hint">Projected short-term income</div>
+              </div>
+
+              <div className="summary-card">
+                <div className="summary-label">Safety Buffer</div>
+                <div className="summary-value">—</div>
+                <div className="summary-hint">Protected reserve cushion</div>
+              </div>
+            </section>
+
+            {/* Forecast Section Slot */}
+            <section className="product-section">
+              <div className="section-header">
+                <h3>Cash-Flow Forecast</h3>
+                <button className="view-more-btn" onClick={() => setActiveTab('forecast')}>
+                  <span>View Forecast</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+              <div className="empty-state-card">
+                <TrendingUp size={36} className="empty-icon" />
+                <h4>Liquidity Forecast Unavailable</h4>
+                <p>Connect or import financial activity to calculate short-term and 30-day cash flow projections.</p>
+              </div>
+            </section>
+
+            {/* Scenario Simulator Entry Banner */}
+            <section className="simulate-banner">
+              <div className="banner-content">
+                <div className="banner-icon-wrapper">
+                  <Sliders size={24} color="#00e5a3" />
+                </div>
+                <div>
+                  <h4>What-If Scenario Explorer</h4>
+                  <p>Explore how a potential expense or purchase affects your safe spending runway.</p>
+                </div>
+              </div>
+              <button className="secondary-btn" onClick={() => setActiveTab('simulate')}>
+                <span>Explore Scenarios</span>
                 <ArrowRight size={16} />
               </button>
-            </div>
-            {userBalance && (
-              <div className="calc-preview-msg">
-                Estimated observable input: <strong>৳{Number(userBalance).toLocaleString()}</strong>.
-              </div>
-            )}
+            </section>
           </div>
-        </section>
+        )}
 
-        <div className="grid-2">
-          <div className="card">
-            <div className="card-title">
-              <Server size={20} color="#3b82f6" />
-              <span>System Health & API Connectivity</span>
+        {activeTab === 'activity' && (
+          <div className="tab-pane">
+            <div className="page-header">
+              <h2>Financial Activity</h2>
+              <p className="subtitle">Observable account inflows, payments, and commitments.</p>
             </div>
-
-            {loading ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Connecting to backend service...</div>
-            ) : error ? (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <span className="status-dot offline"></span>
-                  <span style={{ fontWeight: 600 }}>Backend Service Offline</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Target Endpoint: <code>{backendUrl}/api/v1/health</code>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#ef4444', marginTop: '0.5rem' }}>
-                  Start backend using <code>pnpm run dev</code> or Docker Compose.
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <span className={`status-dot ${health?.status === 'healthy' ? 'healthy' : 'degraded'}`}></span>
-                  <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>
-                    System Status: {health?.status}
-                  </span>
-                </div>
-                <table className="meta-table">
-                  <tbody>
-                    <tr>
-                      <td>Application Engine</td>
-                      <td>{health?.app_name} ({health?.version})</td>
-                    </tr>
-                    <tr>
-                      <td>Environment</td>
-                      <td>{health?.environment}</td>
-                    </tr>
-                    <tr>
-                      <td>Database Readiness</td>
-                      <td>{health?.database.connected ? 'Connected' : 'Ready'}</td>
-                    </tr>
-                    <tr>
-                      <td>AI Engine Readiness</td>
-                      <td>{health?.services.ai_integration}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          <div className="card">
-            <div className="card-title">
-              <ShieldCheck size={20} color="#00e5a3" />
-              <span>Core Architectural Guarantees</span>
+            <div className="empty-state-card full-page-empty">
+              <Receipt size={44} className="empty-icon" />
+              <h3>No Activity Recorded Yet</h3>
+              <p>Import your account activity to calculate your safe spending liquidity.</p>
             </div>
-            <ul className="principle-list">
-              <li className="principle-item">
-                <Cpu size={18} color="#00e5a3" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Engine vs LLM Separation:</strong> Deterministic calculations are handled by the analytical engine; LLM provides natural language insights.
-                </div>
-              </li>
-              <li className="principle-item">
-                <Activity size={18} color="#3b82f6" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Data Transparency:</strong> Distinguishes verified Observed account facts from Inferred patterns and Predicted projections.
-                </div>
-              </li>
-              <li className="principle-item">
-                <Database size={18} color="#8b5cf6" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Clean Extensibility:</strong> Modular codebase designed for high-performance iteration and easy deployment.
-                </div>
-              </li>
-            </ul>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'forecast' && (
+          <div className="tab-pane">
+            <div className="page-header">
+              <h2>Cash-Flow Forecast</h2>
+              <p className="subtitle">Projected balance trajectories and liquidity pressure analysis.</p>
+            </div>
+            <div className="empty-state-card full-page-empty">
+              <TrendingUp size={44} className="empty-icon" />
+              <h3>Forecast Unavailable</h3>
+              <p>Your financial activity data is required to generate short-term and 30-day liquidity forecasts.</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'simulate' && (
+          <div className="tab-pane">
+            <div className="page-header">
+              <h2>Scenario Simulator</h2>
+              <p className="subtitle">What happens if I spend more?</p>
+            </div>
+            <div className="empty-state-card full-page-empty">
+              <Sliders size={44} className="empty-icon" />
+              <h3>Simulation Engine Standby</h3>
+              <p>Scenario modeling will allow you to test what-if expenses against your projected liquidity runway once financial activity is available.</p>
+            </div>
+          </div>
+        )}
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-content">
-          <div className="footer-brand">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', justifyContent: 'center' }}>
-              <img src="/logo.svg" alt="Spendable Logo" className="footer-logo-img" draggable={false} />
-              <span className="footer-title">Spendable</span>
+      {/* Calculation Explanation Modal */}
+      {showCalculationInfo && (
+        <div className="modal-overlay" onClick={() => setShowCalculationInfo(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Shield size={20} color="#00e5a3" />
+                <h3>How Spendable Is Calculated</h3>
+              </div>
+              <button className="modal-close" onClick={() => setShowCalculationInfo(false)}>
+                <X size={18} />
+              </button>
             </div>
-            <span className="footer-tag">Predictive Liquidity Intelligence</span>
+            <div className="modal-body">
+              <p>
+                Spendable calculates how much money you can safely spend without risking upcoming financial pressure.
+              </p>
+              <div className="calc-formula-box">
+                <div className="formula-row">+ Current Observable Balance</div>
+                <div className="formula-row">+ Expected Short-Term Inflows</div>
+                <div className="formula-row minus">- Upcoming Commitments & Bills</div>
+                <div className="formula-row minus">- Expected Essential Outflows</div>
+                <div className="formula-row minus">- Protected Safety Buffer</div>
+                <div className="formula-result">= Estimated Safe Spendable Amount</div>
+              </div>
+              <div className="data-honesty-note">
+                <Info size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span>Spendable estimates are based exclusively on observable financial activity. Unrecorded cash or external bank accounts are not included.</span>
+              </div>
+            </div>
           </div>
+        </div>
+      )}
 
-          <div className="footer-links">
-            <a href="mailto:contact@supanroy.com" className="footer-link" target="_blank" rel="noopener noreferrer">
-              <Mail size={16} />
-              <span>contact@supanroy.com</span>
-            </a>
-            <a href="https://linkedin.com/in/supanroy" className="footer-link" target="_blank" rel="noopener noreferrer">
-              <LinkedInIcon />
-              <span>linkedin.com/in/supanroy</span>
-            </a>
-            <a href="https://github.com/Supan-Roy" className="footer-link" target="_blank" rel="noopener noreferrer">
-              <GitHubIcon />
-              <span>github.com/Supan-Roy</span>
-            </a>
+      {/* Clean Product Footer */}
+      <footer className="product-footer">
+        <div className="footer-container">
+          <div className="footer-left">
+            <img src="/logo.svg" alt="Spendable Logo" className="footer-logo-img" draggable={false} />
+            <span className="footer-brand-text">Spendable</span>
+            <span className="footer-divider">•</span>
+            <span className="footer-tagline">Personal Liquidity Intelligence</span>
           </div>
-
-          <div className="footer-copyright">
-            © {currentYear} Spendable. Crafted with <Heart size={14} color="#00e5a3" style={{ display: 'inline', margin: '0 2px' }} /> by <strong>Supan Roy</strong>. All rights reserved.
+          <div className="footer-right">
+            © {currentYear} Spendable. All rights reserved.
           </div>
         </div>
       </footer>
