@@ -2,19 +2,9 @@
 
 > **"Know what you can safely spend."**
 
-Spendable is an AI-powered personal financial runway and liquidity intelligence product designed for **Upay** customers. 
+Spendable is an AI-powered personal financial runway and liquidity intelligence platform. 
 
-While a traditional mobile financial service (MFS) balance tells customers how much money they currently have, **Spendable** calculates and predicts how much of that balance is realistically and safely spendable after accounting for expected short-term outflows, recurring commitments, behavioral patterns, and safety buffers.
-
----
-
-## 🏆 Hackathon Context
-
-- **Event:** AI DEV FEST 2026 AI Hackathon
-- **Organizer:** DIU Computer and Programming Club (DIU-CPC), Department of CSE, Daffodil International University
-- **Ecosystem:** Upay Ecosystem
-- **Track:** **Track 03 — Customer Innovation & Financial Independence**
-- **Status:** Initial Skeleton / Foundation Phase Initialized
+While traditional account balance displays tell customers how much money they currently have, **Spendable** calculates and predicts how much of that balance is realistically and safely spendable after accounting for expected short-term outflows, recurring commitments, behavioral patterns, and safety buffers.
 
 ---
 
@@ -33,6 +23,22 @@ This single command automatically:
 
 ---
 
+## 🎯 Central Proposition & Problem Statement
+
+Suppose a customer has **৳18,400** in their observable account balance. 
+Spendable answers the customer's central financial question:
+
+> *"I have ৳18,400. How much of it is actually safe for me to spend?"*
+
+Spendable is **NOT**:
+- A basic expense logger or static budgeting spreadsheet.
+- A generic financial chatbot built directly on top of raw CRUD endpoints.
+- A simple balance subtractor.
+
+Spendable is built to deliver **predictive personal liquidity intelligence**.
+
+---
+
 ## 🏗️ Technology Stack
 
 | Layer | Technology |
@@ -45,6 +51,26 @@ This single command automatically:
 | **Testing** | `pytest`, `httpx`, `FastAPI TestClient` |
 | **Containerization** | Docker, Multi-stage Dockerfiles, Docker Compose |
 | **Deployment Target** | Railway (Monorepo Dockerfile deployment ready) |
+
+---
+
+## 🛡️ Key Architectural & Responsible AI Principles
+
+### 1. LLM Engine vs. Financial Engine Separation
+The LLM is **NEVER** the financial calculation engine.
+- **Financial / Analytical Engine:** Computes numbers, forecasts, scenario simulations, and structured metrics.
+- **LLM Layer (Gemini):** Translates structured financial engine outputs into clear, natural language explanations and conversational advice.
+
+### 2. Critical Data Honesty
+Spendable **never** pretends to know unobservable financial facts (e.g., external bank balances or unrecorded cash spending).
+- **OBSERVED:** Raw, verified account transactions and cash flows.
+- **INFERRED:** Detected patterns, such as recurring bill frequencies or cash-out behavior.
+- **PREDICTED:** Projected runway trajectories and short-term liquidity estimates.
+
+### 3. Responsible AI & Customer Empowerment
+- No manipulative recommendations or hidden costs.
+- No autonomous consequential financial decisions.
+- Transparent explanations behind every spendable runway estimate.
 
 ---
 

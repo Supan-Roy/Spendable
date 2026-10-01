@@ -6,7 +6,7 @@ from app.api.health import router as health_router
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Spendable - AI-powered personal financial liquidity intelligence for Upay customers.",
+    description="Spendable - AI-powered personal financial liquidity intelligence platform.",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -34,8 +34,7 @@ def root():
     return {
         "project": "Spendable",
         "tagline": "Know what you can safely spend.",
-        "track": "Track 03 — Customer Innovation & Financial Independence",
-        "hackathon": "AI DEV FEST 2026 AI Hackathon",
+        "platform": "Personal Liquidity Intelligence Engine",
         "status": "initialization_foundation",
         "documentation": "/docs",
         "health_check": "/api/v1/health"
