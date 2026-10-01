@@ -8,24 +8,19 @@
       <stop offset="0%" stop-color="#00E5A3"/>
       <stop offset="100%" stop-color="#3B82F6"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
   <!-- Base Squircle Container -->
   <rect x="32" y="32" width="448" height="448" rx="112" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.12)" stroke-width="8"/>
   
   <!-- Outer Glow Ring -->
-  <rect x="48" y="48" width="416" height="416" rx="96" fill="none" stroke="url(#primaryGrad)" stroke-width="4" opacity="0.35" filter="url(#glow)"/>
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="none" stroke="url(#primaryGrad)" stroke-width="4" opacity="0.35"/>
 
   <g transform="translate(256, 256)">
     <!-- Outer Financial Shield -->
     <path d="M0 -170 C95 -170 170 -115 170 0 C170 125 75 190 0 220 C-75 190 -170 125 -170 0 C-170 -115 -95 -170 0 -170 Z" fill="none" stroke="url(#primaryGrad)" stroke-width="20" stroke-linecap="round"/>
     
-    <!-- Clean Centered 'S' Symbol -->
-    <path d="M45 -75 C45 -115 -45 -115 -45 -55 C-45 0 55 -15 55 50 C55 115 -45 120 -55 75" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <!-- Clean Crisp Solid White 'S' Symbol -->
     <path d="M45 -75 C45 -115 -45 -115 -45 -55 C-45 0 55 -15 55 50 C55 115 -45 120 -55 75" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>
