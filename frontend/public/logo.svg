@@ -23,14 +23,9 @@
   <g transform="translate(256, 256)">
     <!-- Outer Financial Shield -->
     <path d="M0 -170 C95 -170 170 -115 170 0 C170 125 75 190 0 220 C-75 190 -170 125 -170 0 C-170 -115 -95 -170 0 -170 Z" fill="none" stroke="url(#primaryGrad)" stroke-width="20" stroke-linecap="round"/>
-
-    <!-- Upward Emerald Liquidity Wave -->
-    <path d="M-120 50 Q -50 -50 20 20 T 120 -60" fill="none" stroke="#00E5A3" stroke-width="16" stroke-linecap="round" filter="url(#glow)"/>
     
-    <!-- Clean Centered 'S' Core -->
-    <path d="M45 -75 C45 -115 -45 -115 -45 -55 C-45 0 55 -15 55 50 C55 115 -45 120 -55 75" fill="none" stroke="#FFFFFF" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <!-- Glowing Trend Spark Pin -->
-    <circle cx="120" cy="-60" r="14" fill="#00E5A3" filter="url(#glow)"/>
+    <!-- Clean Centered 'S' Symbol -->
+    <path d="M45 -75 C45 -115 -45 -115 -45 -55 C-45 0 55 -15 55 50 C55 115 -45 120 -55 75" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M45 -75 C45 -115 -45 -115 -45 -55 C-45 0 55 -15 55 50 C55 115 -45 120 -55 75" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>
