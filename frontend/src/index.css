@@ -74,6 +74,13 @@ header {
   box-shadow: 0 0 20px rgba(0, 229, 163, 0.3);
 }
 
+.logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(0, 229, 163, 0.4));
+}
+
 .brand-name {
   font-size: 1.5rem;
   font-weight: 800;

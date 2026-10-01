@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, ShieldCheck, Cpu, Database, Layers, Server, Mail, Heart, Wallet, ArrowRight } from 'lucide-react'
+import { Activity, ShieldCheck, Cpu, Database, Server, Mail, Heart, Wallet, ArrowRight } from 'lucide-react'
 
 interface HealthState {
   status: string
@@ -63,17 +63,13 @@ function App() {
     <div className="container">
       <header>
         <div className="logo-group">
-          <div className="logo-icon">S</div>
+          <img src="/logo.svg" alt="Spendable Logo" className="logo-img" />
           <div>
             <div className="brand-name">SPENDABLE</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               Personal Liquidity Intelligence Platform
             </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span className="badge badge-track">Liquidity Intelligence Engine</span>
-          <span className="badge badge-status">Foundation Active</span>
         </div>
       </header>
 
@@ -108,14 +104,9 @@ function App() {
             </div>
             {userBalance && (
               <div className="calc-preview-msg">
-                Estimated observable input: <strong>৳{Number(userBalance).toLocaleString()}</strong>. Analytical calculation pipeline ready for model deployment.
+                Estimated observable input: <strong>৳{Number(userBalance).toLocaleString()}</strong>.
               </div>
             )}
-          </div>
-
-          <div style={{ fontSize: '0.875rem', color: 'var(--accent-warning)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
-            <Layers size={16} />
-            <span>Clean system skeleton active. Database schemas, prediction pipelines, and LLM integrations will be connected incrementally.</span>
           </div>
         </section>
 
