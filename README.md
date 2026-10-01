@@ -56,7 +56,13 @@ Spendable is built to deliver **predictive personal liquidity intelligence**.
 
 ## 🛡️ Key Architectural & Responsible AI Principles
 
-### 1. LLM Engine vs. Financial Engine Separation
+### 1. Financial Data Contract & Data Classification
+Spendable strictly delineates data into three explicit tiers documented in [`docs/FINANCIAL_DATA_CONTRACT.md`](docs/FINANCIAL_DATA_CONTRACT.md):
+- **OBSERVED**: Verified, raw financial events (`INFLOW`/`OUTFLOW`, monetary `Decimal`, UTC timestamps).
+- **INFERRED**: Behavioral patterns & recurring commitment intelligence (derived downstream).
+- **PREDICTED**: Forecasted cash flow trajectories & safe spendable runway estimates.
+
+### 2. LLM Engine vs. Financial Engine Separation
 The LLM is **NEVER** the financial calculation engine.
 - **Financial / Analytical Engine:** Computes numbers, forecasts, scenario simulations, and structured metrics.
 - **LLM Layer (Gemini):** Translates structured financial engine outputs into clear, natural language explanations and conversational advice.
