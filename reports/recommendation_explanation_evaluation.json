@@ -1,0 +1,301 @@
+{
+  "snapshots_evaluated": 50,
+  "recommendation_counts_by_type": {
+    "INCOME_IRREGULARITY": 50,
+    "POSITIVE_LIQUIDITY": 43,
+    "SPENDING_CAUTION": 1,
+    "FORECAST_PRESSURE": 1
+  },
+  "sample_evaluations": [
+    {
+      "user_id": "ACC-0497",
+      "current_balance": 59835.05,
+      "spendable_amount": 22552.76,
+      "liquidity_state": "HEALTHY",
+      "recommendations_generated": [
+        {
+          "type": "INCOME_IRREGULARITY",
+          "priority": "INFO",
+          "title": "Adaptive Volatility Buffer Active",
+          "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "supporting_amount": 5514.07,
+          "supporting_metric": "volatility_addon",
+          "reason": "Safety reserve includes an additional \u09f35,514.07 buffer due to cash flow volatility.",
+          "action": "Maintain liquidity buffer to cushion against income fluctuations."
+        }
+      ],
+      "explanation_output": {
+        "summary": "You have \u09f322,552.76 safely spendable out of your \u09f359,835.05 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f359,835.05, but \u09f337,282.29 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f334,284.50."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f311,731.74",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": null,
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      },
+      "scenario_explanation_output": {
+        "summary": "You have \u09f322,552.76 safely spendable out of your \u09f359,835.05 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f359,835.05, but \u09f337,282.29 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f334,284.50."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f311,731.74",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[WARNING] Scenario Impact Insight: Simulating 'One-time expense of \u09f35,000.00 deducted today.' would reduce your spendable amount by \u09f35,000.00.",
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": "Simulating scenario 'One-time expense of \u09f35,000.00 deducted today.' results in a decrease of \u09f35,000.00 in spendable capacity (from \u09f322,552.76 to \u09f317,552.76).",
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      }
+    },
+    {
+      "user_id": "ACC-0497",
+      "current_balance": 90894.41,
+      "spendable_amount": 27712.59,
+      "liquidity_state": "HEALTHY",
+      "recommendations_generated": [
+        {
+          "type": "INCOME_IRREGULARITY",
+          "priority": "INFO",
+          "title": "Adaptive Volatility Buffer Active",
+          "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "supporting_amount": 13418.29,
+          "supporting_metric": "volatility_addon",
+          "reason": "Safety reserve includes an additional \u09f313,418.29 buffer due to cash flow volatility.",
+          "action": "Maintain liquidity buffer to cushion against income fluctuations."
+        }
+      ],
+      "explanation_output": {
+        "summary": "You have \u09f327,712.59 safely spendable out of your \u09f390,894.41 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f390,894.41, but \u09f363,181.82 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f354,549.17."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f326,836.58",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": null,
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      },
+      "scenario_explanation_output": {
+        "summary": "You have \u09f327,712.59 safely spendable out of your \u09f390,894.41 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f390,894.41, but \u09f363,181.82 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f354,549.17."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f326,836.58",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[WARNING] Scenario Impact Insight: Simulating 'One-time expense of \u09f35,000.00 deducted today.' would reduce your spendable amount by \u09f35,000.00.",
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": "Simulating scenario 'One-time expense of \u09f35,000.00 deducted today.' results in a decrease of \u09f35,000.00 in spendable capacity (from \u09f327,712.59 to \u09f322,712.59).",
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      }
+    },
+    {
+      "user_id": "ACC-0497",
+      "current_balance": 82711.01,
+      "spendable_amount": 34136.17,
+      "liquidity_state": "HEALTHY",
+      "recommendations_generated": [
+        {
+          "type": "INCOME_IRREGULARITY",
+          "priority": "INFO",
+          "title": "Adaptive Volatility Buffer Active",
+          "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "supporting_amount": 13399.81,
+          "supporting_metric": "volatility_addon",
+          "reason": "Safety reserve includes an additional \u09f313,399.81 buffer due to cash flow volatility.",
+          "action": "Maintain liquidity buffer to cushion against income fluctuations."
+        }
+      ],
+      "explanation_output": {
+        "summary": "You have \u09f334,136.17 safely spendable out of your \u09f382,711.01 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f382,711.01, but \u09f348,574.84 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f360,935.79."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f326,799.62",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": null,
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      },
+      "scenario_explanation_output": {
+        "summary": "You have \u09f334,136.17 safely spendable out of your \u09f382,711.01 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f382,711.01, but \u09f348,574.84 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f360,935.79."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f326,799.62",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[WARNING] Scenario Impact Insight: Simulating 'One-time expense of \u09f35,000.00 deducted today.' would reduce your spendable amount by \u09f35,000.00.",
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded."
+        ],
+        "scenario_explanation": "Simulating scenario 'One-time expense of \u09f35,000.00 deducted today.' results in a decrease of \u09f35,000.00 in spendable capacity (from \u09f334,136.17 to \u09f329,136.17).",
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      }
+    },
+    {
+      "user_id": "ACC-0497",
+      "current_balance": 112175.01,
+      "spendable_amount": 63122.0,
+      "liquidity_state": "HEALTHY",
+      "recommendations_generated": [
+        {
+          "type": "INCOME_IRREGULARITY",
+          "priority": "INFO",
+          "title": "Adaptive Volatility Buffer Active",
+          "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "supporting_amount": 13504.99,
+          "supporting_metric": "volatility_addon",
+          "reason": "Safety reserve includes an additional \u09f313,504.99 buffer due to cash flow volatility.",
+          "action": "Maintain liquidity buffer to cushion against income fluctuations."
+        },
+        {
+          "type": "POSITIVE_LIQUIDITY",
+          "priority": "INFO",
+          "title": "Healthy Liquidity Position",
+          "message": "You have \u09f363,122.00 in safe spendable capacity available.",
+          "supporting_amount": 63122.0,
+          "supporting_metric": "spendable_amount",
+          "reason": "Forecasted trajectories remain strong with spendable capacity representing 56.3% of current balance.",
+          "action": "Liquidity position is healthy for planned goals."
+        }
+      ],
+      "explanation_output": {
+        "summary": "You have \u09f363,122.00 safely spendable out of your \u09f3112,175.01 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f3112,175.01, but \u09f349,053.01 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f390,131.98."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f327,009.98",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "[INFO] Healthy Liquidity Position: You have \u09f363,122.00 in safe spendable capacity available."
+        ],
+        "scenario_explanation": null,
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      },
+      "scenario_explanation_output": {
+        "summary": "You have \u09f363,122.00 safely spendable out of your \u09f3112,175.01 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f3112,175.01, but \u09f349,053.01 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f390,131.98."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f327,009.98",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[WARNING] Scenario Impact Insight: Simulating 'One-time expense of \u09f35,000.00 deducted today.' would reduce your spendable amount by \u09f35,000.00.",
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "[INFO] Healthy Liquidity Position: You have \u09f363,122.00 in safe spendable capacity available."
+        ],
+        "scenario_explanation": "Simulating scenario 'One-time expense of \u09f35,000.00 deducted today.' results in a decrease of \u09f35,000.00 in spendable capacity (from \u09f363,122.00 to \u09f358,122.00).",
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      }
+    },
+    {
+      "user_id": "ACC-0497",
+      "current_balance": 102213.55,
+      "spendable_amount": 62269.64,
+      "liquidity_state": "HEALTHY",
+      "recommendations_generated": [
+        {
+          "type": "INCOME_IRREGULARITY",
+          "priority": "INFO",
+          "title": "Adaptive Volatility Buffer Active",
+          "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "supporting_amount": 14028.9,
+          "supporting_metric": "volatility_addon",
+          "reason": "Safety reserve includes an additional \u09f314,028.90 buffer due to cash flow volatility.",
+          "action": "Maintain liquidity buffer to cushion against income fluctuations."
+        },
+        {
+          "type": "POSITIVE_LIQUIDITY",
+          "priority": "INFO",
+          "title": "Healthy Liquidity Position",
+          "message": "You have \u09f362,269.64 in safe spendable capacity available.",
+          "supporting_amount": 62269.64,
+          "supporting_metric": "spendable_amount",
+          "reason": "Forecasted trajectories remain strong with spendable capacity representing 60.9% of current balance.",
+          "action": "Liquidity position is healthy for planned goals."
+        }
+      ],
+      "explanation_output": {
+        "summary": "You have \u09f362,269.64 safely spendable out of your \u09f3102,213.55 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f3102,213.55, but \u09f339,943.91 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f390,327.44."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f328,057.80",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "[INFO] Healthy Liquidity Position: You have \u09f362,269.64 in safe spendable capacity available."
+        ],
+        "scenario_explanation": null,
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      },
+      "scenario_explanation_output": {
+        "summary": "You have \u09f362,269.64 safely spendable out of your \u09f3102,213.55 account balance over the next 30 days.",
+        "why": [
+          "Your observed balance is \u09f3102,213.55, but \u09f339,943.91 is protected for obligations and safety reserves.",
+          "Forecasted minimum account balance trajectory is projected at \u09f390,327.44."
+        ],
+        "key_factors": [
+          "Adaptive safety reserve buffer: \u09f328,057.80",
+          "Categorical liquidity state: HEALTHY"
+        ],
+        "recommendations": [
+          "[WARNING] Scenario Impact Insight: Simulating 'One-time expense of \u09f35,000.00 deducted today.' would reduce your spendable amount by \u09f35,000.00.",
+          "[INFO] Adaptive Volatility Buffer Active: Your recent cash flow has shown variability, so your safety buffer has been expanded.",
+          "[INFO] Healthy Liquidity Position: You have \u09f362,269.64 in safe spendable capacity available."
+        ],
+        "scenario_explanation": "Simulating scenario 'One-time expense of \u09f35,000.00 deducted today.' results in a decrease of \u09f35,000.00 in spendable capacity (from \u09f362,269.64 to \u09f357,269.64).",
+        "disclaimer": "This estimate is strictly derived from observed account transaction history up to the snapshot date. It does not include external accounts, physical cash, or unobserved obligations.",
+        "is_fallback": true
+      }
+    }
+  ],
+  "summary": "Stage 6 Recommendation + Explanation Engine executed successfully with deterministic fallback support."
+}
