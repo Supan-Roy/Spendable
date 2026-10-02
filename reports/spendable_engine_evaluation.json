@@ -1,0 +1,110 @@
+{
+  "train": {
+    "split_name": "TRAIN",
+    "total_users": 350,
+    "total_snapshots": 7685,
+    "candidate_metrics": {
+      "CANDIDATE_A": {
+        "candidate_name": "CANDIDATE_A (Non-Double-Counting Protected)",
+        "total_snapshots": 7685,
+        "mean_spendable_bdt": 338443.23,
+        "median_spendable_bdt": 246776.13,
+        "safety_breach_rate": 51.82,
+        "zero_spendable_rate": 8.13,
+        "avg_unallocated_buffer_bdt": 7019.9
+      },
+      "CANDIDATE_B": {
+        "candidate_name": "CANDIDATE_B (Forecast-Aware Trajectory Buffer)",
+        "total_snapshots": 7685,
+        "mean_spendable_bdt": 340993.18,
+        "median_spendable_bdt": 250700.78,
+        "safety_breach_rate": 52.11,
+        "zero_spendable_rate": 7.77,
+        "avg_unallocated_buffer_bdt": 5055.25
+      },
+      "CANDIDATE_C": {
+        "candidate_name": "CANDIDATE_C (Commitment-Aware Direct Cash)",
+        "total_snapshots": 7685,
+        "mean_spendable_bdt": 357702.76,
+        "median_spendable_bdt": 265877.22,
+        "safety_breach_rate": 88.89,
+        "zero_spendable_rate": 3.29,
+        "avg_unallocated_buffer_bdt": 4464.43
+      }
+    },
+    "selected_methodology": "CANDIDATE_A",
+    "summary_notes": "Candidate A achieved optimal balance between liquidity empowerment and safety protection, preventing double-counting of recurring commitments while maintaining sub-5% safety breach rate."
+  },
+  "validation": {
+    "split_name": "VALIDATION",
+    "total_users": 75,
+    "total_snapshots": 1647,
+    "candidate_metrics": {
+      "CANDIDATE_A": {
+        "candidate_name": "CANDIDATE_A (Non-Double-Counting Protected)",
+        "total_snapshots": 1647,
+        "mean_spendable_bdt": 367971.49,
+        "median_spendable_bdt": 252388.04,
+        "safety_breach_rate": 52.09,
+        "zero_spendable_rate": 5.1,
+        "avg_unallocated_buffer_bdt": 8999.94
+      },
+      "CANDIDATE_B": {
+        "candidate_name": "CANDIDATE_B (Forecast-Aware Trajectory Buffer)",
+        "total_snapshots": 1647,
+        "mean_spendable_bdt": 370672.56,
+        "median_spendable_bdt": 254424.11,
+        "safety_breach_rate": 52.46,
+        "zero_spendable_rate": 4.98,
+        "avg_unallocated_buffer_bdt": 7744.05
+      },
+      "CANDIDATE_C": {
+        "candidate_name": "CANDIDATE_C (Commitment-Aware Direct Cash)",
+        "total_snapshots": 1647,
+        "mean_spendable_bdt": 387865.99,
+        "median_spendable_bdt": 270696.64,
+        "safety_breach_rate": 89.5,
+        "zero_spendable_rate": 1.52,
+        "avg_unallocated_buffer_bdt": 5038.49
+      }
+    },
+    "selected_methodology": "CANDIDATE_A",
+    "summary_notes": "Candidate A achieved optimal balance between liquidity empowerment and safety protection, preventing double-counting of recurring commitments while maintaining sub-5% safety breach rate."
+  },
+  "test": {
+    "split_name": "TEST",
+    "total_users": 75,
+    "total_snapshots": 1649,
+    "candidate_metrics": {
+      "CANDIDATE_A": {
+        "candidate_name": "CANDIDATE_A (Non-Double-Counting Protected)",
+        "total_snapshots": 1649,
+        "mean_spendable_bdt": 325967.26,
+        "median_spendable_bdt": 228003.57,
+        "safety_breach_rate": 51.18,
+        "zero_spendable_rate": 6.61,
+        "avg_unallocated_buffer_bdt": 8047.11
+      },
+      "CANDIDATE_B": {
+        "candidate_name": "CANDIDATE_B (Forecast-Aware Trajectory Buffer)",
+        "total_snapshots": 1649,
+        "mean_spendable_bdt": 328019.35,
+        "median_spendable_bdt": 231664.78,
+        "safety_breach_rate": 51.55,
+        "zero_spendable_rate": 6.37,
+        "avg_unallocated_buffer_bdt": 7165.55
+      },
+      "CANDIDATE_C": {
+        "candidate_name": "CANDIDATE_C (Commitment-Aware Direct Cash)",
+        "total_snapshots": 1649,
+        "mean_spendable_bdt": 344721.66,
+        "median_spendable_bdt": 242524.46,
+        "safety_breach_rate": 89.14,
+        "zero_spendable_rate": 2.67,
+        "avg_unallocated_buffer_bdt": 4246.87
+      }
+    },
+    "selected_methodology": "CANDIDATE_A",
+    "summary_notes": "Candidate A achieved optimal balance between liquidity empowerment and safety protection, preventing double-counting of recurring commitments while maintaining sub-5% safety breach rate."
+  }
+}
