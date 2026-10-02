@@ -51,3 +51,10 @@ export async function injectSampleDataApi(): Promise<{
     method: 'POST',
   });
 }
+
+export async function deleteAccountApi(): Promise<{ status: string; detail: string }> {
+  return apiFetch('/auth/delete-account', {
+    method: 'DELETE',
+  });
+}
+

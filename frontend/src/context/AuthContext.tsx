@@ -9,6 +9,7 @@ import {
   registerApi,
   getDemoAccountsApi,
   getMeApi,
+  deleteAccountApi,
 } from '../api/auth';
 import { setStoredToken, getStoredToken, setUnauthorizedHandler } from '../api/client';
 
@@ -68,6 +69,7 @@ interface AuthContextType {
   loginNormal: (username: string, password: string) => Promise<void>;
   registerNormal: (username: string, password: string, displayName?: string) => Promise<void>;
   logout: () => void;
+  deleteAccount: () => Promise<void>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -149,6 +151,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await deleteAccountApi();
+      logout();
+      // Default back to Supan demo
+      const authRes = await demoLoginApi('acc_supan');
+      setStoredToken(authRes.access_token);
+      const me = await getMeApi();
+      setCurrentUser(me);
+      await fetchDemoAccounts();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete account');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchDemoAccounts, logout]);
+
   const refreshUser = useCallback(async () => {
     try {
       const me = await getMeApi();
@@ -225,6 +247,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginNormal,
         registerNormal,
         logout,
+        deleteAccount,
         clearError: () => setError(null),
         refreshUser,
       }}

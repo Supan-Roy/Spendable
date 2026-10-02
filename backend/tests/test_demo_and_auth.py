@@ -230,3 +230,38 @@ def test_20_no_data_lost_after_restart():
         assert len(users) >= 5
     finally:
         session.close()
+
+
+def test_21_delete_user_account_permanently_removes_data():
+    """Test 21: User-created account deletion permanently removes account & transactions from DB."""
+    # Register user
+    reg_res = client.post("/api/v1/auth/register", json={"username": "todelete", "password": "pass"})
+    assert reg_res.status_code == 201
+    token = reg_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Inject sample data
+    inj_res = client.post("/api/v1/auth/inject-sample-data", headers=headers)
+    assert inj_res.status_code == 200
+
+    # Delete account
+    del_res = client.delete("/api/v1/auth/delete-account", headers=headers)
+    assert del_res.status_code == 200
+    assert del_res.json()["status"] == "success"
+
+    # Verify user account no longer exists in DB
+    session = TestingSessionLocal()
+    try:
+        acc = session.query(UserAccount).filter_by(username="todelete").first()
+        assert acc is None
+        from app.models.activity import FinancialActivityModel
+        acts = session.query(FinancialActivityModel).filter_by(account_id="usr_todelete").all()
+        assert len(acts) == 0
+    finally:
+        session.close()
+
+    # Attempting to delete demo account should fail
+    d_token = create_access_token({"sub": "acc_supan", "username": "supan"})
+    fail_del = client.delete("/api/v1/auth/delete-account", headers={"Authorization": f"Bearer {d_token}"})
+    assert fail_del.status_code == 400
+

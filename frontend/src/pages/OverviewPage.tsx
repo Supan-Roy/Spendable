@@ -101,11 +101,17 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
 
   const badge = getLiquidityBadgeConfig(overview.liquidity_state);
 
+  const getFirstName = (name?: string | null) => {
+    if (!name) return 'Spendable User';
+    const clean = name.trim();
+    return clean.split(' ')[0] || clean;
+  };
+
   return (
     <div className="tab-pane">
       <div className="welcome-banner">
         <div>
-          <h2>Good day, {currentUser?.display_name || currentUser?.username || 'Spendable User'}</h2>
+          <h2>Good day, {getFirstName(currentUser?.display_name || currentUser?.username)}</h2>
           <p className="subtitle">Know what you can safely spend.</p>
         </div>
       </div>

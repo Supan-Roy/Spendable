@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth, DEMO_PERSONAS } from '../context/AuthContext';
-import { User, ChevronDown, LogOut, Sparkles, ShieldCheck } from 'lucide-react';
+import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 export type TabType = 'overview' | 'activity' | 'forecast' | 'simulate';
@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenLogin }) => {
-  const { currentUser, loginAsDemo, logout, isAuthenticated, demoAccounts } = useAuth();
+  const { currentUser, loginAsDemo, logout, deleteAccount, isAuthenticated, demoAccounts } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +30,16 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
   const handleSelectDemo = async (accountId: string) => {
     setDropdownOpen(false);
     await loginAsDemo(accountId);
+  };
+
+  const handleDeleteAccount = async () => {
+    const accName = currentUser?.display_name || currentUser?.username || 'account';
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete your account (${accName})?\n\nAll database entries and financial records for this account will be erased with no trace.`
+    );
+    if (!confirmed) return;
+    setDropdownOpen(false);
+    await deleteAccount();
   };
 
   return (
@@ -85,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                 {currentUser.display_name || currentUser.username || currentUser.account_id}
               </span>
               {currentUser.is_demo_account && (
-                <span className="demo-tag">DEMO</span>
+                <span className="demo-tag">D</span>
               )}
               <ChevronDown size={14} className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`} />
             </button>
@@ -122,6 +132,16 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
 
                 <div className="dropdown-divider"></div>
 
+                {!currentUser.is_demo_account && (
+                  <button
+                    className="delete-account-dropdown-item"
+                    onClick={handleDeleteAccount}
+                  >
+                    <Trash2 size={14} color="#ef4444" />
+                    <span>Delete account</span>
+                  </button>
+                )}
+
                 <button
                   className="logout-dropdown-item"
                   onClick={() => {
@@ -146,3 +166,4 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
     </header>
   );
 };
+

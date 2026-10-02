@@ -177,3 +177,38 @@ def inject_sample_data(
     from app.auth import seed_sample_data_for_user
     res = seed_sample_data_for_user(account.account_id, db)
     return res
+
+
+@router.delete("/delete-account", status_code=status.HTTP_200_OK)
+def delete_user_account(
+    account: UserAccount = Depends(get_current_account),
+    db: Session = Depends(get_db)
+):
+    """Permanently delete user-created account and all associated database records with no trace."""
+    if account.is_demo_account:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permanent demo accounts cannot be deleted.",
+        )
+
+    from app.models.activity import FinancialActivityModel
+    from app.models.snapshot import SpendableSnapshot
+
+    acc_id = account.account_id
+    uname = account.username
+
+    # 1. Permanently delete all financial activity records
+    db.query(FinancialActivityModel).filter(FinancialActivityModel.account_id == acc_id).delete(synchronize_session=False)
+
+    # 2. Permanently delete all spendable snapshot records
+    db.query(SpendableSnapshot).filter(SpendableSnapshot.account_id == acc_id).delete(synchronize_session=False)
+
+    # 3. Permanently delete the user account profile record itself
+    db.delete(account)
+    db.commit()
+
+    return {
+        "status": "success",
+        "detail": f"Account '{uname}' and all associated database entries have been permanently removed with no trace.",
+    }
+
