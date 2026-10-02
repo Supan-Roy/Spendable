@@ -1,8 +1,8 @@
-"""Ground-truth offline evaluator for recurring payment detection.
+"""Ground-truth offline evaluator for recurring payment and commitment detection.
 
 Matches observable detected commitments against hidden planted recurring rules
 to compute unbiased Precision, Recall, F1, True Positive, False Positive, and False Negative metrics
-across user-level TRAIN, VALIDATION, and TEST dataset splits.
+across user-level TRAIN, VALIDATION, and TEST dataset splits and financial categories.
 """
 
 from datetime import datetime
@@ -12,6 +12,7 @@ import numpy as np
 
 from app.recurring.detector import RecurringDetector
 from app.recurring.schema import (
+    CategoryEvaluationMetric,
     DetectionConfig,
     DetectionStatus,
     DetectedCommitment,
@@ -43,8 +44,17 @@ class RecurringEvaluator:
         transactions: List[Dict[str, Any]],
         snapshot_time: datetime,
         split_name: str,
+        direction_filter: str = "OUTFLOW",
     ) -> SingleEvaluationMetric:
-        """Evaluate recurring detector on a specific dataset split at snapshot time T."""
+        """Evaluate recurring detector on a specific dataset split at snapshot time T.
+
+        Args:
+            detector: RecurringDetector instance.
+            transactions: Full raw transactions list.
+            snapshot_time: Point-in-time snapshot date/time T.
+            split_name: Name of split ('TRAIN', 'VALIDATION', or 'TEST').
+            direction_filter: 'OUTFLOW' for commitments, 'INFLOW' for income, or 'ALL'.
+        """
         split_name_upper = split_name.upper()
 
         # Identify users belonging to target split
@@ -59,22 +69,32 @@ class RecurringEvaluator:
             if str(tx.get("account_id") or tx.get("user_id")) in target_users
         ]
 
-        # Run detector (without ground truth access!)
+        # Run detector for target direction
         detected_commitments = detector.detect(
             transactions=split_txs,
             snapshot_time=snapshot_time,
             include_insufficient=False,
+            direction_filter=direction_filter,
         )
 
-        # Collect ground truth planted rules for split users
+        # Collect relevant ground truth rules for split users
         gt_rules: List[Dict[str, Any]] = []
         for uid in target_users:
             udata = self.users_gt.get(uid, {})
             rules = udata.get("planted_rules", [])
             for r in rules:
-                gt_rules.append(r)
+                cat = str(r.get("category") or "").upper()
+                act = str(r.get("activity_type") or "").upper()
+                is_income_rule = (cat == "INCOME" or act == "SALARY")
 
-        # Perform bipartite matching between detected commitments and ground truth rules
+                if direction_filter == "OUTFLOW" and not is_income_rule:
+                    gt_rules.append(r)
+                elif direction_filter == "INFLOW" and is_income_rule:
+                    gt_rules.append(r)
+                elif direction_filter == "ALL":
+                    gt_rules.append(r)
+
+        # Perform bipartite matching
         tp, fp, fn, matched_gt_ids = self._evaluate_matches(
             detected_commitments=detected_commitments,
             gt_rules=gt_rules,
@@ -87,8 +107,15 @@ class RecurringEvaluator:
         strong_count = sum(1 for c in detected_commitments if c.detection_status == DetectionStatus.STRONG)
         moderate_count = sum(1 for c in detected_commitments if c.detection_status == DetectionStatus.MODERATE)
 
+        # Category breakdown evaluation
+        category_metrics = self._evaluate_by_category(
+            detected_commitments=detected_commitments,
+            gt_rules=gt_rules,
+        )
+
         return SingleEvaluationMetric(
             split_name=split_name_upper,
+            direction_filter=direction_filter,
             total_users=len(target_users),
             ground_truth_rules_count=len(gt_rules),
             detected_commitments_count=len(detected_commitments),
@@ -100,6 +127,7 @@ class RecurringEvaluator:
             precision=round(prec, 4),
             recall=round(rec, 4),
             f1_score=round(f1, 4),
+            category_breakdown=category_metrics,
         )
 
     def evaluate_all_splits(
@@ -107,11 +135,12 @@ class RecurringEvaluator:
         detector: RecurringDetector,
         transactions: List[Dict[str, Any]],
         snapshot_time: datetime,
+        direction_filter: str = "OUTFLOW",
     ) -> EvaluationReport:
         """Run complete offline evaluation report across TRAIN, VALIDATION, and TEST splits."""
-        train_m = self.evaluate_split(detector, transactions, snapshot_time, "TRAIN")
-        val_m = self.evaluate_split(detector, transactions, snapshot_time, "VALIDATION")
-        test_m = self.evaluate_split(detector, transactions, snapshot_time, "TEST")
+        train_m = self.evaluate_split(detector, transactions, snapshot_time, "TRAIN", direction_filter)
+        val_m = self.evaluate_split(detector, transactions, snapshot_time, "VALIDATION", direction_filter)
+        test_m = self.evaluate_split(detector, transactions, snapshot_time, "TEST", direction_filter)
 
         snapshot_str = snapshot_time.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -194,3 +223,40 @@ class RecurringEvaluator:
         fn = len(gt_rules) - len(matched_gt_ids)
 
         return tp, fp, fn, matched_gt_ids
+
+    def _evaluate_by_category(
+        self,
+        detected_commitments: List[DetectedCommitment],
+        gt_rules: List[Dict[str, Any]],
+    ) -> List[CategoryEvaluationMetric]:
+        """Compute category-level evaluation metrics breakdown."""
+        categories = set(c.category.upper() for c in detected_commitments)
+        categories.update(str(r.get("category") or r.get("activity_type") or "OTHER").upper() for r in gt_rules)
+
+        metrics: List[CategoryEvaluationMetric] = []
+
+        for cat in sorted(categories):
+            cat_dets = [c for c in detected_commitments if c.category.upper() == cat]
+            cat_rules = [r for r in gt_rules if str(r.get("category") or r.get("activity_type") or "OTHER").upper() == cat]
+
+            if not cat_dets and not cat_rules:
+                continue
+
+            tp, fp, fn, _ = self._evaluate_matches(cat_dets, cat_rules)
+            prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            rec = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+
+            metrics.append(
+                CategoryEvaluationMetric(
+                    category=cat,
+                    ground_truth_count=len(cat_rules),
+                    detected_count=len(cat_dets),
+                    true_positives=tp,
+                    false_positives=fp,
+                    false_negatives=fn,
+                    precision=round(prec, 4),
+                    recall=round(rec, 4),
+                )
+            )
+
+        return metrics

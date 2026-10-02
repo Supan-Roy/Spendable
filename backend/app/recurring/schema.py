@@ -50,10 +50,12 @@ class DetectionEvidence(BaseModel):
     amount_consistency_score: float = Field(..., description="Sub-score [0,1] for amount predictability")
     recency_score: float = Field(..., description="Sub-score [0,1] for transaction recency")
     count_score: float = Field(..., description="Sub-score [0,1] for observation frequency")
+    counterparty_score: float = Field(..., description="Sub-score [0,1] for counterparty specificity")
+    commitment_likelihood_score: float = Field(..., description="Overall commitment-likeness score [0,1]")
 
 
 class DetectedCommitment(BaseModel):
-    """Structured representation of a detected recurring financial commitment."""
+    """Structured representation of a detected recurring financial commitment or income stream."""
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     commitment_id: str = Field(..., description="Unique deterministic identifier for this commitment")
@@ -62,6 +64,7 @@ class DetectedCommitment(BaseModel):
     category: str = Field(..., description="Financial category or activity type")
     activity_type: str = Field(..., description="Primary transaction activity type")
     direction: str = Field(..., description="Transaction direction: OUTFLOW or INFLOW")
+    is_commitment: bool = Field(True, description="True for OUTFLOW obligations, False for INFLOW income")
     
     expected_amount: float = Field(..., description="Estimated expected transaction amount")
     recurrence_interval: RecurrenceIntervalType = Field(..., description="Detected recurrence periodicity")
@@ -71,6 +74,7 @@ class DetectedCommitment(BaseModel):
     occurrence_count: int = Field(..., description="Total historical observation count at snapshot time")
     
     confidence_score: float = Field(..., description="Normalized confidence score in range [0.0, 1.0]")
+    commitment_likelihood: float = Field(..., description="Commitment-likeness score in range [0.0, 1.0]")
     detection_status: DetectionStatus = Field(..., description="Confidence classification status")
     
     evidence: DetectionEvidence = Field(..., description="Detailed structured sub-scores and metrics")
@@ -84,16 +88,29 @@ class DetectionConfig(BaseModel):
     strong_threshold: float = 0.70
     moderate_threshold: float = 0.45
     
-    # Sub-score component weights (must sum to 1.0)
+    # Sub-score component weights
     weight_interval: float = 0.35
     weight_amount: float = 0.30
     weight_count: float = 0.20
     weight_recency: float = 0.15
 
 
+class CategoryEvaluationMetric(BaseModel):
+    """Evaluation summary for a specific financial category."""
+    category: str
+    ground_truth_count: int
+    detected_count: int
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+    precision: float
+    recall: float
+
+
 class SingleEvaluationMetric(BaseModel):
     """Evaluation summary for a specific split or dataset segment."""
     split_name: str
+    direction_filter: str
     total_users: int
     ground_truth_rules_count: int
     detected_commitments_count: int
@@ -105,6 +122,7 @@ class SingleEvaluationMetric(BaseModel):
     precision: float
     recall: float
     f1_score: float
+    category_breakdown: List[CategoryEvaluationMetric] = []
 
 
 class EvaluationReport(BaseModel):

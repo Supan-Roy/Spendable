@@ -1,7 +1,7 @@
 """Recurring payment and financial commitment detector.
 
-Identifies repeated financial commitments (e.g., rent, utility bills, subscriptions, salary)
-using point-in-time observable transaction history up to snapshot cutoff T.
+Identifies repeated financial commitments (rent, utilities, telecom, subscriptions, loans)
+and recurring income streams using point-in-time observable transaction history up to snapshot cutoff T.
 No ground truth labels or future transaction data are used.
 """
 
@@ -19,16 +19,22 @@ from app.recurring.schema import (
     RecurrenceIntervalType,
 )
 
-# Standard recurring financial commitment categories (high prior confidence)
+# Contractual / financial commitment categories (high commitment prior)
 CORE_COMMITMENT_CATEGORIES = {
     "HOUSING", "UTILITIES", "TELECOM", "DEBT_PAYMENT", "SOFTWARE",
     "FITNESS", "FAMILY_SUPPORT", "INCOME", "SALARY", "RENT",
     "INSURANCE", "EDUCATION", "SUBSCRIPTION", "UTILITY_BILL"
 }
 
+# Habitual / discretionary spending categories (low commitment prior unless strong counterparty evidence)
+DISCRETIONARY_CATEGORIES = {
+    "DINING", "FOOD_AND_DINING", "FOOD_AND_GROCERIES", "DISCRETIONARY_SHOPPING",
+    "GENERAL_PURCHASE", "TRANSPORT", "MEDICAL_OR_EMERGENCY", "SHOPPING"
+}
+
 
 class RecurringDetector:
-    """Deterministic, point-in-time baseline recurring payment detector."""
+    """Deterministic, point-in-time baseline recurring commitment and income detector."""
 
     def __init__(self, config: Optional[DetectionConfig] = None):
         """Initialize detector with configurable thresholds and weights."""
@@ -39,13 +45,15 @@ class RecurringDetector:
         transactions: List[Dict[str, Any]],
         snapshot_time: datetime,
         include_insufficient: bool = False,
+        direction_filter: Optional[str] = "OUTFLOW",
     ) -> List[DetectedCommitment]:
-        """Detect recurring financial commitments observable at snapshot time T.
+        """Detect recurring financial commitments or income streams observable at snapshot time T.
 
         Args:
             transactions: Raw transaction list from transaction feed.
             snapshot_time: Point-in-time cutoff date/time T.
             include_insufficient: If True, include INSUFFICIENT_EVIDENCE candidates in result.
+            direction_filter: Filter by direction ('OUTFLOW' for commitments, 'INFLOW' for income, or 'ALL').
 
         Returns:
             List of DetectedCommitment objects sorted by confidence score descending.
@@ -57,6 +65,13 @@ class RecurringDetector:
             tx for tx in transactions
             if self._extract_tx_datetime(tx) <= snapshot_dt
         ]
+
+        if direction_filter and direction_filter.upper() != "ALL":
+            target_dir = direction_filter.upper()
+            filtered_txs = [
+                tx for tx in filtered_txs
+                if str(tx.get("direction") or "OUTFLOW").upper() == target_dir
+            ]
 
         if not filtered_txs:
             return []
@@ -111,6 +126,9 @@ class RecurringDetector:
             if has_counterparty:
                 group_key = (user_id, "COUNTERPARTY", counterparty, category, direction)
             else:
+                # Do NOT group generic discretionary transactions without a specific merchant into an artificial sequence
+                if category in DISCRETIONARY_CATEGORIES:
+                    continue
                 group_key = (user_id, "CATEGORY", category, category, direction)
 
             if group_key not in grouped:
@@ -157,20 +175,17 @@ class RecurringDetector:
             interval_cv = 1.0
 
         # Classify recurrence interval pattern
-        interval_type, target_days = self._classify_interval_type(median_interval)
+        interval_type, target_days, is_periodic = self._classify_interval_type(median_interval)
 
         # Interval sub-score calculation
         if n_occurrences < 2:
             interval_consistency_score = 0.0
-        elif interval_type == RecurrenceIntervalType.IRREGULAR:
-            # Irregular interval penalty: low interval score
-            cv_score = max(0.0, 1.0 - interval_cv * 1.5)
-            interval_consistency_score = min(0.3, max(0.0, 0.3 * cv_score))
+        elif not is_periodic or interval_cv > 0.35:
+            # Irregular interval penalty
+            interval_consistency_score = max(0.0, 0.2 - interval_cv)
         else:
             rel_dev = abs(median_interval - target_days) / target_days if target_days > 0 else 0.5
-            cv_score = max(0.0, 1.0 - interval_cv * 1.2)
-            dev_score = max(0.0, 1.0 - rel_dev * 2.0)
-            interval_consistency_score = min(1.0, max(0.0, 0.65 * cv_score + 0.35 * dev_score))
+            interval_consistency_score = max(0.0, 1.0 - (interval_cv * 1.5 + rel_dev * 1.5))
 
         # 2. Amount Consistency Analysis
         mean_amount = float(np.mean(amounts))
@@ -178,7 +193,7 @@ class RecurringDetector:
         std_amount = float(np.std(amounts)) if n_occurrences >= 2 else 0.0
         amount_cv = (std_amount / mean_amount) if mean_amount > 0 else 0.0
 
-        amount_consistency_score = min(1.0, max(0.0, 1.0 - amount_cv * 1.5))
+        amount_consistency_score = max(0.0, 1.0 - amount_cv * 1.5)
 
         # 3. Recency & Active Duration Analysis
         last_tx_time = timestamps[-1]
@@ -193,19 +208,19 @@ class RecurringDetector:
         # 4. Occurrence Count Score
         count_score = min(1.0, n_occurrences / 8.0)
 
-        # 5. Category Domain Prior Adjustment
-        category_boost = 1.0
-        if category in CORE_COMMITMENT_CATEGORIES:
-            category_boost = 1.1
+        # 5. Counterparty Specificity & Category Domain Prior
+        counterparty_score = 1.0 if group_type == "COUNTERPARTY" else 0.5
+        category_prior = 1.1 if category in CORE_COMMITMENT_CATEGORIES else 0.6
 
-        # Composite Confidence Score calculation
-        raw_score = (
+        # Composite Commitment Likelihood Score
+        base_evidence_score = (
             self.config.weight_interval * interval_consistency_score
             + self.config.weight_amount * amount_consistency_score
             + self.config.weight_count * count_score
             + self.config.weight_recency * recency_score
         )
-        confidence_score = round(min(1.0, max(0.0, raw_score * category_boost)), 4)
+        commitment_likelihood = round(min(1.0, max(0.0, base_evidence_score * counterparty_score * category_prior)), 4)
+        confidence_score = commitment_likelihood
 
         # 6. Determine Categorical Status
         if n_occurrences < self.config.min_occurrences:
@@ -223,11 +238,12 @@ class RecurringDetector:
             next_expected_dt += timedelta(days=median_interval)
         next_expected_date_str = next_expected_dt.strftime("%Y-%m-%d")
 
-        # 8. Deterministic Identifier
+        # 8. Deterministic Identifier & Semantics
         counterparty_name = key_name if group_type == "COUNTERPARTY" else None
         primary_activity_type = str(tx_sorted[-1].get("activity_type") or category).upper()
+        is_commitment = (direction == "OUTFLOW")
 
-        hash_str = f"{user_id}:{counterparty_name or 'NONE'}:{category}:{interval_type.value}"
+        hash_str = f"{user_id}:{counterparty_name or 'NONE'}:{category}:{interval_type.value}:{direction}"
         commitment_id = f"comm_{hashlib.md5(hash_str.encode('utf-8')).hexdigest()[:12]}"
 
         evidence = DetectionEvidence(
@@ -246,6 +262,8 @@ class RecurringDetector:
             amount_consistency_score=round(amount_consistency_score, 4),
             recency_score=round(recency_score, 4),
             count_score=round(count_score, 4),
+            counterparty_score=round(counterparty_score, 2),
+            commitment_likelihood_score=commitment_likelihood,
         )
 
         return DetectedCommitment(
@@ -255,6 +273,7 @@ class RecurringDetector:
             category=category,
             activity_type=primary_activity_type,
             direction=direction,
+            is_commitment=is_commitment,
             expected_amount=round(median_amount, 2),
             recurrence_interval=interval_type,
             median_interval_days=round(median_interval, 2),
@@ -262,26 +281,27 @@ class RecurringDetector:
             amount_variability=round(std_amount, 2),
             occurrence_count=n_occurrences,
             confidence_score=confidence_score,
+            commitment_likelihood=commitment_likelihood,
             detection_status=status,
             evidence=evidence,
         )
 
     def _classify_interval_type(
         self, median_interval: float
-    ) -> Tuple[RecurrenceIntervalType, float]:
-        """Classify interval into standard frequency band and return target days."""
+    ) -> Tuple[RecurrenceIntervalType, float, bool]:
+        """Classify interval into standard frequency band and return (type, target_days, is_periodic)."""
         if 5.0 <= median_interval <= 9.0:
-            return RecurrenceIntervalType.WEEKLY, 7.0
+            return RecurrenceIntervalType.WEEKLY, 7.0, True
         elif 12.0 <= median_interval <= 17.0:
-            return RecurrenceIntervalType.BIWEEKLY, 14.0
+            return RecurrenceIntervalType.BIWEEKLY, 14.0, True
         elif 25.0 <= median_interval <= 35.0:
-            return RecurrenceIntervalType.MONTHLY, 30.0
+            return RecurrenceIntervalType.MONTHLY, 30.0, True
         elif 80.0 <= median_interval <= 105.0:
-            return RecurrenceIntervalType.QUARTERLY, 90.0
+            return RecurrenceIntervalType.QUARTERLY, 90.0, True
         elif 340.0 <= median_interval <= 380.0:
-            return RecurrenceIntervalType.ANNUAL, 365.0
+            return RecurrenceIntervalType.ANNUAL, 365.0, True
         else:
-            return RecurrenceIntervalType.IRREGULAR, max(median_interval, 1.0)
+            return RecurrenceIntervalType.IRREGULAR, max(median_interval, 1.0), False
 
     def _extract_tx_datetime(self, tx: Dict[str, Any]) -> datetime:
         """Extract datetime object from transaction record."""

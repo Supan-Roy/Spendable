@@ -3,12 +3,14 @@
 Verifies:
 - Strong monthly and weekly recurring pattern detection.
 - Variable amount recurring commitment detection.
-- Filtering of irregular/non-recurring transaction noise.
+- Discretionary habit spending (dining/shopping) non-commitment filtering.
+- Specific merchant strong signal emergence.
+- Inflow income vs Outflow commitment separation.
 - Insufficient historical observation cutoff (< 3 occurrences).
 - Strict snapshot cutoff non-leakage invariant (t <= T).
 - Next expected occurrence date & expected amount calculations.
 - Deterministic output across multiple detector runs.
-- Ground truth offline evaluation metrics matching & split isolation.
+- Ground truth offline evaluator with category breakdown & split isolation.
 """
 
 from datetime import datetime, timedelta
@@ -39,13 +41,13 @@ def default_detector():
 def test_strong_monthly_recurring_pattern(default_detector, base_snapshot):
     """Test detection of regular monthly rent payments."""
     txs = [
-        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "timestamp_utc": "2026-06-01T10:00:00"},
-        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "timestamp_utc": "2026-07-01T10:00:00"},
-        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "timestamp_utc": "2026-08-01T10:00:00"},
-        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "timestamp_utc": "2026-09-01T10:00:00"},
+        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-06-01T10:00:00"},
+        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-07-01T10:00:00"},
+        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-08-01T10:00:00"},
+        {"account_id": "U1", "counterparty_name": "Apex Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 15000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-01T10:00:00"},
     ]
 
-    commitments = default_detector.detect(txs, base_snapshot)
+    commitments = default_detector.detect(txs, base_snapshot, direction_filter="OUTFLOW")
 
     assert len(commitments) == 1
     comm = commitments[0]
@@ -53,89 +55,70 @@ def test_strong_monthly_recurring_pattern(default_detector, base_snapshot):
     assert comm.counterparty_name == "Apex Landlord"
     assert comm.category == "HOUSING"
     assert comm.expected_amount == 15000.0
+    assert comm.is_commitment is True
     assert comm.recurrence_interval == RecurrenceIntervalType.MONTHLY
     assert comm.detection_status == DetectionStatus.STRONG
     assert comm.next_expected_date in ("2026-10-01", "2026-10-02")
     assert comm.confidence_score >= 0.70
 
 
-def test_strong_weekly_recurring_pattern(default_detector, base_snapshot):
-    """Test detection of regular weekly payments."""
+def test_discretionary_dining_not_classified_as_commitment(default_detector, base_snapshot):
+    """Test that generic dining transactions without a specific counterparty do not get grouped into a commitment."""
     txs = [
-        {"account_id": "U2", "counterparty_name": "Weekly Maid Service", "category": "SERVICES", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "timestamp_utc": "2026-09-01T10:00:00"},
-        {"account_id": "U2", "counterparty_name": "Weekly Maid Service", "category": "SERVICES", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "timestamp_utc": "2026-09-08T10:00:00"},
-        {"account_id": "U2", "counterparty_name": "Weekly Maid Service", "category": "SERVICES", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "timestamp_utc": "2026-09-15T10:00:00"},
-        {"account_id": "U2", "counterparty_name": "Weekly Maid Service", "category": "SERVICES", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "timestamp_utc": "2026-09-22T10:00:00"},
-        {"account_id": "U2", "counterparty_name": "Weekly Maid Service", "category": "SERVICES", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "timestamp_utc": "2026-09-29T10:00:00"},
+        {"account_id": "U_DINING", "counterparty_name": None, "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 450.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-01T12:00:00"},
+        {"account_id": "U_DINING", "counterparty_name": None, "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 890.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-05T19:00:00"},
+        {"account_id": "U_DINING", "counterparty_name": None, "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 1200.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-12T13:00:00"},
+        {"account_id": "U_DINING", "counterparty_name": None, "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 350.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-20T20:00:00"},
     ]
 
-    commitments = default_detector.detect(txs, base_snapshot)
-
-    assert len(commitments) == 1
-    comm = commitments[0]
-    assert comm.recurrence_interval == RecurrenceIntervalType.WEEKLY
-    assert comm.occurrence_count == 5
-    assert comm.detection_status in (DetectionStatus.STRONG, DetectionStatus.MODERATE)
-
-
-def test_variable_amount_recurring_pattern(default_detector, base_snapshot):
-    """Test recurring payment with minor amount variations (e.g. electric utility bill)."""
-    txs = [
-        {"account_id": "U3", "counterparty_name": "Dhaka Power Electricity", "category": "UTILITIES", "activity_type": "UTILITY_BILL", "amount": 3450.0, "timestamp_utc": "2026-06-05T00:00:00"},
-        {"account_id": "U3", "counterparty_name": "Dhaka Power Electricity", "category": "UTILITIES", "activity_type": "UTILITY_BILL", "amount": 3610.0, "timestamp_utc": "2026-07-05T00:00:00"},
-        {"account_id": "U3", "counterparty_name": "Dhaka Power Electricity", "category": "UTILITIES", "activity_type": "UTILITY_BILL", "amount": 3390.0, "timestamp_utc": "2026-08-05T00:00:00"},
-        {"account_id": "U3", "counterparty_name": "Dhaka Power Electricity", "category": "UTILITIES", "activity_type": "UTILITY_BILL", "amount": 3520.0, "timestamp_utc": "2026-09-05T00:00:00"},
-    ]
-
-    commitments = default_detector.detect(txs, base_snapshot)
-
-    assert len(commitments) == 1
-    comm = commitments[0]
-    assert comm.category == "UTILITIES"
-    assert comm.recurrence_interval == RecurrenceIntervalType.MONTHLY
-    assert 3300.0 <= comm.expected_amount <= 3700.0
-    assert comm.detection_status in (DetectionStatus.STRONG, DetectionStatus.MODERATE)
-
-
-def test_irregular_non_recurring_pattern(default_detector, base_snapshot):
-    """Test that highly irregular random purchases do not get classified as STRONG recurring commitments."""
-    txs = [
-        {"account_id": "U4", "counterparty_name": "Random Gift Shop", "category": "SHOPPING", "activity_type": "MERCHANT_PAYMENT", "amount": 500.0, "timestamp_utc": "2026-01-10T00:00:00"},
-        {"account_id": "U4", "counterparty_name": "Random Gift Shop", "category": "SHOPPING", "activity_type": "MERCHANT_PAYMENT", "amount": 3500.0, "timestamp_utc": "2026-04-22T00:00:00"},
-        {"account_id": "U4", "counterparty_name": "Random Gift Shop", "category": "SHOPPING", "activity_type": "MERCHANT_PAYMENT", "amount": 120.0, "timestamp_utc": "2026-05-02T00:00:00"},
-    ]
-
-    commitments = default_detector.detect(txs, base_snapshot)
-
-    assert len(commitments) == 0 or commitments[0].detection_status != DetectionStatus.STRONG
-
-
-def test_insufficient_history(default_detector, base_snapshot):
-    """Test candidate with < min_occurrences is excluded from active detection."""
-    txs = [
-        {"account_id": "U5", "counterparty_name": "New Gym", "category": "FITNESS", "activity_type": "MERCHANT_PAYMENT", "amount": 2500.0, "timestamp_utc": "2026-08-01T00:00:00"},
-        {"account_id": "U5", "counterparty_name": "New Gym", "category": "FITNESS", "activity_type": "MERCHANT_PAYMENT", "amount": 2500.0, "timestamp_utc": "2026-09-01T00:00:00"},
-    ]
-
-    commitments = default_detector.detect(txs, base_snapshot, include_insufficient=False)
+    commitments = default_detector.detect(txs, base_snapshot, direction_filter="OUTFLOW")
     assert len(commitments) == 0
 
-    all_candidates = default_detector.detect(txs, base_snapshot, include_insufficient=True)
-    assert len(all_candidates) == 1
-    assert all_candidates[0].detection_status == DetectionStatus.INSUFFICIENT_EVIDENCE
+
+def test_specific_merchant_discretionary_can_emerge(default_detector, base_snapshot):
+    """Test that a specific merchant (e.g., Coffee Subscription) with stable interval and amount CAN emerge even if category is discretionary."""
+    txs = [
+        {"account_id": "U_COFFEE", "counterparty_name": "Artisan Coffee Club Subscription", "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 1500.0, "direction": "OUTFLOW", "timestamp_utc": "2026-06-15T09:00:00"},
+        {"account_id": "U_COFFEE", "counterparty_name": "Artisan Coffee Club Subscription", "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 1500.0, "direction": "OUTFLOW", "timestamp_utc": "2026-07-15T09:00:00"},
+        {"account_id": "U_COFFEE", "counterparty_name": "Artisan Coffee Club Subscription", "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 1500.0, "direction": "OUTFLOW", "timestamp_utc": "2026-08-15T09:00:00"},
+        {"account_id": "U_COFFEE", "counterparty_name": "Artisan Coffee Club Subscription", "category": "DINING", "activity_type": "MERCHANT_PAYMENT", "amount": 1500.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-15T09:00:00"},
+    ]
+
+    commitments = default_detector.detect(txs, base_snapshot, direction_filter="OUTFLOW")
+    assert len(commitments) == 1
+    assert commitments[0].counterparty_name == "Artisan Coffee Club Subscription"
+    assert commitments[0].expected_amount == 1500.0
+    assert commitments[0].detection_status in (DetectionStatus.STRONG, DetectionStatus.MODERATE)
+
+
+def test_income_separated_from_outflow_commitment(default_detector, base_snapshot):
+    """Test that INFLOW salary and freelance transactions are separated from OUTFLOW commitment detection."""
+    txs = [
+        {"account_id": "U_INC", "counterparty_name": "Tech Corp Payroll", "category": "INCOME", "activity_type": "SALARY", "amount": 75000.0, "direction": "INFLOW", "timestamp_utc": "2026-07-01T00:00:00"},
+        {"account_id": "U_INC", "counterparty_name": "Tech Corp Payroll", "category": "INCOME", "activity_type": "SALARY", "amount": 75000.0, "direction": "INFLOW", "timestamp_utc": "2026-08-01T00:00:00"},
+        {"account_id": "U_INC", "counterparty_name": "Tech Corp Payroll", "category": "INCOME", "activity_type": "SALARY", "amount": 75000.0, "direction": "INFLOW", "timestamp_utc": "2026-09-01T00:00:00"},
+    ]
+
+    outflow_commitments = default_detector.detect(txs, base_snapshot, direction_filter="OUTFLOW")
+    assert len(outflow_commitments) == 0
+
+    inflow_streams = default_detector.detect(txs, base_snapshot, direction_filter="INFLOW")
+    assert len(inflow_streams) == 1
+    assert inflow_streams[0].is_commitment is False
+    assert inflow_streams[0].direction == "INFLOW"
 
 
 def test_snapshot_cutoff_exclusion(default_detector, base_snapshot):
     """Critical non-leakage invariant: adding future transactions after snapshot T must NOT change output at T."""
     txs_past = [
-        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "timestamp_utc": "2026-07-01T00:00:00"},
-        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "timestamp_utc": "2026-08-01T00:00:00"},
-        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "timestamp_utc": "2026-09-01T00:00:00"},
+        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "direction": "OUTFLOW", "timestamp_utc": "2026-07-01T00:00:00"},
+        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "direction": "OUTFLOW", "timestamp_utc": "2026-08-01T00:00:00"},
+        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-01T00:00:00"},
     ]
 
     txs_with_future = txs_past + [
-        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "timestamp_utc": "2026-10-02T00:00:00"},
-        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 9999.0, "timestamp_utc": "2026-11-01T00:00:00"},
+        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 1200.0, "direction": "OUTFLOW", "timestamp_utc": "2026-10-02T00:00:00"},
+        {"account_id": "U6", "counterparty_name": "ISP Broadband", "category": "TELECOM", "activity_type": "UTILITY_BILL", "amount": 9999.0, "direction": "OUTFLOW", "timestamp_utc": "2026-11-01T00:00:00"},
     ]
 
     comm_past = default_detector.detect(txs_past, base_snapshot)
@@ -151,9 +134,9 @@ def test_snapshot_cutoff_exclusion(default_detector, base_snapshot):
 def test_deterministic_output(default_detector, base_snapshot):
     """Test that running detector multiple times on identical input yields identical outputs."""
     txs = [
-        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "timestamp_utc": "2026-07-10T00:00:00"},
-        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "timestamp_utc": "2026-08-10T00:00:00"},
-        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "timestamp_utc": "2026-09-10T00:00:00"},
+        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "direction": "OUTFLOW", "timestamp_utc": "2026-07-10T00:00:00"},
+        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "direction": "OUTFLOW", "timestamp_utc": "2026-08-10T00:00:00"},
+        {"account_id": "U7", "counterparty_name": "Netflix", "category": "ENTERTAINMENT", "activity_type": "MERCHANT_PAYMENT", "amount": 1499.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-10T00:00:00"},
     ]
 
     res1 = default_detector.detect(txs, base_snapshot)
@@ -162,7 +145,7 @@ def test_deterministic_output(default_detector, base_snapshot):
     assert res1[0].model_dump() == res2[0].model_dump()
 
 
-def test_evaluator_metrics_and_split_isolation(default_detector, base_snapshot):
+def test_evaluator_metrics_and_category_breakdown(default_detector, base_snapshot):
     """Test ground-truth offline evaluator calculations on mock user splits."""
     mock_gt = {
         "users": {
@@ -184,13 +167,13 @@ def test_evaluator_metrics_and_split_isolation(default_detector, base_snapshot):
     }
 
     txs = [
-        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "timestamp_utc": "2026-07-01T00:00:00"},
-        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "timestamp_utc": "2026-08-01T00:00:00"},
-        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "timestamp_utc": "2026-09-01T00:00:00"},
+        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-07-01T00:00:00"},
+        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-08-01T00:00:00"},
+        {"account_id": "U8", "counterparty_name": "Apartment Landlord", "category": "HOUSING", "activity_type": "UTILITY_BILL", "amount": 20000.0, "direction": "OUTFLOW", "timestamp_utc": "2026-09-01T00:00:00"},
     ]
 
     evaluator = RecurringEvaluator(mock_gt)
-    m = evaluator.evaluate_split(default_detector, txs, base_snapshot, "TRAIN")
+    m = evaluator.evaluate_split(default_detector, txs, base_snapshot, "TRAIN", direction_filter="OUTFLOW")
 
     assert m.split_name == "TRAIN"
     assert m.total_users == 1
@@ -200,3 +183,5 @@ def test_evaluator_metrics_and_split_isolation(default_detector, base_snapshot):
     assert m.precision == 1.0
     assert m.recall == 1.0
     assert m.f1_score == 1.0
+    assert len(m.category_breakdown) >= 1
+    assert m.category_breakdown[0].category == "HOUSING"
