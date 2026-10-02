@@ -19,8 +19,16 @@ from app.explanation.prompts import SYSTEM_INSTRUCTION, build_explanation_prompt
 class ExplanationGenerator:
     """Generates structured explanations via Gemini API with deterministic fallback."""
 
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or getattr(settings, "GEMINI_API_KEY", "")
+    def __init__(self, api_key: Optional[str] = None, model_name: Optional[str] = None):
+        if api_key is not None:
+            self.api_key = api_key
+        else:
+            self.api_key = os.environ.get("GEMINI_API_KEY") or getattr(settings, "GEMINI_API_KEY", "")
+
+        if model_name is not None:
+            self.model_name = model_name
+        else:
+            self.model_name = os.environ.get("GEMINI_MODEL") or getattr(settings, "GEMINI_MODEL", "gemini-3.5-flash-lite")
 
     def build_context(
         self,
@@ -75,7 +83,7 @@ class ExplanationGenerator:
             prompt = build_explanation_prompt(context)
 
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=self.model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,

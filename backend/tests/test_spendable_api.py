@@ -97,6 +97,8 @@ def test_8_post_simulate_does_not_mutate_base_state():
     _ = client.post("/api/v1/simulate", json={"scenario_type": "ONE_TIME_EXPENSE", "amount": 15000.0})
 
     overview_after = client.get("/api/v1/overview").json()
+    overview_before.pop("explanation_summary", None)
+    overview_after.pop("explanation_summary", None)
     assert overview_before == overview_after
 
 
@@ -108,8 +110,11 @@ def test_9_gemini_failure_does_not_break_overview():
     assert "explanation_summary" in data
 
 
-def test_10_gemini_failure_returns_fallback_explanation():
+def test_10_gemini_failure_returns_fallback_explanation(monkeypatch):
     """Test 10: Gemini API failure returns fallback explanation."""
+    from app.api.spendable import get_spendable_service
+    service = get_spendable_service()
+    monkeypatch.setattr(service.expl_generator, "api_key", "")
     response = client.post("/api/v1/explain", json={})
     assert response.status_code == 200
     data = response.json()

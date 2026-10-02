@@ -21,8 +21,9 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str = "postgresql://spendable_user:spendable_pass@localhost:5432/spendable_db"
 
-    # Planned AI Service settings (Placeholder for future Gemini integration)
+    # AI Service settings (Gemini API integration)
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
