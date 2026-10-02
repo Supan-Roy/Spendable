@@ -1,0 +1,340 @@
+{
+  "evaluated_at": "2026-10-02 17:23:00",
+  "config": {
+    "safety_threshold_bdt": 15000.0,
+    "cadence_days": 14,
+    "max_horizon_days": 30,
+    "random_seed": 42
+  },
+  "models_evaluated": [
+    "ROLLING_AVERAGE_BASELINE",
+    "RECURRING_COMMITMENT_BASELINE",
+    "HIST_GRADIENT_BOOSTING"
+  ],
+  "summaries": [
+    {
+      "model_name": "ROLLING_AVERAGE_BASELINE",
+      "split_name": "VALIDATION",
+      "total_snapshots": 1647,
+      "metrics_7d": {
+        "horizon_days": 7,
+        "mae": 16972.14,
+        "rmse": 33429.98,
+        "r2_score": 0.9923
+      },
+      "metrics_14d": {
+        "horizon_days": 14,
+        "mae": 22148.81,
+        "rmse": 35123.09,
+        "r2_score": 0.9913
+      },
+      "metrics_30d": {
+        "horizon_days": 30,
+        "mae": 28418.56,
+        "rmse": 41137.53,
+        "r2_score": 0.9879
+      },
+      "pressure_metrics_30d": {
+        "horizon_days": 30,
+        "safety_threshold_bdt": 15000.0,
+        "true_positives": 73,
+        "false_positives": 19,
+        "false_negatives": 57,
+        "true_negatives": 1498,
+        "precision": 0.7935,
+        "recall": 0.5615,
+        "f1_score": 0.6577
+      },
+      "persona_breakdown": [
+        {
+          "persona": "COMMITMENT_HEAVY",
+          "total_snapshots": 396,
+          "mae_30d": 44319.01,
+          "rmse_30d": 54553.05,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "FINANCIAL_PRESSURE",
+          "total_snapshots": 196,
+          "mae_30d": 25738.97,
+          "rmse_30d": 38616.35,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "IRREGULAR_INCOME",
+          "total_snapshots": 263,
+          "mae_30d": 22404.28,
+          "rmse_30d": 28727.71,
+          "pressure_f1_30d": 0.5625
+        },
+        {
+          "persona": "SPENDING_DRIFT",
+          "total_snapshots": 176,
+          "mae_30d": 33183.4,
+          "rmse_30d": 49271.31,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "STABLE",
+          "total_snapshots": 396,
+          "mae_30d": 25766.59,
+          "rmse_30d": 39661.15,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "TIGHT_LIQUIDITY",
+          "total_snapshots": 220,
+          "mae_30d": 10336.48,
+          "rmse_30d": 14953.53,
+          "pressure_f1_30d": 0.7051
+        }
+      ]
+    },
+    {
+      "model_name": "RECURRING_COMMITMENT_BASELINE",
+      "split_name": "VALIDATION",
+      "total_snapshots": 1647,
+      "metrics_7d": {
+        "horizon_days": 7,
+        "mae": 16842.7,
+        "rmse": 32759.45,
+        "r2_score": 0.9926
+      },
+      "metrics_14d": {
+        "horizon_days": 14,
+        "mae": 21926.65,
+        "rmse": 33987.57,
+        "r2_score": 0.9919
+      },
+      "metrics_30d": {
+        "horizon_days": 30,
+        "mae": 27750.43,
+        "rmse": 38998.73,
+        "r2_score": 0.9891
+      },
+      "pressure_metrics_30d": {
+        "horizon_days": 30,
+        "safety_threshold_bdt": 15000.0,
+        "true_positives": 63,
+        "false_positives": 10,
+        "false_negatives": 67,
+        "true_negatives": 1507,
+        "precision": 0.863,
+        "recall": 0.4846,
+        "f1_score": 0.6207
+      },
+      "persona_breakdown": [
+        {
+          "persona": "COMMITMENT_HEAVY",
+          "total_snapshots": 396,
+          "mae_30d": 42950.46,
+          "rmse_30d": 52356.24,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "FINANCIAL_PRESSURE",
+          "total_snapshots": 196,
+          "mae_30d": 26061.4,
+          "rmse_30d": 37841.5,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "IRREGULAR_INCOME",
+          "total_snapshots": 263,
+          "mae_30d": 23405.13,
+          "rmse_30d": 29352.47,
+          "pressure_f1_30d": 0.36
+        },
+        {
+          "persona": "SPENDING_DRIFT",
+          "total_snapshots": 176,
+          "mae_30d": 30820.8,
+          "rmse_30d": 43532.54,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "STABLE",
+          "total_snapshots": 396,
+          "mae_30d": 24715.52,
+          "rmse_30d": 36738.72,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "TIGHT_LIQUIDITY",
+          "total_snapshots": 220,
+          "mae_30d": 10096.31,
+          "rmse_30d": 14162.79,
+          "pressure_f1_30d": 0.7059
+        }
+      ]
+    },
+    {
+      "model_name": "HIST_GRADIENT_BOOSTING",
+      "split_name": "VALIDATION",
+      "total_snapshots": 1647,
+      "metrics_7d": {
+        "horizon_days": 7,
+        "mae": 15429.47,
+        "rmse": 28354.9,
+        "r2_score": 0.9944
+      },
+      "metrics_14d": {
+        "horizon_days": 14,
+        "mae": 15655.88,
+        "rmse": 27274.81,
+        "r2_score": 0.9948
+      },
+      "metrics_30d": {
+        "horizon_days": 30,
+        "mae": 15873.29,
+        "rmse": 26436.34,
+        "r2_score": 0.995
+      },
+      "pressure_metrics_30d": {
+        "horizon_days": 30,
+        "safety_threshold_bdt": 15000.0,
+        "true_positives": 102,
+        "false_positives": 14,
+        "false_negatives": 28,
+        "true_negatives": 1503,
+        "precision": 0.8793,
+        "recall": 0.7846,
+        "f1_score": 0.8293
+      },
+      "persona_breakdown": [
+        {
+          "persona": "COMMITMENT_HEAVY",
+          "total_snapshots": 396,
+          "mae_30d": 19357.33,
+          "rmse_30d": 30765.94,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "FINANCIAL_PRESSURE",
+          "total_snapshots": 196,
+          "mae_30d": 19762.06,
+          "rmse_30d": 29927.87,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "IRREGULAR_INCOME",
+          "total_snapshots": 263,
+          "mae_30d": 20491.87,
+          "rmse_30d": 27596.88,
+          "pressure_f1_30d": 0.4815
+        },
+        {
+          "persona": "SPENDING_DRIFT",
+          "total_snapshots": 176,
+          "mae_30d": 14180.28,
+          "rmse_30d": 24955.2,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "STABLE",
+          "total_snapshots": 396,
+          "mae_30d": 15218.13,
+          "rmse_30d": 26850.32,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "TIGHT_LIQUIDITY",
+          "total_snapshots": 220,
+          "mae_30d": 3149.9,
+          "rmse_30d": 4896.8,
+          "pressure_f1_30d": 0.9271
+        }
+      ]
+    },
+    {
+      "model_name": "HIST_GRADIENT_BOOSTING",
+      "split_name": "TEST",
+      "total_snapshots": 1649,
+      "metrics_7d": {
+        "horizon_days": 7,
+        "mae": 13982.08,
+        "rmse": 24685.64,
+        "r2_score": 0.9946
+      },
+      "metrics_14d": {
+        "horizon_days": 14,
+        "mae": 13907.12,
+        "rmse": 23437.21,
+        "r2_score": 0.9951
+      },
+      "metrics_30d": {
+        "horizon_days": 30,
+        "mae": 14682.01,
+        "rmse": 23903.56,
+        "r2_score": 0.9948
+      },
+      "pressure_metrics_30d": {
+        "horizon_days": 30,
+        "safety_threshold_bdt": 15000.0,
+        "true_positives": 108,
+        "false_positives": 10,
+        "false_negatives": 23,
+        "true_negatives": 1508,
+        "precision": 0.9153,
+        "recall": 0.8244,
+        "f1_score": 0.8675
+      },
+      "persona_breakdown": [
+        {
+          "persona": "COMMITMENT_HEAVY",
+          "total_snapshots": 308,
+          "mae_30d": 16230.3,
+          "rmse_30d": 24229.17,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "FINANCIAL_PRESSURE",
+          "total_snapshots": 110,
+          "mae_30d": 15744.92,
+          "rmse_30d": 22239.99,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "IRREGULAR_INCOME",
+          "total_snapshots": 263,
+          "mae_30d": 27582.89,
+          "rmse_30d": 38486.29,
+          "pressure_f1_30d": 0.2857
+        },
+        {
+          "persona": "SPENDING_DRIFT",
+          "total_snapshots": 220,
+          "mae_30d": 11610.09,
+          "rmse_30d": 17956.51,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "STABLE",
+          "total_snapshots": 374,
+          "mae_30d": 14791.03,
+          "rmse_30d": 24062.88,
+          "pressure_f1_30d": 0.0
+        },
+        {
+          "persona": "TIGHT_LIQUIDITY",
+          "total_snapshots": 374,
+          "mae_30d": 5720.32,
+          "rmse_30d": 8947.49,
+          "pressure_f1_30d": 0.9545
+        }
+      ]
+    }
+  ],
+  "feature_importances": {
+    "current_balance": 0.3567160218934326,
+    "balance_max_30d": 0.23146731554983155,
+    "balance_min_30d": 0.02071193668949678,
+    "balance_mean_30d": 0.01674909682417054,
+    "balance_min_7d": 0.007356595479464478,
+    "balance_min_14d": 0.002362126312316204,
+    "net_cash_flow_30d": 0.0010509420194602104,
+    "total_outflow_30d": 0.0010303162294047264,
+    "balance_std_30d": 0.0008475223006705335,
+    "balance_change_30d": 0.0005280807346509375
+  }
+}
