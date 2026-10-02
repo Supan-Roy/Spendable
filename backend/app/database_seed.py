@@ -20,9 +20,7 @@ def seed_database(data_dir: str = "data", limit_accounts: int = 5) -> dict:
     
     Returns a dictionary summary of inserted records.
     """
-    # Ensure database schema is created if running directly
-    Base.metadata.create_all(bind=engine)
-
+    # Ensure data directory exists
     session: Session = SessionLocal()
     try:
         data_path = Path(data_dir)

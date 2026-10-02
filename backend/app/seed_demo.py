@@ -25,8 +25,6 @@ def seed_demo_accounts(session_factory=None) -> Dict[str, Any]:
     
     s_factory = session_factory or default_session_factory
     bind_engine = getattr(s_factory, "kw", {}).get("bind") or default_engine
-    
-    Base.metadata.create_all(bind=bind_engine)
 
     # Locate canonical seed directory
     seed_dir = Path("backend/seed")
