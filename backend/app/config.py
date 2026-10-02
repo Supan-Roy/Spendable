@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
 
     # Database settings
-    DATABASE_URL: str = "postgresql://spendable_user:spendable_pass@localhost:5432/spendable_db"
+    DATABASE_URL: str = "sqlite:///./spendable.db"
+    DATA_PROVIDER: str = "database"
 
     # AI Service settings (Gemini API integration)
     GEMINI_API_KEY: str = ""

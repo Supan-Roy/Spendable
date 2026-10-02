@@ -46,5 +46,7 @@ backend/synthetic_data/
 backend/synthetic_output/
 data/
 backend/data/
+*.db
+spendable.db
 
 

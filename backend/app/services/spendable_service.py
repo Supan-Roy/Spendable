@@ -31,11 +31,51 @@ class SpendableService:
     """Application orchestration service for Spendable domain operations."""
 
     def __init__(self, data_provider: Optional[BaseDataProvider] = None):
-        self.data_provider = data_provider or SyntheticDataProvider()
+        from app.services.data_provider import get_data_provider
+        self.data_provider = data_provider or get_data_provider()
         self.calculator = SpendableCalculator()
         self.simulator = ScenarioSimulator(self.calculator)
         self.rec_engine = RecommendationEngine()
         self.expl_generator = ExplanationGenerator()
+
+    def _cache_snapshot(self, sp_out) -> None:
+        """Persist calculated Spendable snapshot output into database cache."""
+        try:
+            from app.database import SessionLocal
+            from app.models.snapshot import SpendableSnapshot
+            session = SessionLocal()
+            try:
+                existing = (
+                    session.query(SpendableSnapshot)
+                    .filter(
+                        SpendableSnapshot.account_id == sp_out.user_id,
+                        SpendableSnapshot.snapshot_time == sp_out.snapshot_time,
+                    )
+                    .first()
+                )
+                if not existing:
+                    snap_obj = SpendableSnapshot(
+                        account_id=sp_out.user_id,
+                        snapshot_time=sp_out.snapshot_time,
+                        current_balance=sp_out.current_balance,
+                        spendable_amount=sp_out.spendable_amount,
+                        protected_amount=sp_out.protected_amount,
+                        planning_horizon_days=sp_out.planning_horizon_days,
+                        expected_inflow=sp_out.expected_inflow,
+                        expected_outflow=sp_out.expected_outflow,
+                        upcoming_commitments=sp_out.upcoming_commitments,
+                        forecasted_minimum_balance=sp_out.forecasted_minimum_balance,
+                        safety_reserve=sp_out.safety_reserve,
+                        liquidity_state=sp_out.liquidity_state.value if hasattr(sp_out.liquidity_state, "value") else str(sp_out.liquidity_state),
+                    )
+                    session.add(snap_obj)
+                    session.commit()
+            except Exception:
+                session.rollback()
+            finally:
+                session.close()
+        except Exception:
+            pass
 
     def get_overview(
         self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
@@ -51,6 +91,9 @@ class SpendableService:
             commitments=snap_data["commitments"],
             forecast=snap_data["forecast"],
         )
+
+        # Cache calculated Spendable snapshot
+        self._cache_snapshot(sp_out)
 
         recs = self.rec_engine.generate_recommendations(sp_out)
         context = self.expl_generator.build_context(sp_out, recs)

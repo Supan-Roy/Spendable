@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Numeric, DateTime, Enum as SQLEnum
+from sqlalchemy.orm import relationship, foreign
 from app.database import Base
 from app.domain.enums import TransactionDirection, ActivityType, DataProvenance
 
@@ -24,3 +25,9 @@ class FinancialActivityModel(Base):
     balance_after = Column(Numeric(14, 2), nullable=True)
     provenance = Column(SQLEnum(DataProvenance, native_enum=False, length=32), nullable=False, default=DataProvenance.SYNTHETIC)
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
+
+    account = relationship(
+        "UserAccount",
+        back_populates="activities",
+        primaryjoin="foreign(FinancialActivityModel.account_id) == UserAccount.account_id",
+    )
