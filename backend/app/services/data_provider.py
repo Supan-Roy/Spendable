@@ -217,7 +217,34 @@ class DatabaseDataProvider(BaseDataProvider):
             )
 
             if not db_acts:
-                return self._get_fallback().get_snapshot_data(user_id, snapshot_time)
+                from datetime import datetime, timezone
+                now_iso = datetime.now(timezone.utc).isoformat()
+                return {
+                    "user_id": account_id,
+                    "snapshot_time": now_iso,
+                    "current_balance": current_balance,
+                    "features": {
+                        "account_id": account_id,
+                        "user_id": account_id,
+                        "snapshot_time": now_iso,
+                        "current_balance": current_balance,
+                        "mean_inflow_30d": 0.0,
+                        "sum_inflow_30d": 0.0,
+                        "mean_outflow_30d": 0.0,
+                        "sum_outflow_30d": 0.0,
+                        "std_outflow_30d": 0.0,
+                        "count_outflow_30d": 0,
+                        "count_inflow_30d": 0,
+                        "net_cash_flow_30d": 0.0,
+                        "days_since_last_inflow": 999.0,
+                        "days_since_last_outflow": 999.0,
+                        "volatility_ratio_30d": 0.0,
+                        "liquidity_cushion_days": 0.0,
+                        "balance_trend_30d": 0.0,
+                    },
+                    "commitments": [],
+                    "forecast": None,
+                }
 
             act_dicts = []
             for a in db_acts:
@@ -290,7 +317,12 @@ class DatabaseDataProvider(BaseDataProvider):
 
             total_count = query.count()
             if total_count == 0:
-                return self._get_fallback().get_recent_activities(user_id, limit, offset)
+                return {
+                    "total_count": 0,
+                    "limit": limit,
+                    "offset": offset,
+                    "activities": [],
+                }
 
             db_acts = (
                 query.order_by(FinancialActivityModel.timestamp_utc.desc())

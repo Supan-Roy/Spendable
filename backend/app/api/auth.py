@@ -166,3 +166,14 @@ def get_current_user_profile(account: UserAccount = Depends(get_current_account)
         current_balance=float(account.current_balance),
         is_demo_account=account.is_demo_account,
     )
+
+
+@router.post("/inject-sample-data")
+def inject_sample_data(
+    account: UserAccount = Depends(get_current_account),
+    db: Session = Depends(get_db)
+):
+    """Programmatically generate 1-year realistic sample transaction history for the authenticated user."""
+    from app.auth import seed_sample_data_for_user
+    res = seed_sample_data_for_user(account.account_id, db)
+    return res

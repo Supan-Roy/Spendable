@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getOverviewApi, getRecommendationsApi } from '../api/spendable';
+import { injectSampleDataApi } from '../api/auth';
 import type { SpendableOverviewResponse, SpendableRecommendationsResponse } from '../api/types';
 import { formatCurrency, getLiquidityBadgeConfig } from '../utils/formatters';
 import {
@@ -8,9 +9,9 @@ import {
   ArrowRight,
   ShieldCheck,
   AlertTriangle,
-  Info,
   CheckCircle2,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -20,10 +21,11 @@ interface OverviewPageProps {
 }
 
 export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpenCalcModal }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, refreshUser } = useAuth();
   const [overview, setOverview] = useState<SpendableOverviewResponse | null>(null);
   const [recs, setRecs] = useState<SpendableRecommendationsResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInjecting, setIsInjecting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -46,6 +48,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
   useEffect(() => {
     fetchData();
   }, [fetchData, currentUser?.account_id]);
+
+  const handleInjectSampleData = async () => {
+    setIsInjecting(true);
+    try {
+      await injectSampleDataApi();
+      await refreshUser();
+      await fetchData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to inject sample transaction data');
+    } finally {
+      setIsInjecting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -96,12 +111,23 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
       </div>
 
       {isNewAccountEmpty ? (
-        <div className="empty-state-card full-page-empty">
-          <Info size={44} className="empty-icon" />
-          <h3>No Transaction History Yet</h3>
-          <p>
-            Spendable will calculate your safe spending liquidity once there is enough observed financial activity.
+        <div className="empty-state-card full-page-empty new-account-card">
+          <Sparkles size={48} className="empty-icon text-teal" />
+          <h3>Welcome to Spendable!</h3>
+          <p className="main-empty-desc">
+            This is a new account with <strong>৳0 balance</strong> and no observed transaction history yet.
           </p>
+          <p className="sub-empty-desc">
+            To immediately test safe spending calculations, commitment detection, and 30-day forecast trajectory for your account, click below:
+          </p>
+          <button
+            className="primary-btn inject-sample-btn"
+            onClick={handleInjectSampleData}
+            disabled={isInjecting}
+          >
+            <Sparkles size={16} />
+            <span>{isInjecting ? 'Generating 1-Year Sample Activity...' : 'Inject Sample Financial Data'}</span>
+          </button>
         </div>
       ) : (
         <>

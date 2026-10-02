@@ -40,3 +40,14 @@ export async function getMeApi(): Promise<UserAccountResponse> {
     method: 'GET',
   });
 }
+
+export async function injectSampleDataApi(): Promise<{
+  status: string;
+  message: string;
+  activities_inserted: number;
+  current_balance: number;
+}> {
+  return apiFetch('/auth/inject-sample-data', {
+    method: 'POST',
+  });
+}

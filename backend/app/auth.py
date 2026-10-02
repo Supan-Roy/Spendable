@@ -93,3 +93,171 @@ def get_current_account(
 
     # Hard fallback if database not yet seeded or table uninitialized in test fixtures
     return UserAccount(account_id="acc_supan", display_name="Supan Roy (Default Demo)", is_demo_account=True)
+
+
+def seed_sample_data_for_user(account_id: str, db: Session) -> dict:
+    """Generate realistic 1-year historical sample transaction activity for a user account."""
+    from app.models.activity import FinancialActivityModel
+    from app.domain.enums import TransactionDirection, ActivityType, DataProvenance
+
+    user = db.query(UserAccount).filter(UserAccount.account_id == account_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found")
+
+    existing_count = db.query(FinancialActivityModel).filter(FinancialActivityModel.account_id == user.account_id).count()
+    if existing_count > 0:
+        return {
+            "status": "success",
+            "message": "User already has transaction history",
+            "activities_inserted": 0,
+            "current_balance": float(user.current_balance),
+        }
+
+    bal = 15000.0
+    activities = []
+    ref_seq = 1000
+
+    for year, month in [
+        (2025, 3), (2025, 4), (2025, 5), (2025, 6),
+        (2025, 7), (2025, 8), (2025, 9), (2025, 10),
+        (2025, 11), (2025, 12), (2026, 1), (2026, 2)
+    ]:
+        m_dt = datetime(year, month, 1, 10, 0, tzinfo=timezone.utc)
+
+        # 1. Salary Inflow on 1st: ৳85,000
+        bal += 85000.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=85000.0,
+            currency="BDT",
+            direction=TransactionDirection.INFLOW,
+            activity_type=ActivityType.SALARY,
+            timestamp_utc=m_dt,
+            category="SALARY",
+            channel="BANK_TRANSFER",
+            counterparty_name="Tech Innovations Ltd",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 2. Housing Payment on 5th: ৳22,000
+        bal -= 22000.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=22000.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.UTILITY_PAYMENT,
+            timestamp_utc=m_dt.replace(day=5),
+            category="HOUSING",
+            channel="BANK_TRANSFER",
+            counterparty_name="Green City Apartments",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 3. Groceries on 8th: ৳3,500
+        bal -= 3500.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=3500.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.MERCHANT_PAYMENT,
+            timestamp_utc=m_dt.replace(day=8),
+            category="FOOD_AND_GROCERIES",
+            channel="POS",
+            counterparty_name="Unimart Superstore",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 4. Utility Bill on 10th: ৳3,200
+        bal -= 3200.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=3200.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.UTILITY_PAYMENT,
+            timestamp_utc=m_dt.replace(day=10),
+            category="UTILITIES",
+            channel="BILL_PAY",
+            counterparty_name="DESCO Electricity",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 5. Mobile Recharge on 12th: ৳600
+        bal -= 600.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=600.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.MOBILE_RECHARGE,
+            timestamp_utc=m_dt.replace(day=12),
+            category="MOBILE_RECHARGE",
+            channel="APP",
+            counterparty_name="Grameenphone Ltd",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 6. Groceries 2nd round on 22nd: ৳3,800
+        bal -= 3800.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=3800.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.MERCHANT_PAYMENT,
+            timestamp_utc=m_dt.replace(day=22),
+            category="FOOD_AND_GROCERIES",
+            channel="POS",
+            counterparty_name="Agora Supermarket",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+        # 7. Dining on 25th: ৳1,800
+        bal -= 1800.0
+        ref_seq += 1
+        activities.append(FinancialActivityModel(
+            account_id=user.account_id,
+            amount=1800.0,
+            currency="BDT",
+            direction=TransactionDirection.OUTFLOW,
+            activity_type=ActivityType.MERCHANT_PAYMENT,
+            timestamp_utc=m_dt.replace(day=25),
+            category="FOOD_AND_DINING",
+            channel="POS",
+            counterparty_name="Star Kabab & Restaurant",
+            reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+            balance_after=round(bal, 2),
+            provenance=DataProvenance.SYNTHETIC,
+        ))
+
+    db.add_all(activities)
+    user.current_balance = round(bal, 2)
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "status": "success",
+        "message": "Sample transaction data injected successfully.",
+        "activities_inserted": len(activities),
+        "current_balance": float(user.current_balance),
+    }

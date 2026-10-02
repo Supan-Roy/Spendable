@@ -1024,3 +1024,46 @@
     transform: rotate(90deg);
   }
 }
+
+/* New Account Sample Data Ingestion Styles */
+.new-account-card {
+  background: linear-gradient(135deg, rgba(14, 19, 31, 0.95), rgba(0, 229, 163, 0.05));
+  border: 1px dashed rgba(0, 229, 163, 0.3);
+  padding: 3.5rem 2rem;
+  max-width: 600px;
+  margin: 1.5rem auto;
+}
+
+.text-teal {
+  color: var(--accent-teal) !important;
+  opacity: 1 !important;
+}
+
+.main-empty-desc {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.sub-empty-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+  max-width: 480px;
+}
+
+.inject-sample-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 229, 163, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.inject-sample-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 229, 163, 0.4);
+}
