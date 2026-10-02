@@ -44,4 +44,7 @@ synthetic_data/
 synthetic_output/
 backend/synthetic_data/
 backend/synthetic_output/
+data/
+backend/data/
+
 

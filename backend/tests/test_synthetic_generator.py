@@ -172,3 +172,37 @@ def test_db_seeding_exporter(db_session):
     # Query DB to confirm records exist
     db_records = db_session.query(FinancialActivityModel).all()
     assert len(db_records) == len(activities)
+
+
+def test_user_level_split_integrity():
+    """Verify user-level train/validation/test split assignment contains zero user ID overlap."""
+    config = GeneratorConfig(seed=42, num_users=50, duration_days=30, train_split=0.70, val_split=0.15, test_split=0.15)
+    generator = SyntheticDataGenerator(config)
+    activities, ground_truth = generator.generate()
+
+    train_users = {uid for uid, split in ground_truth.user_splits.items() if split == "TRAIN"}
+    val_users = {uid for uid, split in ground_truth.user_splits.items() if split == "VALIDATION"}
+    test_users = {uid for uid, split in ground_truth.user_splits.items() if split == "TEST"}
+
+    assert len(train_users) == 35
+    assert len(val_users) == 7
+    assert len(test_users) == 8
+
+    # Zero overlap invariant
+    assert len(train_users.intersection(val_users)) == 0
+    assert len(train_users.intersection(test_users)) == 0
+    assert len(val_users.intersection(test_users)) == 0
+
+
+def test_future_outcome_ground_truth_generation():
+    """Verify offline evaluation future outcome checkpoints are generated in ground truth."""
+    config = GeneratorConfig(seed=42, num_users=2, duration_days=90)
+    generator = SyntheticDataGenerator(config)
+    activities, ground_truth = generator.generate()
+
+    assert len(ground_truth.future_outcomes) > 0
+    for outcome in ground_truth.future_outcomes:
+        assert outcome.account_id in ground_truth.users
+        assert outcome.future_min_balance_7d <= outcome.observed_balance or outcome.future_min_balance_7d >= Decimal("0.00")
+        assert outcome.future_outflow_sum_30d >= Decimal("0.00")
+

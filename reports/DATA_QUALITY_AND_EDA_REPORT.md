@@ -1,8 +1,8 @@
 # Spendable — Data Quality & Exploratory Data Analysis (EDA) Report
 
-**Generated Date (UTC)**: `2026-10-02T06:15:39.453301+00:00`  
+**Generated Date (UTC)**: `2026-10-02T06:41:37.895901+00:00`  
 **Overall Dataset Validation Status**: `WARNING`  
-**Total Records**: `1125` | **Total Synthetic Users**: `10`  
+**Total Records**: `98884` | **Total Synthetic Users**: `500`  
 
 ---
 
@@ -37,26 +37,26 @@ The synthetic dataset was subjected to automated validation and exploratory anal
 
 ## 3. Dataset Overview Statistics
 
-- **Total Users**: 10
-- **Total Transactions**: 1125
-- **Date Range**: `2026-01-01T08:19:07+00:00` to `2026-06-29T11:37:07+00:00` (180 days)
-- **Transactions per User**: Mean = `112.5`, Median = `110.5`, Min = `49`, Max = `192`
-- **Inflows**: `84` transactions | Total = `৳5,361,053.00` | Mean = `৳63,822.06`
-- **Outflows**: `1041` transactions | Total = `৳3,016,749.85` | Mean = `৳2,897.93`
-- **Amount Distribution**: Mean = `৳7,446.94`, Median = `৳1,332.00`, IQR = `৳1,841.00` (Q25: `৳616.00`, Q75: `৳2,457.00`)
-- **Post-Transaction Balance Distribution**: Median = `৳167,325.23`, Min = `৳0.00`, Max = `৳625,922.40`
+- **Total Users**: 500
+- **Total Transactions**: 98884
+- **Date Range**: `2026-01-01T08:00:09+00:00` to `2026-12-31T10:50:18+00:00` (365 days)
+- **Transactions per User**: Mean = `197.77`, Median = `218.0`, Min = `70`, Max = `283`
+- **Inflows**: `7129` transactions | Total = `৳652,728,471.44` | Mean = `৳91,559.61`
+- **Outflows**: `91755` transactions | Total = `৳362,375,173.78` | Mean = `৳3,949.38`
+- **Amount Distribution**: Mean = `৳10,265.60`, Median = `৳1,711.22`, IQR = `৳2,622.50` (Q25: `৳877.50`, Q75: `৳3,500.00`)
+- **Post-Transaction Balance Distribution**: Median = `৳307,208.06`, Min = `৳0.00`, Max = `৳2,416,827.00`
 
 ### Transaction Type Distribution
 
 | Activity Type | Count | % Count | Total Volume (৳) |
 | :--- | :--- | :--- | :--- |
-| `CASH_IN` | 13 | 1.16% | ৳473,387.00 |
-| `MERCHANT_PAYMENT` | 841 | 74.76% | ৳965,005.76 |
-| `MOBILE_RECHARGE` | 18 | 1.6% | ৳9,887.34 |
-| `OTHER` | 35 | 3.11% | ৳820,634.00 |
-| `P2P_TRANSFER` | 45 | 4.0% | ৳735,489.00 |
-| `SALARY` | 42 | 3.73% | ৳3,748,854.00 |
-| `UTILITY_BILL` | 131 | 11.64% | ৳1,624,545.75 |
+| `CASH_IN` | 782 | 0.79% | ৳42,274,086.63 |
+| `MERCHANT_PAYMENT` | 72423 | 73.24% | ৳121,640,500.22 |
+| `MOBILE_RECHARGE` | 2153 | 2.18% | ৳1,335,972.57 |
+| `OTHER` | 1764 | 1.78% | ৳54,123,535.99 |
+| `P2P_TRANSFER` | 3721 | 3.76% | ৳65,921,584.24 |
+| `SALARY` | 4832 | 4.89% | ৳527,950,594.28 |
+| `UTILITY_BILL` | 13209 | 13.36% | ৳201,857,371.29 |
 
 ---
 
@@ -66,29 +66,30 @@ Behavioral stats grouped by synthetic user persona (from ground truth metadata):
 
 | Persona Type | User Count | Total Txns | Avg Txns/User | Avg Inflow/User (৳) | Avg Outflow/User (৳) | Net Cash Flow/User (৳) | Min Balance (৳) | Balance Volatility (Std) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `COMMITMENT_HEAVY` | 3 | 346 | 115.3 | ৳826,408.00 | ৳398,100.59 | ৳428,307.41 | ৳119,460.54 | ৳121,790.32 |
-| `FINANCIAL_PRESSURE` | 1 | 49 | 49.0 | ৳403,386.00 | ৳319,432.00 | ৳83,954.00 | ৳82,335.00 | ৳30,770.90 |
-| `IRREGULAR_INCOME` | 3 | 284 | 94.7 | ৳537,399.67 | ৳252,205.33 | ৳285,194.33 | ৳0.00 | ৳91,758.49 |
-| `STABLE` | 1 | 192 | 192.0 | ৳427,470.00 | ৳333,768.77 | ৳93,701.23 | ৳83,707.42 | ৳34,389.14 |
-| `TIGHT_LIQUIDITY` | 2 | 254 | 127.0 | ৳219,387.00 | ৳206,315.66 | ৳13,071.34 | ৳10,968.23 | ৳10,452.18 |
+| `COMMITMENT_HEAVY` | 82 | 18276 | 222.9 | ৳1,854,381.55 | ৳982,279.51 | ৳872,102.05 | ৳0.00 | ৳255,449.31 |
+| `FINANCIAL_PRESSURE` | 67 | 6799 | 101.5 | ৳1,077,518.60 | ৳806,948.45 | ৳270,570.15 | ৳0.00 | ৳93,529.24 |
+| `IRREGULAR_INCOME` | 93 | 15933 | 171.3 | ৳1,341,697.60 | ৳574,767.27 | ৳766,930.33 | ৳0.00 | ৳233,998.17 |
+| `SPENDING_DRIFT` | 73 | 16909 | 231.6 | ৳1,393,633.35 | ৳823,331.44 | ৳570,301.91 | ৳5,644.80 | ৳167,761.80 |
+| `STABLE` | 97 | 21729 | 224.0 | ৳1,611,649.02 | ৳782,786.07 | ৳828,862.95 | ৳12,298.36 | ৳242,415.00 |
+| `TIGHT_LIQUIDITY` | 88 | 19238 | 218.6 | ৳518,549.68 | ৳434,953.50 | ৳83,596.18 | ৳0.00 | ৳25,095.41 |
 
 ---
 
 ## 5. Recurring-Pattern Sanity Checks
 
-- **Planted Ground Truth Rules**: `49` recurring commitments intentionally planted by generator.
-- **Observable Repeated Streams Detected**: `100` recurring candidates identified from transaction history.
-- **Planted Rule Observable Detection Rate**: `100.0%`
+- **Planted Ground Truth Rules**: `2208` recurring commitments intentionally planted by generator.
+- **Observable Repeated Streams Detected**: `4581` recurring candidates identified from transaction history.
+- **Planted Rule Observable Detection Rate**: `99.9%`
 
 ### Sample Observable Repeated Streams (Top 5)
 
 | Account ID | Counterparty Name | Category | Occurrences | Mean Interval (Days) | Mean Amount (৳) | Amount Std (৳) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `ACC-0001` | **BRAC Bank Personal Loan** | `DEBT_PAYMENT` | 6 | 30.2 days | ৳12,012.00 | ৳0.00 |
-| `ACC-0001` | **Chillox Burgers** | `DINING` | 24 | 7.7 days | ৳1,319.00 | ৳444.52 |
-| `ACC-0001` | **Dotlines Fiber Internet** | `UTILITIES` | 6 | 30.2 days | ৳2,457.00 | ৳0.00 |
-| `ACC-0001` | **Enterprise Payroll Services** | `INCOME` | 6 | 30.2 days | ৳138,598.00 | ৳0.00 |
-| `ACC-0001` | **Fitness Plus Gym Membership** | `FITNESS` | 6 | 30.2 days | ৳3,500.00 | ৳0.00 |
+| `ACC-0001` | **Chillox Burgers** | `DINING` | 40 | 9.2 days | ৳759.33 | ৳278.87 |
+| `ACC-0001` | **City Bank EMI** | `DEBT_PAYMENT` | 12 | 30.4 days | ৳8,679.00 | ৳0.00 |
+| `ACC-0001` | **Dotlines Fiber Internet** | `UTILITIES` | 12 | 30.4 days | ৳2,916.00 | ৳0.00 |
+| `ACC-0001` | **Enterprise Payroll Services** | `INCOME` | 12 | 30.4 days | ৳61,508.20 | ৳0.00 |
+| `ACC-0001` | **Fitness Plus Gym Membership** | `FITNESS` | 12 | 30.4 days | ৳3,500.00 | ৳0.00 |
 
 ---
 

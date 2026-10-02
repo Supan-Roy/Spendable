@@ -73,16 +73,17 @@ class EDAEngine:
         balances = self.df["balance_num"].dropna()
         bal_q25, bal_q50, bal_q75 = np.percentile(balances, [25, 50, 75]) if not balances.empty else (0, 0, 0)
 
-        # Monthly summary
-        monthly = self.df.groupby(["year_month", "direction_clean"])["amount_num"].agg(["count", "sum"]).unstack(fill_value=0)
-        
+        # Monthly summary using pivot_table
+        pivot_sum = self.df.pivot_table(index="year_month", columns="direction_clean", values="amount_num", aggfunc="sum", fill_value=0.0)
+        pivot_cnt = self.df.pivot_table(index="year_month", columns="direction_clean", values="amount_num", aggfunc="count", fill_value=0)
+
         monthly_summary = []
         months = sorted(self.df["year_month"].unique())
         for m in months:
-            in_val = float(monthly.loc[m, ("sum", "INFLOW")]) if (m, ("sum", "INFLOW")) in monthly.columns else 0.0
-            out_val = float(monthly.loc[m, ("sum", "OUTFLOW")]) if (m, ("sum", "OUTFLOW")) in monthly.columns else 0.0
-            in_cnt = int(monthly.loc[m, ("count", "INFLOW")]) if (m, ("count", "INFLOW")) in monthly.columns else 0
-            out_cnt = int(monthly.loc[m, ("count", "OUTFLOW")]) if (m, ("count", "OUTFLOW")) in monthly.columns else 0
+            in_val = float(pivot_sum.loc[m, "INFLOW"]) if "INFLOW" in pivot_sum.columns and m in pivot_sum.index else 0.0
+            out_val = float(pivot_sum.loc[m, "OUTFLOW"]) if "OUTFLOW" in pivot_sum.columns and m in pivot_sum.index else 0.0
+            in_cnt = int(pivot_cnt.loc[m, "INFLOW"]) if "INFLOW" in pivot_cnt.columns and m in pivot_cnt.index else 0
+            out_cnt = int(pivot_cnt.loc[m, "OUTFLOW"]) if "OUTFLOW" in pivot_cnt.columns and m in pivot_cnt.index else 0
 
             monthly_summary.append({
                 "year_month": m,

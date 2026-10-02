@@ -9,17 +9,20 @@ class GeneratorConfig(BaseModel):
     """Configuration settings for deterministic synthetic data generation."""
 
     seed: int = Field(default=42, description="Random seed for deterministic reproducible generation")
-    num_users: int = Field(default=10, ge=1, le=1000, description="Total number of synthetic user accounts to generate")
+    num_users: int = Field(default=500, ge=1, le=5000, description="Total number of synthetic user accounts to generate")
     start_date: datetime = Field(
         default_factory=lambda: datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         description="Historical simulation start timestamp (UTC)"
     )
-    duration_days: int = Field(default=180, ge=7, le=1095, description="Historical simulation duration in days")
+    duration_days: int = Field(default=365, ge=7, le=1095, description="Historical simulation duration in days")
     currency: str = Field(default="BDT", min_length=3, max_length=3, description="ISO-4217 3-letter currency code")
     persona_weights: Optional[Dict[PersonaType, float]] = Field(
         default=None,
         description="Optional probability distribution weights for personas. If None, default balanced weights apply."
     )
+    train_split: float = Field(default=0.70, ge=0.1, le=0.9, description="Proportion of users allocated to TRAIN split")
+    val_split: float = Field(default=0.15, ge=0.05, le=0.5, description="Proportion of users allocated to VALIDATION split")
+    test_split: float = Field(default=0.15, ge=0.05, le=0.5, description="Proportion of users allocated to TEST split")
 
     @field_validator("currency")
     @classmethod

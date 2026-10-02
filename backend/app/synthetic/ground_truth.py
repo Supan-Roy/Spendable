@@ -1,8 +1,8 @@
 """Ground truth representation for synthetic financial datasets.
 
 Ground truth metadata captures internal generator state, planted recurring rules,
-persona allocations, and behavioral phase shifts. Ground truth is maintained
-separately from observable raw customer transaction feeds.
+persona allocations, behavioral phase shifts, user dataset splits, and future evaluation outcomes.
+Ground truth is maintained strictly separately from observable raw transaction feeds.
 """
 
 from datetime import datetime
@@ -46,11 +46,29 @@ class ActivityAnnotationGroundTruth(BaseModel):
     persona_phase: str = "DEFAULT"
 
 
+class FutureOutcomeGroundTruth(BaseModel):
+    """Ground truth future outcomes evaluated at a historical checkpoint date for model validation."""
+    account_id: str
+    checkpoint_date: datetime
+    observed_balance: Decimal
+    future_min_balance_7d: Decimal
+    future_min_balance_14d: Decimal
+    future_min_balance_30d: Decimal
+    future_inflow_sum_7d: Decimal
+    future_inflow_sum_14d: Decimal
+    future_inflow_sum_30d: Decimal
+    future_outflow_sum_7d: Decimal
+    future_outflow_sum_14d: Decimal
+    future_outflow_sum_30d: Decimal
+    liquidity_stress_event_within_30d: bool = False
+
+
 class UserGroundTruth(BaseModel):
     """Ground truth metadata summary for a single generated synthetic user."""
     account_id: str
     persona: PersonaType
     starting_balance: Decimal
+    split_assignment: str  # "TRAIN", "VALIDATION", "TEST"
     planted_rules: List[PlantedRuleGroundTruth] = []
     milestones: List[BehaviorMilestoneGroundTruth] = []
 
@@ -60,7 +78,9 @@ class DatasetGroundTruth(BaseModel):
     seed: int
     num_users: int
     generated_at_utc: datetime
+    user_splits: Dict[str, str] = {}  # account_id -> "TRAIN" | "VALIDATION" | "TEST"
     users: Dict[str, UserGroundTruth] = {}
     annotations: Dict[str, ActivityAnnotationGroundTruth] = {}
+    future_outcomes: List[FutureOutcomeGroundTruth] = []
 
     model_config = ConfigDict(from_attributes=True)
