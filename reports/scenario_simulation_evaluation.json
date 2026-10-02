@@ -1,0 +1,56 @@
+{
+  "total_snapshots_evaluated": 100,
+  "total_scenarios_executed": 700,
+  "monotonicity_violations": 0,
+  "negative_spendable_violations": 0,
+  "state_mutation_violations": 0,
+  "passed_all_sanity_checks": true,
+  "sample_scenario_transformations": [
+    {
+      "scenario_type": "ONE_TIME_EXPENSE",
+      "scenario_description": "Spend \u09f35,000 today",
+      "base_spendable_amount": 22552.76,
+      "scenario_spendable_amount": 17552.76,
+      "spendable_delta": -5000.0,
+      "base_liquidity_state": "HEALTHY",
+      "scenario_liquidity_state": "HEALTHY"
+    },
+    {
+      "scenario_type": "ADDITIONAL_INCOME",
+      "scenario_description": "Receive \u09f310,000 income",
+      "base_spendable_amount": 22552.76,
+      "scenario_spendable_amount": 32552.76,
+      "spendable_delta": 10000.0,
+      "base_liquidity_state": "HEALTHY",
+      "scenario_liquidity_state": "HEALTHY"
+    },
+    {
+      "scenario_type": "ADDITIONAL_COMMITMENT",
+      "scenario_description": "Add \u09f33,000 bill",
+      "base_spendable_amount": 22552.76,
+      "scenario_spendable_amount": 22552.76,
+      "spendable_delta": 0.0,
+      "base_liquidity_state": "HEALTHY",
+      "scenario_liquidity_state": "HEALTHY"
+    },
+    {
+      "scenario_type": "SPENDING_REDUCTION",
+      "scenario_description": "Cut spending by 15%",
+      "base_spendable_amount": 22552.76,
+      "scenario_spendable_amount": 27711.53,
+      "spendable_delta": 5158.77,
+      "base_liquidity_state": "HEALTHY",
+      "scenario_liquidity_state": "HEALTHY"
+    },
+    {
+      "scenario_type": "INCOME_DELAY",
+      "scenario_description": "Delay \u09f35,000 income",
+      "base_spendable_amount": 22552.76,
+      "scenario_spendable_amount": 17552.76,
+      "spendable_delta": -5000.0,
+      "base_liquidity_state": "HEALTHY",
+      "scenario_liquidity_state": "HEALTHY"
+    }
+  ],
+  "summary": "Scenario Simulation Engine passed all financial sanity laws, zero state mutation, and non-negative spendable constraints."
+}
