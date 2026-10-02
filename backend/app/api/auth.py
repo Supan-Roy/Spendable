@@ -176,6 +176,11 @@ def inject_sample_data(
     """Programmatically generate 1-year realistic sample transaction history for the authenticated user."""
     from app.auth import seed_sample_data_for_user
     res = seed_sample_data_for_user(account.account_id, db)
+    try:
+        from app.api.spendable import get_spendable_service
+        get_spendable_service().invalidate_user_cache(account.account_id)
+    except Exception:
+        pass
     return res
 
 
@@ -206,6 +211,12 @@ def delete_user_account(
     # 3. Permanently delete the user account profile record itself
     db.delete(account)
     db.commit()
+
+    try:
+        from app.api.spendable import get_spendable_service
+        get_spendable_service().invalidate_user_cache(acc_id)
+    except Exception:
+        pass
 
     return {
         "status": "success",

@@ -76,18 +76,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const PROFILE_CACHE_KEY = 'spendable_user_profile';
+
+const getInitialUser = (): UserAccountResponse | null => {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<UserAccountResponse | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserAccountResponse | null>(getInitialUser);
   const [demoAccounts, setDemoAccounts] = useState<UserAccountResponse[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getInitialUser());
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDemoAccounts = useCallback(async () => {
-    try {
-      const demos = await getDemoAccountsApi();
-      setDemoAccounts(demos);
-    } catch {
-      // Fall back silently
+  const updateUserState = useCallback((user: UserAccountResponse | null) => {
+    setCurrentUser(user);
+    if (user) {
+      try {
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(user));
+      } catch {}
+    } else {
+      localStorage.removeItem(PROFILE_CACHE_KEY);
     }
   }, []);
 
@@ -97,16 +110,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const authRes: AuthTokenResponse = await demoLoginApi(accountId);
       setStoredToken(authRes.access_token);
-      const userRes = await getMeApi();
-      setCurrentUser(userRes);
-      await fetchDemoAccounts();
+      const [userRes, demosRes] = await Promise.all([
+        getMeApi(),
+        getDemoAccountsApi().catch(() => []),
+      ]);
+      updateUserState(userRes);
+      setDemoAccounts(demosRes);
     } catch (err: any) {
       setError(err.message || 'Failed to authenticate demo account');
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDemoAccounts]);
+  }, [updateUserState]);
 
   const loginNormal = useCallback(async (username: string, password: string) => {
     setIsLoading(true);
@@ -114,16 +130,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const authRes = await loginApi({ username, password });
       setStoredToken(authRes.access_token);
-      const userRes = await getMeApi();
-      setCurrentUser(userRes);
-      await fetchDemoAccounts();
+      const [userRes, demosRes] = await Promise.all([
+        getMeApi(),
+        getDemoAccountsApi().catch(() => []),
+      ]);
+      updateUserState(userRes);
+      setDemoAccounts(demosRes);
     } catch (err: any) {
       setError(err.message || 'Invalid username or password');
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDemoAccounts]);
+  }, [updateUserState]);
 
   const registerNormal = useCallback(
     async (username: string, password: string, displayName?: string) => {
@@ -132,9 +151,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const authRes = await registerApi({ username, password, display_name: displayName });
         setStoredToken(authRes.access_token);
-        const userRes = await getMeApi();
-        setCurrentUser(userRes);
-        await fetchDemoAccounts();
+        const [userRes, demosRes] = await Promise.all([
+          getMeApi(),
+          getDemoAccountsApi().catch(() => []),
+        ]);
+        updateUserState(userRes);
+        setDemoAccounts(demosRes);
       } catch (err: any) {
         setError(err.message || 'Registration failed');
         throw err;
@@ -142,14 +164,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false);
       }
     },
-    [fetchDemoAccounts]
+    [updateUserState]
   );
 
   const logout = useCallback(() => {
     setStoredToken(null);
-    setCurrentUser(null);
+    updateUserState(null);
     setError(null);
-  }, []);
+  }, [updateUserState]);
 
   const deleteAccount = useCallback(async () => {
     setIsLoading(true);
@@ -160,25 +182,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Default back to Supan demo
       const authRes = await demoLoginApi('acc_supan');
       setStoredToken(authRes.access_token);
-      const me = await getMeApi();
-      setCurrentUser(me);
-      await fetchDemoAccounts();
+      const [userRes, demosRes] = await Promise.all([
+        getMeApi(),
+        getDemoAccountsApi().catch(() => []),
+      ]);
+      updateUserState(userRes);
+      setDemoAccounts(demosRes);
     } catch (err: any) {
       setError(err.message || 'Failed to delete account');
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDemoAccounts, logout]);
+  }, [logout, updateUserState]);
 
   const refreshUser = useCallback(async () => {
     try {
       const me = await getMeApi();
-      setCurrentUser(me);
+      updateUserState(me);
     } catch {
       logout();
     }
-  }, [logout]);
+  }, [logout, updateUserState]);
 
   // Initial boot effect: check existing session or default to Supan
   useEffect(() => {
@@ -195,16 +220,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const existingToken = getStoredToken();
       if (existingToken) {
         try {
-          const me = await getMeApi();
+          const [me, demos] = await Promise.all([
+            getMeApi(),
+            getDemoAccountsApi().catch(() => []),
+          ]);
           if (isMounted) {
-            setCurrentUser(me);
-            await fetchDemoAccounts();
+            updateUserState(me);
+            setDemoAccounts(demos);
             setIsLoading(false);
           }
           return;
         } catch {
           // Token invalid, clear and proceed to default Supan login
           setStoredToken(null);
+          updateUserState(null);
         }
       }
 
@@ -212,10 +241,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const authRes = await demoLoginApi('acc_supan');
         setStoredToken(authRes.access_token);
-        const me = await getMeApi();
+        const [me, demos] = await Promise.all([
+          getMeApi(),
+          getDemoAccountsApi().catch(() => []),
+        ]);
         if (isMounted) {
-          setCurrentUser(me);
-          await fetchDemoAccounts();
+          updateUserState(me);
+          setDemoAccounts(demos);
         }
       } catch (err: any) {
         if (isMounted) {
@@ -233,7 +265,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       isMounted = false;
     };
-  }, [fetchDemoAccounts, logout]);
+  }, [logout, updateUserState]);
 
   return (
     <AuthContext.Provider

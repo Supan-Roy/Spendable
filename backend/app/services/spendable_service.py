@@ -9,6 +9,7 @@ Orchestrates calls between data providers and authoritative domain modules:
 Ensures route handlers remain lightweight thin wrappers.
 """
 
+import time
 from typing import Dict, List, Optional, Any
 
 from app.services.data_provider import BaseDataProvider, SyntheticDataProvider
@@ -37,6 +38,25 @@ class SpendableService:
         self.simulator = ScenarioSimulator(self.calculator)
         self.rec_engine = RecommendationEngine()
         self.expl_generator = ExplanationGenerator()
+
+        # High performance in-memory TTL cache (60 seconds)
+        self._overview_cache: Dict[str, tuple[float, SpendableOverviewResponse]] = {}
+        self._forecast_cache: Dict[str, tuple[float, SpendableForecastResponse]] = {}
+        self._recs_cache: Dict[str, tuple[float, SpendableRecommendationsResponse]] = {}
+        self._cache_ttl = 60.0  # seconds
+
+    def invalidate_user_cache(self, user_id: Optional[str] = None) -> None:
+        """Clear cached calculation state when user data is modified."""
+        if user_id:
+            clean = str(user_id).strip().lower()
+            for cache in (self._overview_cache, self._forecast_cache, self._recs_cache):
+                keys = [k for k in cache.keys() if clean in k.lower()]
+                for k in keys:
+                    cache.pop(k, None)
+        else:
+            self._overview_cache.clear()
+            self._forecast_cache.clear()
+            self._recs_cache.clear()
 
     def _cache_snapshot(self, sp_out) -> None:
         """Persist calculated Spendable snapshot output into database cache."""
@@ -80,7 +100,14 @@ class SpendableService:
     def get_overview(
         self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
     ) -> SpendableOverviewResponse:
-        """Compute and return main Spendable dashboard overview state."""
+        """Compute and return main Spendable dashboard overview state with fast TTL caching."""
+        cache_key = f"{user_id or 'default'}:{snapshot_time or 'latest'}"
+        now = time.time()
+        if cache_key in self._overview_cache:
+            cached_time, cached_res = self._overview_cache[cache_key]
+            if now - cached_time < self._cache_ttl:
+                return cached_res
+
         snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
 
         sp_out = self.calculator.calculate(
@@ -99,7 +126,7 @@ class SpendableService:
         context = self.expl_generator.build_context(sp_out, recs)
         explanation = self.expl_generator.explain(context)
 
-        return SpendableOverviewResponse(
+        res = SpendableOverviewResponse(
             user_id=sp_out.user_id,
             snapshot_time=sp_out.snapshot_time,
             current_balance=sp_out.current_balance,
@@ -117,17 +144,27 @@ class SpendableService:
             explanation_summary=explanation.summary,
         )
 
+        self._overview_cache[cache_key] = (now, res)
+        return res
+
     def get_forecast(
         self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
     ) -> SpendableForecastResponse:
-        """Return multi-horizon forecasts and daily balance trajectory."""
+        """Return multi-horizon forecasts and daily balance trajectory with TTL caching."""
+        cache_key = f"{user_id or 'default'}:{snapshot_time or 'latest'}"
+        now = time.time()
+        if cache_key in self._forecast_cache:
+            cached_time, cached_res = self._forecast_cache[cache_key]
+            if now - cached_time < self._cache_ttl:
+                return cached_res
+
         snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
         forecast = snap_data.get("forecast")
 
         if forecast is None:
             raise ValueError("Cash-flow forecast is currently unavailable for this account.")
 
-        return SpendableForecastResponse(
+        res = SpendableForecastResponse(
             user_id=forecast.user_id,
             snapshot_time=forecast.snapshot_time,
             current_balance=forecast.current_balance,
@@ -137,6 +174,8 @@ class SpendableService:
             daily_trajectory=forecast.daily_trajectory,
             safety_threshold_bdt=forecast.safety_threshold_bdt,
         )
+        self._forecast_cache[cache_key] = (now, res)
+        return res
 
     def get_activities(
         self, user_id: Optional[str] = None, limit: int = 50, offset: int = 0
@@ -156,7 +195,14 @@ class SpendableService:
     def get_recommendations(
         self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
     ) -> SpendableRecommendationsResponse:
-        """Return deterministic recommendations and Gemini explanation."""
+        """Return deterministic recommendations and Gemini explanation with TTL caching."""
+        cache_key = f"{user_id or 'default'}:{snapshot_time or 'latest'}"
+        now = time.time()
+        if cache_key in self._recs_cache:
+            cached_time, cached_res = self._recs_cache[cache_key]
+            if now - cached_time < self._cache_ttl:
+                return cached_res
+
         snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
 
         sp_out = self.calculator.calculate(
@@ -172,12 +218,14 @@ class SpendableService:
         context = self.expl_generator.build_context(sp_out, recs)
         explanation = self.expl_generator.explain(context)
 
-        return SpendableRecommendationsResponse(
+        res = SpendableRecommendationsResponse(
             user_id=sp_out.user_id,
             snapshot_time=sp_out.snapshot_time,
             recommendations=recs,
             explanation=explanation,
         )
+        self._recs_cache[cache_key] = (now, res)
+        return res
 
     def simulate_scenario(
         self,

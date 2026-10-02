@@ -20,16 +20,45 @@ interface OverviewPageProps {
   onOpenCalcModal: () => void;
 }
 
+const OVERVIEW_CACHE_KEY_PREFIX = 'spendable_overview_cache_';
+
+const getCachedOverviewData = (accId?: string): SpendableOverviewResponse | null => {
+  if (!accId) return null;
+  try {
+    const raw = localStorage.getItem(`${OVERVIEW_CACHE_KEY_PREFIX}${accId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpenCalcModal }) => {
   const { currentUser, refreshUser } = useAuth();
-  const [overview, setOverview] = useState<SpendableOverviewResponse | null>(null);
+  const [overview, setOverview] = useState<SpendableOverviewResponse | null>(() =>
+    getCachedOverviewData(currentUser?.account_id)
+  );
   const [recs, setRecs] = useState<SpendableRecommendationsResponse | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedOverviewData(currentUser?.account_id));
   const [isInjecting, setIsInjecting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sync state when current user changes
+  useEffect(() => {
+    const cached = getCachedOverviewData(currentUser?.account_id);
+    if (cached) {
+      setOverview(cached);
+      setIsLoading(false);
+    } else {
+      setOverview(null);
+      setIsLoading(true);
+    }
+  }, [currentUser?.account_id]);
+
   const fetchData = useCallback(async () => {
-    setIsLoading(true);
+    const hasCache = !!getCachedOverviewData(currentUser?.account_id);
+    if (!hasCache) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const [overviewRes, recsRes] = await Promise.all([
@@ -38,16 +67,23 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
       ]);
       setOverview(overviewRes);
       setRecs(recsRes);
+      if (currentUser?.account_id) {
+        try {
+          localStorage.setItem(`${OVERVIEW_CACHE_KEY_PREFIX}${currentUser.account_id}`, JSON.stringify(overviewRes));
+        } catch {}
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to load your financial overview.');
+      if (!overview && !hasCache) {
+        setError(err.message || 'Failed to load your financial overview.');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUser?.account_id, overview]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, currentUser?.account_id]);
+  }, [currentUser?.account_id]);
 
   const handleInjectSampleData = async () => {
     setIsInjecting(true);
