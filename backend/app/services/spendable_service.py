@@ -1,0 +1,191 @@
+"""Spendable Service Orchestration Layer.
+
+Orchestrates calls between data providers and authoritative domain modules:
+- Spendable Engine (Stage 4)
+- Scenario Simulation Engine (Stage 5)
+- Recommendation Engine (Stage 6)
+- Gemini Explanation Layer (Stage 6)
+
+Ensures route handlers remain lightweight thin wrappers.
+"""
+
+from typing import Dict, List, Optional, Any
+
+from app.services.data_provider import BaseDataProvider, SyntheticDataProvider
+from app.engine.calculator import SpendableCalculator
+from app.scenario.simulator import ScenarioSimulator
+from app.scenario.schema import ScenarioInput, ScenarioResult
+from app.recommendation.engine import RecommendationEngine
+from app.explanation.gemini import ExplanationGenerator
+from app.explanation.schema import GeminiExplanationResponse
+from app.schemas.spendable import (
+    SpendableOverviewResponse,
+    SpendableForecastResponse,
+    SpendableActivityListResponse,
+    SpendableActivityItem,
+    SpendableRecommendationsResponse,
+)
+
+
+class SpendableService:
+    """Application orchestration service for Spendable domain operations."""
+
+    def __init__(self, data_provider: Optional[BaseDataProvider] = None):
+        self.data_provider = data_provider or SyntheticDataProvider()
+        self.calculator = SpendableCalculator()
+        self.simulator = ScenarioSimulator(self.calculator)
+        self.rec_engine = RecommendationEngine()
+        self.expl_generator = ExplanationGenerator()
+
+    def get_overview(
+        self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
+    ) -> SpendableOverviewResponse:
+        """Compute and return main Spendable dashboard overview state."""
+        snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
+
+        sp_out = self.calculator.calculate(
+            user_id=snap_data["user_id"],
+            snapshot_time=snap_data["snapshot_time"],
+            current_balance=snap_data["current_balance"],
+            features=snap_data["features"],
+            commitments=snap_data["commitments"],
+            forecast=snap_data["forecast"],
+        )
+
+        recs = self.rec_engine.generate_recommendations(sp_out)
+        context = self.expl_generator.build_context(sp_out, recs)
+        explanation = self.expl_generator.explain(context)
+
+        return SpendableOverviewResponse(
+            user_id=sp_out.user_id,
+            snapshot_time=sp_out.snapshot_time,
+            current_balance=sp_out.current_balance,
+            spendable_amount=sp_out.spendable_amount,
+            protected_amount=sp_out.protected_amount,
+            planning_horizon_days=sp_out.planning_horizon_days,
+            liquidity_state=sp_out.liquidity_state,
+            expected_inflow=sp_out.expected_inflow,
+            expected_outflow=sp_out.expected_outflow,
+            upcoming_commitments=sp_out.upcoming_commitments,
+            forecasted_minimum_balance=sp_out.forecasted_minimum_balance,
+            safety_reserve=sp_out.safety_reserve,
+            recommendations=recs,
+            factors=sp_out.factors,
+            explanation_summary=explanation.summary,
+        )
+
+    def get_forecast(
+        self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
+    ) -> SpendableForecastResponse:
+        """Return multi-horizon forecasts and daily balance trajectory."""
+        snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
+        forecast = snap_data.get("forecast")
+
+        if forecast is None:
+            raise ValueError("Cash-flow forecast is currently unavailable for this account.")
+
+        return SpendableForecastResponse(
+            user_id=forecast.user_id,
+            snapshot_time=forecast.snapshot_time,
+            current_balance=forecast.current_balance,
+            forecast_7d=forecast.forecast_7d,
+            forecast_14d=forecast.forecast_14d,
+            forecast_30d=forecast.forecast_30d,
+            daily_trajectory=forecast.daily_trajectory,
+            safety_threshold_bdt=forecast.safety_threshold_bdt,
+        )
+
+    def get_activities(
+        self, user_id: Optional[str] = None, limit: int = 50, offset: int = 0
+    ) -> SpendableActivityListResponse:
+        """Return recent observed transactions with pagination."""
+        raw_res = self.data_provider.get_recent_activities(user_id, limit, offset)
+
+        activity_items = [SpendableActivityItem(**item) for item in raw_res["activities"]]
+
+        return SpendableActivityListResponse(
+            total_count=raw_res["total_count"],
+            limit=raw_res["limit"],
+            offset=raw_res["offset"],
+            activities=activity_items,
+        )
+
+    def get_recommendations(
+        self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
+    ) -> SpendableRecommendationsResponse:
+        """Return deterministic recommendations and Gemini explanation."""
+        snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
+
+        sp_out = self.calculator.calculate(
+            user_id=snap_data["user_id"],
+            snapshot_time=snap_data["snapshot_time"],
+            current_balance=snap_data["current_balance"],
+            features=snap_data["features"],
+            commitments=snap_data["commitments"],
+            forecast=snap_data["forecast"],
+        )
+
+        recs = self.rec_engine.generate_recommendations(sp_out)
+        context = self.expl_generator.build_context(sp_out, recs)
+        explanation = self.expl_generator.explain(context)
+
+        return SpendableRecommendationsResponse(
+            user_id=sp_out.user_id,
+            snapshot_time=sp_out.snapshot_time,
+            recommendations=recs,
+            explanation=explanation,
+        )
+
+    def simulate_scenario(
+        self,
+        scenario_input: ScenarioInput,
+        user_id: Optional[str] = None,
+        snapshot_time: Optional[str] = None,
+    ) -> ScenarioResult:
+        """Simulate a hypothetical scenario without mutating base state."""
+        snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
+
+        return self.simulator.simulate(
+            user_id=snap_data["user_id"],
+            snapshot_time=snap_data["snapshot_time"],
+            current_balance=snap_data["current_balance"],
+            features=snap_data["features"],
+            commitments=snap_data["commitments"],
+            forecast=snap_data["forecast"],
+            scenario_input=scenario_input,
+        )
+
+    def explain(
+        self,
+        user_id: Optional[str] = None,
+        snapshot_time: Optional[str] = None,
+        include_scenario: bool = False,
+    ) -> GeminiExplanationResponse:
+        """Generate human-readable explanation using Gemini API (or fallback)."""
+        snap_data = self.data_provider.get_snapshot_data(user_id, snapshot_time)
+
+        sp_out = self.calculator.calculate(
+            user_id=snap_data["user_id"],
+            snapshot_time=snap_data["snapshot_time"],
+            current_balance=snap_data["current_balance"],
+            features=snap_data["features"],
+            commitments=snap_data["commitments"],
+            forecast=snap_data["forecast"],
+        )
+
+        sc_res = None
+        if include_scenario:
+            # Generate default sample scenario for explanation if requested
+            sc_res = self.simulator.simulate(
+                user_id=snap_data["user_id"],
+                snapshot_time=snap_data["snapshot_time"],
+                current_balance=snap_data["current_balance"],
+                features=snap_data["features"],
+                commitments=snap_data["commitments"],
+                forecast=snap_data["forecast"],
+                scenario_input=None,
+            )
+
+        recs = self.rec_engine.generate_recommendations(sp_out, sc_res)
+        context = self.expl_generator.build_context(sp_out, recs, sc_res)
+        return self.expl_generator.explain(context)
