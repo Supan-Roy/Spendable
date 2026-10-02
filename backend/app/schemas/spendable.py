@@ -57,6 +57,7 @@ class SpendableActivityItem(BaseModel):
     timestamp_utc: str = Field(..., description="ISO 8601 transaction timestamp")
     amount: float = Field(..., description="Transaction amount in BDT")
     direction: str = Field(..., description="Transaction direction (INFLOW or OUTFLOW)")
+    activity_type: Optional[str] = Field("GENERAL", description="Categorical activity classification type")
     category: str = Field(..., description="Financial activity category")
     counterparty_name: Optional[str] = Field(None, description="Counterparty or merchant name")
     balance_after: Optional[float] = Field(None, description="Account balance following transaction")

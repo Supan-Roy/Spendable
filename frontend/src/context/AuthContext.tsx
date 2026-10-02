@@ -34,28 +34,28 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     username: 'meraj',
     display_name: 'Meraj',
     descriptor: 'Tight liquidity',
-    balance: 14200,
+    balance: 27000,
   },
   {
     account_id: 'acc_sohana',
     username: 'sohana',
     display_name: 'Sohana',
     descriptor: 'Spending changes',
-    balance: 215800,
+    balance: 308000,
   },
   {
     account_id: 'acc_noman',
     username: 'noman',
     display_name: 'Noman',
     descriptor: 'Variable income',
-    balance: 78500,
+    balance: 321000,
   },
   {
     account_id: 'acc_refat',
     username: 'refat',
     display_name: 'Refat',
     descriptor: 'High commitments',
-    balance: 52100,
+    balance: 192000,
   },
 ];
 

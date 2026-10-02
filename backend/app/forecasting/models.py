@@ -144,8 +144,11 @@ class CashFlowForecastModel:
             min_bal = round(max(0.0, pred_min_bal), 2)
             proj_bal = round(max(0.0, current_balance + pred_net_flow), 2)
 
-            exp_inflow = round(max(0.0, float(snapshot_features.get(f"total_inflow_30d", 0.0)) * (H / 30.0)), 2)
-            exp_outflow = round(max(0.0, exp_inflow - pred_net_flow), 2)
+            exp_inflow_feat = float(snapshot_features.get("total_inflow_30d") or snapshot_features.get("sum_inflow_30d") or snapshot_features.get("inflow_sum_30d") or 0.0)
+            exp_outflow_feat = float(snapshot_features.get("total_outflow_30d") or snapshot_features.get("sum_outflow_30d") or snapshot_features.get("outflow_sum_30d") or 0.0)
+
+            exp_inflow = round(max(0.0, exp_inflow_feat * (H / 30.0)), 2)
+            exp_outflow = round(max(0.0, exp_outflow_feat * (H / 30.0)), 2) if exp_outflow_feat > 0 else round(max(0.0, exp_inflow - pred_net_flow), 2)
 
             r_std = self.residual_std.get(H, 2000.0)
             lower_bound = round(max(0.0, min_bal - 1.645 * r_std), 2)
@@ -210,18 +213,33 @@ class CashFlowForecastModel:
         snap_time_str = str(snapshot_features.get("snapshot_timestamp") or snapshot_features.get("snapshot_time") or "")
         current_balance = float(snapshot_features.get("current_balance", 0.0))
 
-        net_30d = float(snapshot_features.get("net_cash_flow_30d", 0.0))
+        tot_inflow = float(
+            snapshot_features.get("total_inflow_30d")
+            or snapshot_features.get("sum_inflow_30d")
+            or snapshot_features.get("inflow_sum_30d")
+            or 0.0
+        )
+        tot_outflow = float(
+            snapshot_features.get("total_outflow_30d")
+            or snapshot_features.get("sum_outflow_30d")
+            or snapshot_features.get("outflow_sum_30d")
+            or 0.0
+        )
+
+        net_30d = float(snapshot_features.get("net_cash_flow_30d", tot_inflow - tot_outflow))
         daily_rate = net_30d / 30.0
 
         forecasts = {}
         for H in (7, 14, 30):
             exp_net = round(daily_rate * H, 2)
+            exp_in = round(tot_inflow * (H / 30.0), 2) if tot_inflow > 0 else round(max(0.0, exp_net), 2)
+            exp_out = round(tot_outflow * (H / 30.0), 2) if tot_outflow > 0 else round(max(0.0, -exp_net), 2)
             min_b = round(max(0.0, current_balance + min(0.0, exp_net)), 2)
             proj_b = round(max(0.0, current_balance + exp_net), 2)
             forecasts[H] = HorizonForecast(
                 horizon_days=H,
-                expected_inflow=round(max(0.0, exp_net), 2),
-                expected_outflow=round(max(0.0, -exp_net), 2),
+                expected_inflow=exp_in,
+                expected_outflow=exp_out,
                 expected_net_cash_flow=exp_net,
                 projected_balance=proj_b,
                 minimum_projected_balance=min_b,

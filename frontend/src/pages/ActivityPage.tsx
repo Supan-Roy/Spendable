@@ -5,30 +5,65 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { Receipt, AlertTriangle, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const ACTIVITY_CACHE_KEY_PREFIX = 'spendable_activity_cache_';
+
+const getCachedActivityData = (accId?: string): SpendableActivityListResponse | null => {
+  if (!accId) return null;
+  try {
+    const raw = localStorage.getItem(`${ACTIVITY_CACHE_KEY_PREFIX}${accId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const ActivityPage: React.FC = () => {
   const { currentUser } = useAuth();
-  const [activityData, setActivityData] = useState<SpendableActivityListResponse | null>(null);
+  const [activityData, setActivityData] = useState<SpendableActivityListResponse | null>(() =>
+    getCachedActivityData(currentUser?.account_id)
+  );
   const [limit] = useState<number>(50);
   const [offset, setOffset] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedActivityData(currentUser?.account_id));
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const cached = getCachedActivityData(currentUser?.account_id);
+    if (cached) {
+      setActivityData(cached);
+      setIsLoading(false);
+    } else {
+      setActivityData(null);
+      setIsLoading(true);
+    }
+  }, [currentUser?.account_id]);
+
   const fetchActivities = useCallback(async () => {
-    setIsLoading(true);
+    const hasCache = !!getCachedActivityData(currentUser?.account_id);
+    if (!hasCache) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const res = await getActivityApi(limit, offset);
       setActivityData(res);
+      if (currentUser?.account_id && offset === 0) {
+        try {
+          localStorage.setItem(`${ACTIVITY_CACHE_KEY_PREFIX}${currentUser.account_id}`, JSON.stringify(res));
+        } catch {}
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to load transaction history.');
+      if (!activityData && !hasCache) {
+        setError(err.message || 'Failed to load transaction history.');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [limit, offset]);
+  }, [currentUser?.account_id, limit, offset, activityData]);
 
   useEffect(() => {
     fetchActivities();
-  }, [fetchActivities, currentUser?.account_id]);
+  }, [currentUser?.account_id, offset]);
 
   if (isLoading) {
     return (
@@ -94,10 +129,11 @@ export const ActivityPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {activities.map((act) => {
+                {activities.map((act, idx) => {
                   const isInflow = act.direction === 'INFLOW';
+                  const rowKey = act.transaction_id || act.id || `act_${idx}`;
                   return (
-                    <tr key={act.id}>
+                    <tr key={rowKey}>
                       <td className="font-mono text-dim">{formatDate(act.timestamp_utc)}</td>
                       <td className="bold-text">{act.counterparty_name || 'Observed Transaction'}</td>
                       <td>
@@ -106,7 +142,7 @@ export const ActivityPage: React.FC = () => {
                         </span>
                       </td>
                       <td>
-                        <span className="type-tag">{act.activity_type}</span>
+                        <span className="type-tag">{act.activity_type || 'GENERAL'}</span>
                       </td>
                       <td className={`font-mono ${isInflow ? 'inflow-color' : 'outflow-color'}`}>
                         {isInflow ? '+ ' : '− '}

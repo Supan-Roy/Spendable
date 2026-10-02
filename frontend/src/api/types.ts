@@ -55,19 +55,20 @@ export interface SpendableForecastResponse {
 }
 
 export interface FinancialActivityItem {
-  id: string;
+  id?: string;
+  transaction_id?: string;
   account_id: string;
   amount: number;
-  currency: string;
+  currency?: string;
   direction: 'INFLOW' | 'OUTFLOW';
-  activity_type: string;
+  activity_type?: string;
   timestamp_utc: string;
   category?: string;
   channel?: string;
   counterparty_name?: string;
   reference_id?: string;
   balance_after?: number;
-  provenance: string;
+  provenance?: string;
 }
 
 export interface SpendableActivityListResponse {
