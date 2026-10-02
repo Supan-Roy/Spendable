@@ -5,29 +5,64 @@ import { formatCurrency, formatShortDate, getLiquidityBadgeConfig } from '../uti
 import { TrendingUp, AlertTriangle, RefreshCw, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const FORECAST_CACHE_KEY_PREFIX = 'spendable_forecast_cache_';
+
+const getCachedForecastData = (accId?: string): SpendableForecastResponse | null => {
+  if (!accId) return null;
+  try {
+    const raw = localStorage.getItem(`${FORECAST_CACHE_KEY_PREFIX}${accId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const ForecastPage: React.FC = () => {
   const { currentUser } = useAuth();
-  const [forecastData, setForecastData] = useState<SpendableForecastResponse | null>(null);
+  const [forecastData, setForecastData] = useState<SpendableForecastResponse | null>(() =>
+    getCachedForecastData(currentUser?.account_id)
+  );
   const [selectedHorizon, setSelectedHorizon] = useState<'30' | '14' | '7'>('30');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedForecastData(currentUser?.account_id));
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const cached = getCachedForecastData(currentUser?.account_id);
+    if (cached) {
+      setForecastData(cached);
+      setIsLoading(false);
+    } else {
+      setForecastData(null);
+      setIsLoading(true);
+    }
+  }, [currentUser?.account_id]);
+
   const fetchForecast = useCallback(async () => {
-    setIsLoading(true);
+    const hasCache = !!getCachedForecastData(currentUser?.account_id);
+    if (!hasCache) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const data = await getForecastApi();
       setForecastData(data);
+      if (currentUser?.account_id) {
+        try {
+          localStorage.setItem(`${FORECAST_CACHE_KEY_PREFIX}${currentUser.account_id}`, JSON.stringify(data));
+        } catch {}
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to generate cash-flow forecast.');
+      if (!forecastData && !hasCache) {
+        setError(err.message || 'Failed to generate cash-flow forecast.');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUser?.account_id, forecastData]);
 
   useEffect(() => {
     fetchForecast();
-  }, [fetchForecast, currentUser?.account_id]);
+  }, [currentUser?.account_id]);
 
   if (isLoading) {
     return (

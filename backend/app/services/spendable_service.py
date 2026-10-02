@@ -162,7 +162,8 @@ class SpendableService:
         forecast = snap_data.get("forecast")
 
         if forecast is None:
-            raise ValueError("Cash-flow forecast is currently unavailable for this account.")
+            feats = snap_data.get("features", {"current_balance": snap_data.get("current_balance", 0.0), "account_id": user_id})
+            forecast = self.data_provider.forecast_model.predict_snapshot(feats)
 
         res = SpendableForecastResponse(
             user_id=forecast.user_id,

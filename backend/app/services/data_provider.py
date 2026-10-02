@@ -91,10 +91,8 @@ class SyntheticDataProvider(BaseDataProvider):
         matched_snapshot_time = str(row_match.get("snapshot_time", "2026-03-01T00:00:00"))
         current_balance = float(row_match.get("current_balance", 0.0))
 
-        # Predict forecast trajectory using trained model
-        forecast: Optional[ForecastOutput] = None
-        if self.forecast_model.is_fitted:
-            forecast = self.forecast_model.predict_snapshot(row_match)
+        # Predict forecast trajectory using trained model or heuristic fallback
+        forecast = self.forecast_model.predict_snapshot(row_match)
 
         # Detect recurring commitments from transactions if available
         commitments: List[DetectedCommitment] = []
@@ -219,31 +217,33 @@ class DatabaseDataProvider(BaseDataProvider):
             if not db_acts:
                 from datetime import datetime, timezone
                 now_iso = datetime.now(timezone.utc).isoformat()
+                empty_feats = {
+                    "account_id": account_id,
+                    "user_id": account_id,
+                    "snapshot_time": now_iso,
+                    "current_balance": current_balance,
+                    "mean_inflow_30d": 0.0,
+                    "sum_inflow_30d": 0.0,
+                    "mean_outflow_30d": 0.0,
+                    "sum_outflow_30d": 0.0,
+                    "std_outflow_30d": 0.0,
+                    "count_outflow_30d": 0,
+                    "count_inflow_30d": 0,
+                    "net_cash_flow_30d": 0.0,
+                    "days_since_last_inflow": 999.0,
+                    "days_since_last_outflow": 999.0,
+                    "volatility_ratio_30d": 0.0,
+                    "liquidity_cushion_days": 0.0,
+                    "balance_trend_30d": 0.0,
+                }
+                empty_forecast = self.forecast_model.predict_snapshot(empty_feats)
                 return {
                     "user_id": account_id,
                     "snapshot_time": now_iso,
                     "current_balance": current_balance,
-                    "features": {
-                        "account_id": account_id,
-                        "user_id": account_id,
-                        "snapshot_time": now_iso,
-                        "current_balance": current_balance,
-                        "mean_inflow_30d": 0.0,
-                        "sum_inflow_30d": 0.0,
-                        "mean_outflow_30d": 0.0,
-                        "sum_outflow_30d": 0.0,
-                        "std_outflow_30d": 0.0,
-                        "count_outflow_30d": 0,
-                        "count_inflow_30d": 0,
-                        "net_cash_flow_30d": 0.0,
-                        "days_since_last_inflow": 999.0,
-                        "days_since_last_outflow": 999.0,
-                        "volatility_ratio_30d": 0.0,
-                        "liquidity_cushion_days": 0.0,
-                        "balance_trend_30d": 0.0,
-                    },
+                    "features": empty_feats,
                     "commitments": [],
-                    "forecast": None,
+                    "forecast": empty_forecast,
                 }
 
             act_dicts = []
@@ -274,10 +274,7 @@ class DatabaseDataProvider(BaseDataProvider):
             features["current_balance"] = current_balance
 
             commitments = self.recurring_detector.detect(act_dicts, snap_dt.isoformat())
-
-            forecast = None
-            if self.forecast_model.is_fitted:
-                forecast = self.forecast_model.predict_snapshot(features)
+            forecast = self.forecast_model.predict_snapshot(features)
 
             return {
                 "user_id": account_id,

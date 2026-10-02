@@ -151,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                   }}
                 >
                   <LogOut size={14} />
-                  <span>Sign out / Change account</span>
+                  <span>Sign out / Create / Change account</span>
                 </button>
               </div>
             )}
