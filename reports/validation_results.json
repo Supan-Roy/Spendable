@@ -1,0 +1,124 @@
+{
+  "dataset_name": "synthetic_financial_activities",
+  "validated_at_utc": "2026-10-02T06:15:35.289509Z",
+  "overall_status": "WARNING",
+  "total_records": 1125,
+  "total_users": 10,
+  "summary_counts": {
+    "PASS": 11,
+    "WARNING": 1,
+    "FAIL": 0
+  },
+  "checks": [
+    {
+      "rule_id": "SCHEMA_CONTRACT",
+      "category": "SCHEMA",
+      "name": "Data Contract Conformance",
+      "status": "PASS",
+      "description": "All records conform strictly to FinancialActivityCreate contract schema",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "ENUM_VALIDITY",
+      "category": "SCHEMA",
+      "name": "Enum Value Constraints",
+      "status": "PASS",
+      "description": "All direction, activity_type, and provenance values match valid enums",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "UUID_FORMAT",
+      "category": "SCHEMA",
+      "name": "Transaction UUID Constraint",
+      "status": "PASS",
+      "description": "All transaction IDs conform to valid UUID string standard",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "UNIQUE_TXN_ID",
+      "category": "INTEGRITY",
+      "name": "Transaction ID Uniqueness",
+      "status": "PASS",
+      "description": "100% of transaction IDs are unique",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "DUPLICATE_RECORDS",
+      "category": "INTEGRITY",
+      "name": "Duplicate Record Detection",
+      "status": "PASS",
+      "description": "Zero duplicate transaction attribute records detected",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "POSITIVE_AMOUNT",
+      "category": "INTEGRITY",
+      "name": "Monetary Amount Invariant",
+      "status": "PASS",
+      "description": "100% of transaction amounts are strictly positive monetary values",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "DIRECTION_SEMANTICS",
+      "category": "INTEGRITY",
+      "name": "Direction-Activity Semantics",
+      "status": "PASS",
+      "description": "All activity types conform to expected natural transaction direction semantics",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "BALANCE_RECONSTRUCTION",
+      "category": "FINANCIAL",
+      "name": "Balance Progression Reconstruction",
+      "status": "PASS",
+      "description": "100% of recorded balance_after values match exact reconstructed mathematical running balances",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "NEGATIVE_BALANCE",
+      "category": "FINANCIAL",
+      "name": "Non-Negative Balance Invariant",
+      "status": "PASS",
+      "description": "Zero negative account balances detected across all user transaction histories",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "LOW_LIQUIDITY_BUFFER",
+      "category": "FINANCIAL",
+      "name": "Low Liquidity Buffer Alerts",
+      "status": "WARNING",
+      "description": "Identified user instances with available balance dropping under ৳1,000.00",
+      "details": [
+        "User ACC-0004 experienced low buffer: BDT 0.00 on 2026-01-08T09:19:46+00:00"
+      ],
+      "affected_count": 1
+    },
+    {
+      "rule_id": "CHRONOLOGICAL_ORDER",
+      "category": "TEMPORAL",
+      "name": "Per-User Chronological Sequence",
+      "status": "PASS",
+      "description": "All user transaction records maintain strict chronological ordering",
+      "details": [],
+      "affected_count": 0
+    },
+    {
+      "rule_id": "UTC_TIMEZONE",
+      "category": "TEMPORAL",
+      "name": "UTC Timezone Invariant",
+      "status": "PASS",
+      "description": "100% of timestamps are explicit UTC ISO-8601 representations",
+      "details": [],
+      "affected_count": 0
+    }
+  ]
+}

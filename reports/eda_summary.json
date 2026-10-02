@@ -1,0 +1,633 @@
+{
+  "overview": {
+    "total_users": 10,
+    "total_transactions": 1125,
+    "start_date": "2026-01-01T08:19:07+00:00",
+    "end_date": "2026-06-29T11:37:07+00:00",
+    "duration_days": 180,
+    "user_activity": {
+      "mean_txns_per_user": 112.5,
+      "median_txns_per_user": 110.5,
+      "min_txns_per_user": 49,
+      "max_txns_per_user": 192,
+      "std_txns_per_user": 37.27
+    },
+    "inflows": {
+      "count": 84,
+      "total_sum": 5361053.0,
+      "mean_amount": 63822.06,
+      "median_amount": 48595.0
+    },
+    "outflows": {
+      "count": 1041,
+      "total_sum": 3016749.85,
+      "mean_amount": 2897.93,
+      "median_amount": 1148.0
+    },
+    "amount_stats": {
+      "mean": 7446.94,
+      "std": 20396.91,
+      "median": 1332.0,
+      "min": 155.0,
+      "max": 139341.0,
+      "q25": 616.0,
+      "q75": 2457.0,
+      "iqr": 1841.0
+    },
+    "balance_stats": {
+      "mean": 199448.59,
+      "median": 167325.23,
+      "min": 0.0,
+      "max": 625922.4,
+      "q25": 63985.19,
+      "q75": 307272.0
+    },
+    "type_distribution": [
+      {
+        "type_clean": "CASH_IN",
+        "count": 13,
+        "sum": 473387.0,
+        "pct_count": 1.16
+      },
+      {
+        "type_clean": "MERCHANT_PAYMENT",
+        "count": 841,
+        "sum": 965005.76,
+        "pct_count": 74.76
+      },
+      {
+        "type_clean": "MOBILE_RECHARGE",
+        "count": 18,
+        "sum": 9887.34,
+        "pct_count": 1.6
+      },
+      {
+        "type_clean": "OTHER",
+        "count": 35,
+        "sum": 820634.0,
+        "pct_count": 3.11
+      },
+      {
+        "type_clean": "P2P_TRANSFER",
+        "count": 45,
+        "sum": 735489.0,
+        "pct_count": 4.0
+      },
+      {
+        "type_clean": "SALARY",
+        "count": 42,
+        "sum": 3748854.0,
+        "pct_count": 3.73
+      },
+      {
+        "type_clean": "UTILITY_BILL",
+        "count": 131,
+        "sum": 1624545.75,
+        "pct_count": 11.64
+      }
+    ],
+    "category_distribution": [
+      {
+        "category": "DEBT_PAYMENT",
+        "count": 18,
+        "sum": 191844.0,
+        "pct_count": 1.6
+      },
+      {
+        "category": "DINING",
+        "count": 202,
+        "sum": 247971.0,
+        "pct_count": 17.96
+      },
+      {
+        "category": "ENTERTAINMENT",
+        "count": 36,
+        "sum": 34164.0,
+        "pct_count": 3.2
+      },
+      {
+        "category": "FAMILY_SUPPORT",
+        "count": 12,
+        "sum": 66732.0,
+        "pct_count": 1.07
+      },
+      {
+        "category": "FITNESS",
+        "count": 18,
+        "sum": 63000.0,
+        "pct_count": 1.6
+      },
+      {
+        "category": "FOOD_AND_DINING",
+        "count": 198,
+        "sum": 101511.0,
+        "pct_count": 17.6
+      },
+      {
+        "category": "FOOD_AND_GROCERIES",
+        "count": 85,
+        "sum": 125362.0,
+        "pct_count": 7.56
+      },
+      {
+        "category": "FREELANCE_INCOME",
+        "count": 42,
+        "sum": 1612199.0,
+        "pct_count": 3.73
+      },
+      {
+        "category": "GENERAL_PURCHASE",
+        "count": 207,
+        "sum": 347552.0,
+        "pct_count": 18.4
+      },
+      {
+        "category": "HOUSING",
+        "count": 60,
+        "sum": 1460826.0,
+        "pct_count": 5.33
+      },
+      {
+        "category": "INCOME",
+        "count": 42,
+        "sum": 3748854.0,
+        "pct_count": 3.73
+      },
+      {
+        "category": "MEDICAL_OR_EMERGENCY",
+        "count": 21,
+        "sum": 158735.0,
+        "pct_count": 1.87
+      },
+      {
+        "category": "SOFTWARE",
+        "count": 18,
+        "sum": 15346.76,
+        "pct_count": 1.6
+      },
+      {
+        "category": "TELECOM",
+        "count": 18,
+        "sum": 9887.34,
+        "pct_count": 1.6
+      },
+      {
+        "category": "TRANSPORT",
+        "count": 77,
+        "sum": 30099.0,
+        "pct_count": 6.84
+      },
+      {
+        "category": "UTILITIES",
+        "count": 71,
+        "sum": 163719.75,
+        "pct_count": 6.31
+      }
+    ],
+    "channel_distribution": [
+      {
+        "channel": "AGENT_QR",
+        "count": 182,
+        "pct_count": 16.18
+      },
+      {
+        "channel": "BANK_TRANSFER",
+        "count": 72,
+        "pct_count": 6.4
+      },
+      {
+        "channel": "CARD_AUTOPAY",
+        "count": 126,
+        "pct_count": 11.2
+      },
+      {
+        "channel": "CREDIT_CARD",
+        "count": 202,
+        "pct_count": 17.96
+      },
+      {
+        "channel": "DIGITAL_PAYMENT",
+        "count": 24,
+        "pct_count": 2.13
+      },
+      {
+        "channel": "MOBILE_APP",
+        "count": 77,
+        "pct_count": 6.84
+      },
+      {
+        "channel": "MOBILE_BANKING",
+        "count": 128,
+        "pct_count": 11.38
+      },
+      {
+        "channel": "ONLINE_BANKING",
+        "count": 6,
+        "pct_count": 0.53
+      },
+      {
+        "channel": "ONLINE_GATEWAY",
+        "count": 207,
+        "pct_count": 18.4
+      },
+      {
+        "channel": "POS_TERMINAL",
+        "count": 101,
+        "pct_count": 8.98
+      }
+    ],
+    "monthly_summary": [
+      {
+        "year_month": "2026-01",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      },
+      {
+        "year_month": "2026-02",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      },
+      {
+        "year_month": "2026-03",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      },
+      {
+        "year_month": "2026-04",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      },
+      {
+        "year_month": "2026-05",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      },
+      {
+        "year_month": "2026-06",
+        "inflow_count": 0,
+        "inflow_sum": 0.0,
+        "outflow_count": 0,
+        "outflow_sum": 0.0,
+        "total_txns": 0,
+        "net_cashflow": 0.0
+      }
+    ]
+  },
+  "persona_stats": {
+    "COMMITMENT_HEAVY": {
+      "user_count": 3,
+      "total_txns": 346,
+      "avg_txns_per_user": 115.3,
+      "avg_inflow_per_user": 826408.0,
+      "avg_outflow_per_user": 398100.59,
+      "avg_net_cashflow_per_user": 428307.41,
+      "min_balance_observed": 119460.54,
+      "avg_balance_volatility_std": 121790.32
+    },
+    "FINANCIAL_PRESSURE": {
+      "user_count": 1,
+      "total_txns": 49,
+      "avg_txns_per_user": 49.0,
+      "avg_inflow_per_user": 403386.0,
+      "avg_outflow_per_user": 319432.0,
+      "avg_net_cashflow_per_user": 83954.0,
+      "min_balance_observed": 82335.0,
+      "avg_balance_volatility_std": 30770.9
+    },
+    "IRREGULAR_INCOME": {
+      "user_count": 3,
+      "total_txns": 284,
+      "avg_txns_per_user": 94.7,
+      "avg_inflow_per_user": 537399.67,
+      "avg_outflow_per_user": 252205.33,
+      "avg_net_cashflow_per_user": 285194.33,
+      "min_balance_observed": 0.0,
+      "avg_balance_volatility_std": 91758.49
+    },
+    "STABLE": {
+      "user_count": 1,
+      "total_txns": 192,
+      "avg_txns_per_user": 192.0,
+      "avg_inflow_per_user": 427470.0,
+      "avg_outflow_per_user": 333768.77,
+      "avg_net_cashflow_per_user": 93701.23,
+      "min_balance_observed": 83707.42,
+      "avg_balance_volatility_std": 34389.14
+    },
+    "TIGHT_LIQUIDITY": {
+      "user_count": 2,
+      "total_txns": 254,
+      "avg_txns_per_user": 127.0,
+      "avg_inflow_per_user": 219387.0,
+      "avg_outflow_per_user": 206315.66,
+      "avg_net_cashflow_per_user": 13071.34,
+      "min_balance_observed": 10968.23,
+      "avg_balance_volatility_std": 10452.18
+    }
+  },
+  "recurring_stats": {
+    "total_observable_repeated_streams": 100,
+    "sample_repeated_streams": [
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "BRAC Bank Personal Loan",
+        "category": "DEBT_PAYMENT",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 12012.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Chillox Burgers",
+        "category": "DINING",
+        "occurrences": 24,
+        "mean_interval_days": 7.7,
+        "mean_amount": 1319.0,
+        "amount_std": 444.52
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Dotlines Fiber Internet",
+        "category": "UTILITIES",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 2457.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Enterprise Payroll Services",
+        "category": "INCOME",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 138598.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Fitness Plus Gym Membership",
+        "category": "FITNESS",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 3500.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Google One & Cloud Services",
+        "category": "SOFTWARE",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 854.32,
+        "amount_std": 25.32
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Luxury Apartments Co",
+        "category": "HOUSING",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 29506.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Nando's BD",
+        "category": "DINING",
+        "occurrences": 31,
+        "mean_interval_days": 5.9,
+        "mean_amount": 1273.29,
+        "amount_std": 403.84
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Netflix Streaming Subscription",
+        "category": "ENTERTAINMENT",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 1499.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Spotify Music Premium",
+        "category": "ENTERTAINMENT",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 399.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0001",
+        "counterparty_name": "Starbucks BD",
+        "category": "DINING",
+        "occurrences": 22,
+        "mean_interval_days": 5.8,
+        "mean_amount": 1347.86,
+        "amount_std": 496.65
+      },
+      {
+        "account_id": "ACC-0002",
+        "counterparty_name": "Corporate Employer Inc",
+        "category": "INCOME",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 67231.0,
+        "amount_std": 0.0
+      },
+      {
+        "account_id": "ACC-0002",
+        "counterparty_name": "Emergency Medical Care",
+        "category": "MEDICAL_OR_EMERGENCY",
+        "occurrences": 7,
+        "mean_interval_days": 19.3,
+        "mean_amount": 6436.14,
+        "amount_std": 1960.45
+      },
+      {
+        "account_id": "ACC-0002",
+        "counterparty_name": "Family Debt Repayment",
+        "category": "MEDICAL_OR_EMERGENCY",
+        "occurrences": 10,
+        "mean_interval_days": 9.6,
+        "mean_amount": 8331.4,
+        "amount_std": 1915.82
+      },
+      {
+        "account_id": "ACC-0002",
+        "counterparty_name": "House Rent Owner",
+        "category": "HOUSING",
+        "occurrences": 6,
+        "mean_interval_days": 30.2,
+        "mean_amount": 24774.0,
+        "amount_std": 0.0
+      }
+    ],
+    "ground_truth_planted_rules_count": 49,
+    "observable_planted_rules_count": 49,
+    "planted_rule_detection_rate_pct": 100.0
+  },
+  "user_metrics": [
+    {
+      "account_id": "ACC-0001",
+      "persona": "COMMITMENT_HEAVY",
+      "total_txns": 125,
+      "total_inflow": 831588.0,
+      "total_outflow": 402144.93,
+      "net_cashflow": 429443.07,
+      "mean_txn_amount": 9869.86,
+      "median_txn_amount": 1494.0,
+      "starting_balance": 51639.0,
+      "latest_balance": 481082.07,
+      "min_observed_balance": 119460.54,
+      "max_observed_balance": 542854.34
+    },
+    {
+      "account_id": "ACC-0002",
+      "persona": "FINANCIAL_PRESSURE",
+      "total_txns": 49,
+      "total_inflow": 403386.0,
+      "total_outflow": 319432.0,
+      "net_cashflow": 83954.0,
+      "mean_txn_amount": 14751.39,
+      "median_txn_amount": 6896.0,
+      "starting_balance": 44671.0,
+      "latest_balance": 128625.0,
+      "min_observed_balance": 82335.0,
+      "max_observed_balance": 197989.0
+    },
+    {
+      "account_id": "ACC-0003",
+      "persona": "STABLE",
+      "total_txns": 192,
+      "total_inflow": 427470.0,
+      "total_outflow": 333768.77,
+      "net_cashflow": 93701.23,
+      "mean_txn_amount": 3964.79,
+      "median_txn_amount": 766.5,
+      "starting_balance": 70384.0,
+      "latest_balance": 164085.23,
+      "min_observed_balance": 83707.42,
+      "max_observed_balance": 225451.71
+    },
+    {
+      "account_id": "ACC-0004",
+      "persona": "IRREGULAR_INCOME",
+      "total_txns": 75,
+      "total_inflow": 373466.0,
+      "total_outflow": 223879.0,
+      "net_cashflow": 149587.0,
+      "mean_txn_amount": 7964.6,
+      "median_txn_amount": 1864.0,
+      "starting_balance": 25815.0,
+      "latest_balance": 175402.0,
+      "min_observed_balance": 0.0,
+      "max_observed_balance": 189838.0
+    },
+    {
+      "account_id": "ACC-0005",
+      "persona": "TIGHT_LIQUIDITY",
+      "total_txns": 126,
+      "total_inflow": 218382.0,
+      "total_outflow": 198073.06,
+      "net_cashflow": 20308.94,
+      "mean_txn_amount": 3305.2,
+      "median_txn_amount": 574.5,
+      "starting_balance": 11418.0,
+      "latest_balance": 31726.94,
+      "min_observed_balance": 16587.52,
+      "max_observed_balance": 64145.19
+    },
+    {
+      "account_id": "ACC-0006",
+      "persona": "TIGHT_LIQUIDITY",
+      "total_txns": 128,
+      "total_inflow": 220392.0,
+      "total_outflow": 214558.26,
+      "net_cashflow": 5833.74,
+      "mean_txn_amount": 3398.05,
+      "median_txn_amount": 595.0,
+      "starting_balance": 8565.0,
+      "latest_balance": 14398.74,
+      "min_observed_balance": 10968.23,
+      "max_observed_balance": 51481.43
+    },
+    {
+      "account_id": "ACC-0007",
+      "persona": "IRREGULAR_INCOME",
+      "total_txns": 101,
+      "total_inflow": 675964.0,
+      "total_outflow": 263309.0,
+      "net_cashflow": 412655.0,
+      "mean_txn_amount": 9299.73,
+      "median_txn_amount": 1968.0,
+      "starting_balance": 32063.0,
+      "latest_balance": 444718.0,
+      "min_observed_balance": 29888.0,
+      "max_observed_balance": 454347.0
+    },
+    {
+      "account_id": "ACC-0008",
+      "persona": "COMMITMENT_HEAVY",
+      "total_txns": 111,
+      "total_inflow": 811590.0,
+      "total_outflow": 415975.75,
+      "net_cashflow": 395614.25,
+      "mean_txn_amount": 11059.15,
+      "median_txn_amount": 1499.0,
+      "starting_balance": 68511.0,
+      "latest_balance": 464125.25,
+      "min_observed_balance": 132219.28,
+      "max_observed_balance": 528216.65
+    },
+    {
+      "account_id": "ACC-0009",
+      "persona": "IRREGULAR_INCOME",
+      "total_txns": 108,
+      "total_inflow": 562769.0,
+      "total_outflow": 269428.0,
+      "net_cashflow": 293341.0,
+      "mean_txn_amount": 7705.53,
+      "median_txn_amount": 1946.0,
+      "starting_balance": 25884.0,
+      "latest_balance": 319225.0,
+      "min_observed_balance": 21939.0,
+      "max_observed_balance": 359729.0
+    },
+    {
+      "account_id": "ACC-0010",
+      "persona": "COMMITMENT_HEAVY",
+      "total_txns": 110,
+      "total_inflow": 836046.0,
+      "total_outflow": 376181.08,
+      "net_cashflow": 459864.92,
+      "mean_txn_amount": 11020.25,
+      "median_txn_amount": 1383.0,
+      "starting_balance": 106244.0,
+      "latest_balance": 566108.92,
+      "min_observed_balance": 179483.26,
+      "max_observed_balance": 625922.4
+    }
+  ]
+}
