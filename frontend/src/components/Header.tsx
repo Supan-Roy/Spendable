@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenLogin }) => {
-  const { currentUser, loginAsDemo, logout, isAuthenticated } = useAuth();
+  const { currentUser, loginAsDemo, logout, isAuthenticated, demoAccounts } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +100,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                 <div className="demo-list-group">
                   {DEMO_PERSONAS.map((p) => {
                     const isSelected = currentUser?.account_id === p.account_id;
+                    const liveAcc = demoAccounts.find(
+                      (d) => d.account_id === p.account_id || d.username === p.username
+                    );
+                    const displayBalance = liveAcc ? liveAcc.current_balance : p.balance;
                     return (
                       <button
                         key={p.account_id}
@@ -110,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                           <span className="item-name">{p.display_name}</span>
                           <span className="item-desc">{p.descriptor}</span>
                         </div>
-                        <span className="item-bal">{formatCurrency(p.balance)}</span>
+                        <span className="item-bal">{formatCurrency(displayBalance)}</span>
                       </button>
                     );
                   })}

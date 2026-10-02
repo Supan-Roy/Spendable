@@ -26,7 +26,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     username: 'supan',
     display_name: 'Supan',
     descriptor: 'Stable cash flow',
-    balance: 167400,
+    balance: 321000,
   },
   {
     account_id: 'acc_meraj',

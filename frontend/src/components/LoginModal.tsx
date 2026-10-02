@@ -10,7 +10,7 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, canClose = false }) => {
-  const { loginAsDemo, loginNormal, registerNormal, isLoading, error, clearError } = useAuth();
+  const { loginAsDemo, loginNormal, registerNormal, isLoading, error, clearError, demoAccounts } = useAuth();
   const [activeTab, setActiveTab] = useState<'demo' | 'login' | 'register'>('demo');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -130,27 +130,33 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, canClos
               Select a persona to immediately explore genuinely different historical cash-flow behaviors.
             </p>
             <div className="demo-card-grid">
-              {DEMO_PERSONAS.map((p) => (
-                <button
-                  key={p.account_id}
-                  className={`demo-select-card ${p.account_id === 'acc_supan' ? 'default-persona' : ''}`}
-                  onClick={() => handleSelectDemo(p.account_id)}
-                  disabled={isLoading}
-                >
-                  <div className="card-top">
-                    <span className="persona-name">{p.display_name}</span>
-                    {p.account_id === 'acc_supan' && (
-                      <span className="default-badge">DEFAULT</span>
-                    )}
-                  </div>
-                  <div className="persona-descriptor">{p.descriptor}</div>
-                  <div className="persona-balance">{formatCurrency(p.balance)}</div>
-                  <div className="card-action">
-                    <span>Explore Dashboard</span>
-                    <ArrowRight size={13} />
-                  </div>
-                </button>
-              ))}
+              {DEMO_PERSONAS.map((p) => {
+                const liveAcc = demoAccounts.find(
+                  (d) => d.account_id === p.account_id || d.username === p.username
+                );
+                const displayBalance = liveAcc ? liveAcc.current_balance : p.balance;
+                return (
+                  <button
+                    key={p.account_id}
+                    className={`demo-select-card ${p.account_id === 'acc_supan' ? 'default-persona' : ''}`}
+                    onClick={() => handleSelectDemo(p.account_id)}
+                    disabled={isLoading}
+                  >
+                    <div className="card-top">
+                      <span className="persona-name">{p.display_name}</span>
+                      {p.account_id === 'acc_supan' && (
+                        <span className="default-badge">DEFAULT</span>
+                      )}
+                    </div>
+                    <div className="persona-descriptor">{p.descriptor}</div>
+                    <div className="persona-balance">{formatCurrency(displayBalance)}</div>
+                    <div className="card-action">
+                      <span>Explore Dashboard</span>
+                      <ArrowRight size={13} />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
