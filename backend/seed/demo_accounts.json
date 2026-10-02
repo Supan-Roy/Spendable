@@ -1,0 +1,47 @@
+[
+  {
+    "account_id": "acc_supan",
+    "username": "supan",
+    "display_name": "Supan Roy",
+    "currency": "BDT",
+    "initial_balance": 45000.0,
+    "is_demo_account": true,
+    "persona_notes": "Stable regular income, balanced spending, healthy liquidity."
+  },
+  {
+    "account_id": "acc_meraj",
+    "username": "meraj",
+    "display_name": "Meraj Hossain",
+    "currency": "BDT",
+    "initial_balance": 15000.0,
+    "is_demo_account": true,
+    "persona_notes": "Tight liquidity, high fixed commitments relative to income."
+  },
+  {
+    "account_id": "acc_sohana",
+    "username": "sohana",
+    "display_name": "Sohana Rahman",
+    "currency": "BDT",
+    "initial_balance": 50000.0,
+    "is_demo_account": true,
+    "persona_notes": "Spending drift with accelerating discretionary shopping over time."
+  },
+  {
+    "account_id": "acc_noman",
+    "username": "noman",
+    "display_name": "Noman Ahmed",
+    "currency": "BDT",
+    "initial_balance": 30000.0,
+    "is_demo_account": true,
+    "persona_notes": "Irregular freelance income with variable timing and amounts."
+  },
+  {
+    "account_id": "acc_refat",
+    "username": "refat",
+    "display_name": "Refat Chowdhury",
+    "currency": "BDT",
+    "initial_balance": 60000.0,
+    "is_demo_account": true,
+    "persona_notes": "Commitment heavy with high fixed monthly obligations (Rent, Tuition, EMI)."
+  }
+]

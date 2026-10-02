@@ -199,6 +199,8 @@ def test_8_and_9_database_data_provider(memory_db_session):
 
 def test_10_and_16_seed_operation_is_idempotent():
     """Test 10 & 16: Seed operation creates records cleanly and creates 0 duplicates when run again."""
+    from app.database import engine, Base
+    Base.metadata.create_all(bind=engine)
     res1 = seed_database(limit_accounts=2)
     assert res1["status"] == "success"
 
@@ -209,6 +211,10 @@ def test_10_and_16_seed_operation_is_idempotent():
 
 def test_12_and_13_overview_and_spendable_calculation_deterministic():
     """Test 12 & 13: Overview works using DatabaseDataProvider and yields deterministic outputs."""
+    from app.database import engine, Base, SessionLocal
+    from app.seed_demo import seed_demo_accounts
+    Base.metadata.create_all(bind=engine)
+    seed_demo_accounts(session_factory=SessionLocal)
     provider = DatabaseDataProvider()
     service = SpendableService(data_provider=provider)
 
@@ -224,6 +230,10 @@ def test_12_and_13_overview_and_spendable_calculation_deterministic():
 def test_14_gemini_not_required_for_database_functionality(monkeypatch):
     """Test 14: Database operations and Spendable calculation work cleanly when Gemini API key is missing."""
     monkeypatch.setenv("GEMINI_API_KEY", "")
+    from app.database import engine, Base, SessionLocal
+    from app.seed_demo import seed_demo_accounts
+    Base.metadata.create_all(bind=engine)
+    seed_demo_accounts(session_factory=SessionLocal)
     provider = DatabaseDataProvider()
     service = SpendableService(data_provider=provider)
 

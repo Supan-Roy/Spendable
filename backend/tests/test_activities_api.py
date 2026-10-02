@@ -7,7 +7,7 @@ from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 from app.main import app
 from app.database import Base, get_db
-from app.models.activity import FinancialActivityModel  # Ensures model is registered with Base.metadata
+from app.models import *  # Ensures all models (UserAccount, FinancialActivityModel, SpendableSnapshot) are registered with Base.metadata
 
 # Setup shared in-memory SQLite engine using StaticPool for testing
 engine = create_engine(
@@ -26,16 +26,16 @@ def override_get_db():
         db.close()
 
 
-# Override database dependency BEFORE instantiating TestClient
-app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
 @pytest.fixture(autouse=True)
 def setup_database():
+    app.dependency_overrides[get_db] = override_get_db
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+    app.dependency_overrides.clear()
 
 
 def test_record_financial_activity_api():

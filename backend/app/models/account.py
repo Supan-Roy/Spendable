@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Numeric, DateTime
+from sqlalchemy import Column, String, Numeric, DateTime, Boolean
 from sqlalchemy.orm import relationship, foreign
 from app.database import Base
 
@@ -11,9 +11,12 @@ class UserAccount(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     account_id = Column(String(64), unique=True, nullable=False, index=True)
+    username = Column(String(64), unique=True, nullable=True, index=True)
+    password_hash = Column(String(255), nullable=True)
     display_name = Column(String(128), nullable=True)
     currency = Column(String(3), nullable=False, default="BDT")
     current_balance = Column(Numeric(14, 2), nullable=False, default=0.0)
+    is_demo_account = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),

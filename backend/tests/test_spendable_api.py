@@ -4,6 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.database import engine, Base, SessionLocal
+from app.seed_demo import seed_demo_accounts
 from app.schemas.spendable import (
     SpendableOverviewResponse,
     SpendableForecastResponse,
@@ -14,6 +16,15 @@ from app.scenario.schema import ScenarioResult
 from app.explanation.schema import GeminiExplanationResponse
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def setup_test_app():
+    app.dependency_overrides.clear()
+    Base.metadata.create_all(bind=engine)
+    seed_demo_accounts(session_factory=SessionLocal)
+    yield
+    app.dependency_overrides.clear()
 
 
 def test_1_get_health_endpoint():

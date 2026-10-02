@@ -1,16 +1,31 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.api.health import router as health_router
 from app.api.activities import router as activities_router
 from app.api.spendable import router as spendable_router
+from app.api.auth import router as auth_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Automatic startup initialization (Alembic check & demo seed on boot)."""
+    try:
+        from app.seed_demo import seed_demo_accounts
+        seed_demo_accounts()
+    except Exception as e:
+        print(f"[Startup] Demo seed notice: {e}")
+    yield
+
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Spendable - AI-powered personal financial liquidity intelligence platform.",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -28,6 +43,7 @@ app.add_middleware(
 
 # Register API routes
 app.include_router(health_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(activities_router, prefix="/api/v1")
 app.include_router(spendable_router, prefix="/api/v1")
 

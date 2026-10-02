@@ -39,16 +39,22 @@ def get_spendable_service() -> SpendableService:
     return _spendable_service_instance
 
 
+from app.auth import get_current_account
+from app.models.account import UserAccount
+
+
 @router.get("/overview", response_model=SpendableOverviewResponse)
 @router.get("/spendable/overview", response_model=SpendableOverviewResponse)
 def get_overview(
     user_id: Optional[str] = Query(None, description="Account identifier"),
     snapshot_time: Optional[str] = Query(None, description="Snapshot timestamp T"),
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Return main Spendable dashboard overview state."""
     try:
-        return service.get_overview(user_id=user_id, snapshot_time=snapshot_time)
+        target_uid = user_id or current_account.account_id
+        return service.get_overview(user_id=target_uid, snapshot_time=snapshot_time)
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ve))
     except Exception as e:
@@ -63,11 +69,13 @@ def get_overview(
 def get_forecast(
     user_id: Optional[str] = Query(None, description="Account identifier"),
     snapshot_time: Optional[str] = Query(None, description="Snapshot timestamp T"),
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Return multi-horizon forecasts and 30-day daily projected balance trajectory."""
     try:
-        return service.get_forecast(user_id=user_id, snapshot_time=snapshot_time)
+        target_uid = user_id or current_account.account_id
+        return service.get_forecast(user_id=target_uid, snapshot_time=snapshot_time)
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ve))
     except Exception as e:
@@ -83,11 +91,13 @@ def get_activity(
     user_id: Optional[str] = Query(None, description="Account identifier"),
     limit: int = Query(50, ge=1, le=500, description="Pagination page limit"),
     offset: int = Query(0, ge=0, description="Pagination page offset"),
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Return recent observed transaction activity records with pagination."""
     try:
-        return service.get_activities(user_id=user_id, limit=limit, offset=offset)
+        target_uid = user_id or current_account.account_id
+        return service.get_activities(user_id=target_uid, limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -100,11 +110,13 @@ def get_activity(
 def get_recommendations(
     user_id: Optional[str] = Query(None, description="Account identifier"),
     snapshot_time: Optional[str] = Query(None, description="Snapshot timestamp T"),
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Return deterministic recommendations and Gemini explanation (or fallback)."""
     try:
-        return service.get_recommendations(user_id=user_id, snapshot_time=snapshot_time)
+        target_uid = user_id or current_account.account_id
+        return service.get_recommendations(user_id=target_uid, snapshot_time=snapshot_time)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -118,12 +130,14 @@ def simulate_scenario(
     payload: ScenarioInput,
     user_id: Optional[str] = Query(None, description="Account identifier"),
     snapshot_time: Optional[str] = Query(None, description="Snapshot timestamp T"),
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Simulate a hypothetical scenario ('what-if') without mutating base state."""
     try:
+        target_uid = user_id or current_account.account_id
         return service.simulate_scenario(
-            scenario_input=payload, user_id=user_id, snapshot_time=snapshot_time
+            scenario_input=payload, user_id=target_uid, snapshot_time=snapshot_time
         )
     except Exception as e:
         raise HTTPException(
@@ -136,11 +150,12 @@ def simulate_scenario(
 @router.post("/spendable/explain", response_model=GeminiExplanationResponse)
 def explain_context(
     payload: Optional[ExplainRequest] = None,
+    current_account: UserAccount = Depends(get_current_account),
     service: SpendableService = Depends(get_spendable_service),
 ):
     """Generate Gemini explanation (or fallback) from Spendable context."""
     try:
-        uid = payload.user_id if payload else None
+        uid = payload.user_id if (payload and payload.user_id) else current_account.account_id
         stime = payload.snapshot_time if payload else None
         inc_scen = payload.include_scenario if payload else False
         return service.explain(user_id=uid, snapshot_time=stime, include_scenario=inc_scen)

@@ -189,9 +189,17 @@ class DatabaseDataProvider(BaseDataProvider):
         try:
             query = session.query(UserAccount)
             if user_id:
-                account = query.filter(UserAccount.account_id == user_id).first()
+                clean_uid = str(user_id).strip().lower()
+                account = (
+                    query.filter(
+                        (UserAccount.account_id == user_id)
+                        | (UserAccount.username == clean_uid)
+                        | (UserAccount.account_id == f"acc_{clean_uid}")
+                        | (UserAccount.account_id == f"usr_{clean_uid}")
+                    ).first()
+                )
             else:
-                account = query.first()
+                account = query.filter(UserAccount.account_id == "acc_supan").first() or query.first()
 
             if not account:
                 # Fallback to synthetic if database has no accounts
@@ -265,7 +273,20 @@ class DatabaseDataProvider(BaseDataProvider):
         try:
             query = session.query(FinancialActivityModel)
             if user_id:
-                query = query.filter(FinancialActivityModel.account_id == user_id)
+                clean_uid = str(user_id).strip().lower()
+                from app.models.account import UserAccount
+                user = (
+                    session.query(UserAccount)
+                    .filter(
+                        (UserAccount.account_id == user_id)
+                        | (UserAccount.username == clean_uid)
+                        | (UserAccount.account_id == f"acc_{clean_uid}")
+                        | (UserAccount.account_id == f"usr_{clean_uid}")
+                    )
+                    .first()
+                )
+                target_acc_id = user.account_id if user else user_id
+                query = query.filter(FinancialActivityModel.account_id == target_acc_id)
 
             total_count = query.count()
             if total_count == 0:
