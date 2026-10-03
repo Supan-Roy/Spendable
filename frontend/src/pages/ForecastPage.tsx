@@ -330,11 +330,34 @@ export const ForecastPage: React.FC = () => {
             </thead>
             <tbody>
               {dailyBalances.map((item: DailyTrajectoryItem, idx: number) => {
+                const prevBal = idx > 0 ? dailyBalances[idx - 1].balance : (forecastData as any)?.current_balance || item.balance;
+                const delta = item.balance - prevBal;
                 const netMargin = item.balance - item.requiredBuffer;
+
                 const isCritical = item.balance < item.requiredBuffer;
-                const isLow = item.balance < (item.requiredBuffer * 1.15);
-                const statusLabel = isCritical ? 'Critical Risk' : isLow ? 'Low Cushion' : 'Optimal';
-                const statusClass = isCritical ? 'danger' : isLow ? 'warning' : 'healthy';
+                const isLow = item.balance < (item.requiredBuffer * 1.20);
+                const isInflowSurge = delta > 1500;
+                const isOutflowDip = delta < -1500;
+
+                let statusLabel = 'Optimal';
+                let statusClass = 'healthy';
+
+                if (isCritical) {
+                  statusLabel = 'Critical Risk';
+                  statusClass = 'danger';
+                } else if (isLow) {
+                  statusLabel = 'Low Cushion';
+                  statusClass = 'warning';
+                } else if (isInflowSurge) {
+                  statusLabel = 'Payday Peak';
+                  statusClass = 'healthy-bright';
+                } else if (isOutflowDip) {
+                  statusLabel = 'Commitment Dip';
+                  statusClass = 'info-badge';
+                } else {
+                  statusLabel = 'Optimal';
+                  statusClass = 'healthy';
+                }
 
                 return (
                   <tr key={idx}>
