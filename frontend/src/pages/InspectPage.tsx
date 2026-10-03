@@ -1,558 +1,445 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  Zap,
-  Play,
-  Pause,
-  RotateCcw,
-  Cpu,
   Database,
   Layers,
-  GitBranch,
+  Cpu,
   ShieldCheck,
-  Activity,
-  TrendingUp,
   Sliders,
   Bot,
-  Sparkles,
-  Code,
-  Check,
-  BarChart3
+  TrendingUp,
+  Activity,
+  BarChart3,
+  GitBranch,
+  Lock,
+  CheckCircle2,
+  ArrowRight,
+  Eye,
+  Zap,
+  Calendar,
+  DollarSign
 } from 'lucide-react';
 
-interface InspectPageProps {
-  onNavigateTab?: (tab: string) => void;
-}
-
-export const InspectPage: React.FC<InspectPageProps> = () => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [activeStage, setActiveStage] = useState<number>(1);
-  const [selectedNode, setSelectedNode] = useState<string | null>('xgboost');
-  const [copiedCode, setCopiedCode] = useState<boolean>(false);
-
-  // Auto-play pipeline simulation sequence
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      setActiveStage((prev) => (prev % 6) + 1);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
-
-  const stages = [
-    {
-      id: 1,
-      title: 'Stage 1 — Multi-Channel Data Ingestion',
-      badge: 'Data Layer',
-      icon: Database,
-      color: '#38bdf8',
-      summary: 'Ingests transaction streams from bKash, Upay, bank transfers & card POS. Standardizes schema into UTC & ISO 8601.',
-    },
-    {
-      id: 2,
-      title: 'Stage 2 — Rolling Feature Matrix',
-      badge: 'Feature Store',
-      icon: Layers,
-      color: '#a855f7',
-      summary: 'Extracts 7d/14d/30d rolling windows, spending volatility (σ), inflow recency ratios, and category concentration scores.',
-    },
-    {
-      id: 3,
-      title: 'Stage 3 — ML Model Ensemble',
-      badge: 'Machine Learning',
-      icon: Cpu,
-      color: '#00e5a3',
-      summary: 'XGBoost & LightGBM gradient boosted decision trees predict risk scores; DBSCAN clusters recurring monthly commitments.',
-    },
-    {
-      id: 4,
-      title: 'Stage 4 — Deterministic Spendable Engine',
-      badge: 'Core Engine',
-      icon: ShieldCheck,
-      color: '#f59e0b',
-      summary: 'Computes exact safe spendable capacity via non-generative formula: Spendable = Max(0, Balance - Commitments - Reserve).',
-    },
-    {
-      id: 5,
-      title: 'Stage 5 — What-If Scenario Simulator',
-      badge: 'Simulation',
-      icon: Sliders,
-      color: '#ec4899',
-      summary: 'Evaluates hypothetical expenses or salary delays in memory without mutating base account state.',
-    },
-    {
-      id: 6,
-      title: 'Stage 6 — Spendable AI & LLM Layer',
-      badge: 'Responsible AI',
-      icon: Bot,
-      color: '#10b981',
-      summary: 'Translates structured facts into human natural language via Gemini SDK with strict financial scope guardrails.',
-    },
-  ];
-
-  const nodeDetails: Record<string, { title: string; type: string; tech: string; desc: string; metrics: Record<string, string> }> = {
-    xgboost: {
-      title: 'XGBoost Risk Classifier',
-      type: 'Machine Learning Model',
-      tech: 'Python / scikit-learn / XGBoost 2.0',
-      desc: 'Gradient boosted decision trees trained on rolling volatility features to predict liquidity distress probability.',
-      metrics: { 'Training Accuracy': '96.4%', 'AUC-ROC': '0.982', 'Tree Depth': '6', 'Learning Rate': '0.05' },
-    },
-    lightgbm: {
-      title: 'LightGBM Cash Flow Forecaster',
-      type: 'Machine Learning Model',
-      tech: 'LightGBM / Fast Histogram Boosting',
-      desc: 'Predicts daily projected account balances over a 30-day horizon using leaf-wise tree growth.',
-      metrics: { 'MAE': '৳842.15', 'RMSE': '৳1,204.30', 'Horizon': '30 Days', 'Num Leaves': '31' },
-    },
-    dbscan: {
-      title: 'DBSCAN Recurring Commitment Detector',
-      type: 'Unsupervised Pattern Mining',
-      tech: 'Density-Based Spatial Clustering',
-      desc: 'Clusters inter-arrival times Δt and payment amounts to auto-detect monthly rent, utility bills, and subscriptions.',
-      metrics: { 'Eps (Days)': '3.5', 'Min Samples': '2', 'Detection F1': '0.941' },
-    },
-    engine: {
-      title: 'Deterministic Liquidity Calculator',
-      type: 'Financial Logic Engine',
-      tech: 'Pure Python / Zero LLM Math',
-      desc: 'Enforces mathematical certainty. Guarantees calculations never hallucinate or invent fake numbers.',
-      metrics: { 'Execution Time': '1.2ms', 'Uptime': '100%', 'Safety Formula': 'Dynamic Volatility Buffer' },
-    },
-    gemini: {
-      title: 'Spendable AI Gemini SDK Layer',
-      type: 'Generative Language Model',
-      tech: 'Google Gemini SDK (google-genai)',
-      desc: 'Context-aware assistant providing clear natural language answers strictly bound to factual account context.',
-      metrics: { 'Role': 'Spendable AI', 'Scope Enforcement': 'Strict Financial Guardrails', 'Fallback': 'Deterministic Synthesizer' },
-    },
-  };
-
-  const activeNodeData = selectedNode ? nodeDetails[selectedNode] : null;
-
-  const handleCopyArchitectureJson = () => {
-    const archJson = JSON.stringify({
-      application: 'Spendable',
-      architecture: 'Deterministic Financial Engine + ML Ensemble + Gemini LLM Layer',
-      stages: stages.map(s => ({ id: s.id, name: s.title, layer: s.badge })),
-      models: ['XGBoost Risk Classifier', 'LightGBM Balance Forecaster', 'DBSCAN Recurring Detector'],
-      guarantees: ['Zero Hallucinated Financial Calculations', '100% Fallback Reliability', 'Strict Financial Scope Guardrails']
-    }, null, 2);
-    navigator.clipboard.writeText(archJson);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
+export const InspectPage: React.FC = () => {
   return (
-    <div className="tab-pane inspect-page-container">
-      {/* Header Bar */}
-      <div className="page-header inspect-header">
-        <div>
-          <div className="inspect-title-badge">
-            <Zap size={16} color="#00e5a3" />
-            <span>HACKATHON SYSTEM VISUALIZER</span>
+    <div className="inspect-page-container">
+      {/* 1. HERO BANNER */}
+      <section className="inspect-hero-banner">
+        <div className="hero-top-badge">
+          <Zap size={14} color="#00e5a3" />
+          <span>SPENDABLE ARCHITECTURE & WORKFLOW INSPECTOR</span>
+        </div>
+        <h1 className="hero-title">How Spendable Works — End-to-End System Visualizer</h1>
+        <p className="hero-description">
+          A step-by-step technical visualizer explaining our multi-channel data ingestion, rolling feature engineering, machine learning model ensemble (XGBoost, LightGBM, DBSCAN), 100% deterministic financial math engine, and responsible Spendable AI layer.
+        </p>
+
+        <div className="hero-stats-row">
+          <div className="hero-stat-card">
+            <div className="stat-icon-box" style={{ background: 'rgba(0, 229, 163, 0.15)', color: '#00e5a3' }}>
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <span className="stat-val">100%</span>
+              <span className="stat-lbl">Deterministic Financial Math</span>
+            </div>
           </div>
-          <h2>System Architecture & Workflow Inspector</h2>
-          <p className="subtitle">
-            Interactive visualizer demonstrating Spendable’s multi-tier data pipeline, ML model ensemble, deterministic financial engine, and responsible Gemini AI layer.
-          </p>
-        </div>
 
-        {/* Live Simulation Controls */}
-        <div className="inspect-control-bar">
-          <div className="pipeline-status-chip">
-            <span className={`status-dot ${isPlaying ? 'active' : ''}`}></span>
-            <span>{isPlaying ? 'Live Pipeline Running' : 'Pipeline Paused'}</span>
+          <div className="hero-stat-card">
+            <div className="stat-icon-box" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+              <Cpu size={20} />
+            </div>
+            <div>
+              <span className="stat-val">3 Models</span>
+              <span className="stat-lbl">XGBoost + LightGBM + DBSCAN</span>
+            </div>
           </div>
 
-          <button
-            className="secondary-btn compact"
-            onClick={() => setIsPlaying(!isPlaying)}
-            title={isPlaying ? 'Pause simulation' : 'Play simulation'}
-          >
-            {isPlaying ? <Pause size={14} color="#f59e0b" /> : <Play size={14} color="#00e5a3" />}
-            <span>{isPlaying ? 'Pause' : 'Play Flow'}</span>
-          </button>
-
-          <button
-            className="secondary-btn compact"
-            onClick={() => setActiveStage(1)}
-            title="Reset to Stage 1"
-          >
-            <RotateCcw size={14} />
-            <span>Reset</span>
-          </button>
-
-          <button
-            className="primary-btn compact"
-            onClick={handleCopyArchitectureJson}
-          >
-            {copiedCode ? <Check size={14} /> : <Code size={14} />}
-            <span>{copiedCode ? 'Copied' : 'Copy Arch Specs'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Stage Selection Pills */}
-      <div className="inspect-stage-nav">
-        {stages.map((st) => (
-          <button
-            key={st.id}
-            className={`inspect-stage-pill ${activeStage === st.id ? 'active' : ''}`}
-            onClick={() => {
-              setActiveStage(st.id);
-              setIsPlaying(false);
-            }}
-            style={{ borderLeftColor: st.color }}
-          >
-            <span className="stage-num" style={{ background: st.color }}>{st.id}</span>
-            <span className="stage-name">{st.badge}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* ==========================================================================
-         HERO ANIMATED SVG PIPELINE CANVAS
-         ========================================================================== */}
-      <div className="inspect-hero-card">
-        <div className="hero-card-header">
-          <div className="card-title-group">
-            <Activity size={20} color="#00e5a3" />
-            <h3>End-to-End Data Pipeline & Model Topology</h3>
+          <div className="hero-stat-card">
+            <div className="stat-icon-box" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>
+              <Lock size={20} />
+            </div>
+            <div>
+              <span className="stat-val">Zero</span>
+              <span className="stat-lbl">Hallucination Risk (Zero Math in LLM)</span>
+            </div>
           </div>
-          <span className="live-data-stream-badge">
-            <Sparkles size={14} color="#00e5a3" />
-            <span>Active Stage: Stage {activeStage} of 6</span>
-          </span>
+
+          <div className="hero-stat-card">
+            <div className="stat-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
+              <Bot size={20} />
+            </div>
+            <div>
+              <span className="stat-val">Spendable AI</span>
+              <span className="stat-lbl">Context-Grounded Gemini Assistant</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. END-TO-END PIPELINE DIAGRAM */}
+      <section className="inspect-section">
+        <div className="section-header-row">
+          <div className="section-icon-bubble">
+            <GitBranch size={22} color="#00e5a3" />
+          </div>
+          <div>
+            <h2 className="section-title">End-to-End System Architecture Flow</h2>
+            <p className="section-subtitle">How data flows from multi-channel inputs through ML intelligence down to the UI and Spendable AI</p>
+          </div>
         </div>
 
-        <div className="svg-pipeline-canvas-wrapper">
-          <svg className="pipeline-svg" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#00e5a3" stopOpacity="1" />
-                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.8" />
-              </linearGradient>
+        <div className="architecture-flow-diagram">
+          {/* Node 1 */}
+          <div className="flow-node-card node-data">
+            <div className="node-step-tag">STAGE 1</div>
+            <div className="node-icon-header">
+              <Database size={24} color="#38bdf8" />
+              <h3>Data Ingestion Layer</h3>
+            </div>
+            <p>Ingests real-time transactions from Bank APIs, bKash, Upay, & card POS. Standardizes schemas to UTC timestamps & classifies cash directions.</p>
+            <div className="node-tech-badge">Plaid / Bank API / Pydantic</div>
+          </div>
 
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+          <div className="flow-connector-line">
+            <ArrowRight size={20} color="#64748b" />
+          </div>
 
-            {/* Connecting Laser Path Curves */}
-            <path
-              d="M 120 160 C 220 160, 220 160, 310 160"
-              fill="none"
-              stroke={activeStage >= 2 ? "url(#laserGrad)" : "rgba(255,255,255,0.1)"}
-              strokeWidth="3"
-              strokeDasharray={activeStage >= 2 ? "6 6" : "none"}
-              className={activeStage >= 2 ? "animated-laser-path" : ""}
-            />
+          {/* Node 2 */}
+          <div className="flow-node-card node-features">
+            <div className="node-step-tag">STAGE 2</div>
+            <div className="node-icon-header">
+              <Layers size={24} color="#a855f7" />
+              <h3>Rolling Feature Store</h3>
+            </div>
+            <p>Computes 7d/14d/30d rolling windows, spending volatility (σ), recency-weighted cash flow ratios, and category concentrations.</p>
+            <div className="node-tech-badge">Pandas / NumPy Feature Matrix</div>
+          </div>
 
-            <path
-              d="M 310 160 C 400 100, 420 80, 500 80"
-              fill="none"
-              stroke={activeStage >= 3 ? "#00e5a3" : "rgba(255,255,255,0.1)"}
-              strokeWidth="2.5"
-            />
-            <path
-              d="M 310 160 C 400 160, 420 160, 500 160"
-              fill="none"
-              stroke={activeStage >= 3 ? "#38bdf8" : "rgba(255,255,255,0.1)"}
-              strokeWidth="2.5"
-            />
-            <path
-              d="M 310 160 C 400 220, 420 240, 500 240"
-              fill="none"
-              stroke={activeStage >= 3 ? "#a855f7" : "rgba(255,255,255,0.1)"}
-              strokeWidth="2.5"
-            />
+          <div className="flow-connector-line">
+            <ArrowRight size={20} color="#64748b" />
+          </div>
 
-            <path
-              d="M 500 80 C 600 120, 620 160, 690 160"
-              fill="none"
-              stroke={activeStage >= 4 ? "url(#laserGrad)" : "rgba(255,255,255,0.1)"}
-              strokeWidth="3"
-            />
-            <path
-              d="M 500 160 C 600 160, 620 160, 690 160"
-              fill="none"
-              stroke={activeStage >= 4 ? "url(#laserGrad)" : "rgba(255,255,255,0.1)"}
-              strokeWidth="3"
-            />
-            <path
-              d="M 500 240 C 600 200, 620 160, 690 160"
-              fill="none"
-              stroke={activeStage >= 4 ? "url(#laserGrad)" : "rgba(255,255,255,0.1)"}
-              strokeWidth="3"
-            />
+          {/* Node 3 */}
+          <div className="flow-node-card node-ml">
+            <div className="node-step-tag">STAGE 3</div>
+            <div className="node-icon-header">
+              <Cpu size={24} color="#00e5a3" />
+              <h3>ML Model Ensemble</h3>
+            </div>
+            <p>XGBoost predicts risk distress, LightGBM forecasts 30-day daily balance trajectories, and DBSCAN clusters recurring monthly bills.</p>
+            <div className="node-tech-badge">XGBoost / LightGBM / DBSCAN</div>
+          </div>
 
-            <path
-              d="M 690 160 C 760 160, 780 160, 870 160"
-              fill="none"
-              stroke={activeStage >= 6 ? "#10b981" : "rgba(255,255,255,0.1)"}
-              strokeWidth="3"
-            />
+          <div className="flow-connector-line">
+            <ArrowRight size={20} color="#64748b" />
+          </div>
 
-            {/* Stage 1 Node — Ingestion */}
-            <g transform="translate(120, 160)" className={`node-group ${activeStage === 1 ? 'node-highlight' : ''}`}>
-              <rect x="-60" y="-35" width="120" height="70" rx="14" fill="#0f172a" stroke="#38bdf8" strokeWidth="2" filter="url(#glow)" />
-              <text x="0" y="-8" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">STAGE 1</text>
-              <text x="0" y="10" textAnchor="middle" fill="#ffffff" fontSize="12" fontWeight="600">Data Feeds</text>
-              <text x="0" y="24" textAnchor="middle" fill="#94a3b8" fontSize="9">bKash/Bank/POS</text>
-            </g>
+          {/* Node 4 */}
+          <div className="flow-node-card node-engine">
+            <div className="node-step-tag">STAGE 4</div>
+            <div className="node-icon-header">
+              <ShieldCheck size={24} color="#f59e0b" />
+              <h3>Deterministic Engine</h3>
+            </div>
+            <p>Calculates exact Spendable Capacity: Spendable = Max(0, Balance - Upcoming Commitments - Safety Reserve). 100% hardcoded math.</p>
+            <div className="node-tech-badge">Python Core Math Engine</div>
+          </div>
 
-            {/* Stage 2 Node — Feature Store */}
-            <g transform="translate(310, 160)" className={`node-group ${activeStage === 2 ? 'node-highlight' : ''}`}>
-              <rect x="-60" y="-35" width="120" height="70" rx="14" fill="#0f172a" stroke="#a855f7" strokeWidth="2" filter="url(#glow)" />
-              <text x="0" y="-8" textAnchor="middle" fill="#a855f7" fontSize="11" fontWeight="bold">STAGE 2</text>
-              <text x="0" y="10" textAnchor="middle" fill="#ffffff" fontSize="12" fontWeight="600">Feature Store</text>
-              <text x="0" y="24" textAnchor="middle" fill="#94a3b8" fontSize="9">Rolling Windows</text>
-            </g>
+          <div className="flow-connector-line">
+            <ArrowRight size={20} color="#64748b" />
+          </div>
 
-            {/* Stage 3 Nodes — ML Models */}
-            <g
-              transform="translate(500, 80)"
-              className={`node-group clickable-node ${selectedNode === 'xgboost' ? 'node-selected' : ''}`}
-              onClick={() => setSelectedNode('xgboost')}
-            >
-              <rect x="-65" y="-28" width="130" height="56" rx="12" fill="#0f172a" stroke="#00e5a3" strokeWidth="2" />
-              <text x="0" y="-5" textAnchor="middle" fill="#00e5a3" fontSize="11" fontWeight="bold">XGBoost Model</text>
-              <text x="0" y="12" textAnchor="middle" fill="#cbd5e1" fontSize="9">Risk Classifier</text>
-            </g>
+          {/* Node 5 */}
+          <div className="flow-node-card node-ai">
+            <div className="node-step-tag">STAGE 5</div>
+            <div className="node-icon-header">
+              <Bot size={24} color="#ec4899" />
+              <h3>Spendable AI Layer</h3>
+            </div>
+            <p>Injects calculated context into Gemini LLM. Identifies as Spendable AI to answer liquidity queries with zero hallucination.</p>
+            <div className="node-tech-badge">Gemini SDK + Context Injector</div>
+          </div>
+        </div>
+      </section>
 
-            <g
-              transform="translate(500, 160)"
-              className={`node-group clickable-node ${selectedNode === 'lightgbm' ? 'node-selected' : ''}`}
-              onClick={() => setSelectedNode('lightgbm')}
-            >
-              <rect x="-65" y="-28" width="130" height="56" rx="12" fill="#0f172a" stroke="#38bdf8" strokeWidth="2" />
-              <text x="0" y="-5" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">LightGBM Model</text>
-              <text x="0" y="12" textAnchor="middle" fill="#cbd5e1" fontSize="9">Balance Trajectory</text>
-            </g>
-
-            <g
-              transform="translate(500, 240)"
-              className={`node-group clickable-node ${selectedNode === 'dbscan' ? 'node-selected' : ''}`}
-              onClick={() => setSelectedNode('dbscan')}
-            >
-              <rect x="-65" y="-28" width="130" height="56" rx="12" fill="#0f172a" stroke="#a855f7" strokeWidth="2" />
-              <text x="0" y="-5" textAnchor="middle" fill="#a855f7" fontSize="11" fontWeight="bold">DBSCAN Detector</text>
-              <text x="0" y="12" textAnchor="middle" fill="#cbd5e1" fontSize="9">Recurring Bills</text>
-            </g>
-
-            {/* Stage 4 Node — Deterministic Engine */}
-            <g
-              transform="translate(690, 160)"
-              className={`node-group clickable-node ${activeStage === 4 ? 'node-highlight' : ''} ${selectedNode === 'engine' ? 'node-selected' : ''}`}
-              onClick={() => setSelectedNode('engine')}
-            >
-              <rect x="-65" y="-35" width="130" height="70" rx="14" fill="#0f172a" stroke="#f59e0b" strokeWidth="2" filter="url(#glow)" />
-              <text x="0" y="-8" textAnchor="middle" fill="#f59e0b" fontSize="11" fontWeight="bold">STAGE 4</text>
-              <text x="0" y="10" textAnchor="middle" fill="#ffffff" fontSize="12" fontWeight="600">Spend Engine</text>
-              <text x="0" y="24" textAnchor="middle" fill="#94a3b8" fontSize="9">Deterministic Math</text>
-            </g>
-
-            {/* Stage 6 Node — Gemini AI */}
-            <g
-              transform="translate(870, 160)"
-              className={`node-group clickable-node ${activeStage === 6 ? 'node-highlight' : ''} ${selectedNode === 'gemini' ? 'node-selected' : ''}`}
-              onClick={() => setSelectedNode('gemini')}
-            >
-              <rect x="-60" y="-35" width="120" height="70" rx="14" fill="#0f172a" stroke="#10b981" strokeWidth="2" filter="url(#glow)" />
-              <text x="0" y="-8" textAnchor="middle" fill="#10b981" fontSize="11" fontWeight="bold">STAGE 6</text>
-              <text x="0" y="10" textAnchor="middle" fill="#ffffff" fontSize="12" fontWeight="600">Spendable AI</text>
-              <text x="0" y="24" textAnchor="middle" fill="#94a3b8" fontSize="9">Gemini SDK Layer</text>
-            </g>
-          </svg>
+      {/* 3. APPLICATION TABS FUNCTIONALITY (How Overview, Activity, Forecast, Simulate work) */}
+      <section className="inspect-section">
+        <div className="section-header-row">
+          <div className="section-icon-bubble">
+            <Eye size={22} color="#38bdf8" />
+          </div>
+          <div>
+            <h2 className="section-title">How Our 4 Application Tabs Work</h2>
+            <p className="section-subtitle">Understanding the data sources, calculations, and AI integration for each tab in Spendable</p>
+          </div>
         </div>
 
-        {/* Selected Component Node Inspector Bar */}
-        {activeNodeData && (
-          <div className="node-inspector-panel">
-            <div className="inspector-left">
-              <div className="inspector-badge">
-                <Cpu size={16} color="#00e5a3" />
-                <span>Selected Component: {activeNodeData.title}</span>
+        <div className="app-tabs-explain-grid">
+          {/* Overview Tab */}
+          <div className="tab-explain-card">
+            <div className="tab-card-header">
+              <div className="tab-badge overview-badge">
+                <DollarSign size={16} />
+                <span>OVERVIEW TAB</span>
               </div>
-              <h4>{activeNodeData.tech}</h4>
-              <p>{activeNodeData.desc}</p>
+              <h3>Real-Time Spendable Liquidity Dashboard</h3>
             </div>
-
-            <div className="inspector-metrics-grid">
-              {Object.entries(activeNodeData.metrics).map(([k, v]) => (
-                <div key={k} className="inspector-metric-card">
-                  <span className="metric-k">{k}</span>
-                  <span className="metric-v">{v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ==========================================================================
-         STAGE BY STAGE DETAILED ARCHITECTURE CARDS (SCROLLABLE DOWN)
-         ========================================================================== */}
-      <div className="inspect-stages-list">
-        {/* Stage 1 Card */}
-        <div className={`inspect-stage-card ${activeStage === 1 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
-              <Database size={22} />
-            </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}>STAGE 1</span>
-              <h3>Multi-Channel Financial Data Ingestion & UTC Normalization</h3>
-            </div>
-          </div>
-
-          <p className="stage-desc-text">
-            Ingests real-time financial transaction activity streams from bank transfers, bKash, Upay, card POS terminals, and utility billers. Performs strict Pydantic schema validation, direction classification (INFLOW / OUTFLOW), and ISO 8601 UTC timestamp normalization.
-          </p>
-
-          <div className="stage-details-grid">
-            <div className="detail-box">
-              <span className="detail-title">Ingestion Channels</span>
-              <span className="detail-val">Bank API, bKash MFS, Upay, POS, Utility Billers</span>
-            </div>
-            <div className="detail-box">
-              <span className="detail-title">Timezone Standard</span>
-              <span className="detail-val">UTC (Coordinated Universal Time / ISO 8601)</span>
-            </div>
-            <div className="detail-box">
-              <span className="detail-title">Direction Classifier</span>
-              <span className="detail-val">INFLOW (Salary/Transfer) vs OUTFLOW (Expenses)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Stage 2 Card */}
-        <div className={`inspect-stage-card ${activeStage === 2 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>
-              <Layers size={22} />
-            </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#a855f7', borderColor: 'rgba(168, 85, 247, 0.3)' }}>STAGE 2</span>
-              <h3>Rolling Window Feature Store & Aggregators</h3>
-            </div>
-          </div>
-
-          <p className="stage-desc-text">
-            Transforms raw transactions into high-dimensional feature vectors over 7-day, 14-day, and 30-day lookback windows. Calculates spending volatility (σ), recency-weighted cash flow ratios, and category concentration scores.
-          </p>
-
-          <div className="stage-formula-card">
-            <span className="formula-title">Outflow Volatility Formulation (σ_outflow):</span>
-            <div className="math-code-box">
-              {"\\sigma_{\\text{outflow}} = \\sqrt{\\frac{1}{N}\\sum_{i=1}^N (x_i - \\bar{x})^2}"}
-            </div>
-          </div>
-        </div>
-
-        {/* Stage 3 Card */}
-        <div className={`inspect-stage-card ${activeStage === 3 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(0, 229, 163, 0.15)', color: '#00e5a3' }}>
-              <Cpu size={22} />
-            </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#00e5a3', borderColor: 'rgba(0, 229, 163, 0.3)' }}>STAGE 3</span>
-              <h3>Machine Learning Model Ensemble (XGBoost, LightGBM & DBSCAN)</h3>
-            </div>
-          </div>
-
-          <p className="stage-desc-text">
-            Combines gradient boosted decision trees with spatial clustering algorithms to compute multi-horizon predictions and commitment detection without relying on static rules.
-          </p>
-
-          <div className="ml-models-breakdown-grid">
-            <div className="ml-card">
-              <div className="ml-card-head">
-                <GitBranch size={16} color="#00e5a3" />
-                <h4>XGBoost Classifier</h4>
+            <p className="tab-card-desc">
+              Shows how much money you can <em>actually spend today</em> without risking upcoming bills or falling below your safety threshold.
+            </p>
+            <div className="tab-details-list">
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#00e5a3" />
+                <span><strong>Data Source:</strong> Real-time account balance from database + DBSCAN detected upcoming commitments.</span>
               </div>
-              <p>Evaluates non-linear feature interactions to predict 30-day liquidity distress risk probabilities.</p>
-            </div>
-
-            <div className="ml-card">
-              <div className="ml-card-head">
-                <TrendingUp size={16} color="#38bdf8" />
-                <h4>LightGBM Forecaster</h4>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#00e5a3" />
+                <span><strong>Core Calculation:</strong> Subtracts 30-day bill commitments and safety buffer from current balance.</span>
               </div>
-              <p>Predicts 30-day daily projected balance trajectories with fast histogram-based tree boosting.</p>
-            </div>
-
-            <div className="ml-card">
-              <div className="ml-card-head">
-                <BarChart3 size={16} color="#a855f7" />
-                <h4>DBSCAN Recurring Detector</h4>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#00e5a3" />
+                <span><strong>Visual Widgets:</strong> Liquidity Progress Bar, Safe Daily Limit, upcoming commitment timeline cards.</span>
               </div>
-              <p>Clusters transaction inter-arrival times Δt and amount variances to detect monthly rent & bill commitments.</p>
+            </div>
+          </div>
+
+          {/* Activity Tab */}
+          <div className="tab-explain-card">
+            <div className="tab-card-header">
+              <div className="tab-badge activity-badge">
+                <Activity size={16} />
+                <span>ACTIVITY TAB</span>
+              </div>
+              <h3>Multi-Channel Financial Activity Stream</h3>
+            </div>
+            <p className="tab-card-desc">
+              Lists and categorizes every financial transaction ingested across bank accounts, bKash, Upay, and card terminals.
+            </p>
+            <div className="tab-details-list">
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#38bdf8" />
+                <span><strong>Ingestion Pipeline:</strong> Standardizes all timestamps into UTC ISO 8601 strings and validates schemas.</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#38bdf8" />
+                <span><strong>Direction Classification:</strong> Separates INFLOW (salaries, transfers) vs OUTFLOW (bills, food, rent).</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#38bdf8" />
+                <span><strong>Filtering & Analytics:</strong> Filter by date ranges, categories, channels, or payment sources.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Forecast Tab */}
+          <div className="tab-explain-card">
+            <div className="tab-card-header">
+              <div className="tab-badge forecast-badge">
+                <TrendingUp size={16} />
+                <span>FORECAST TAB</span>
+              </div>
+              <h3>30-Day Predictive Cash Flow & Trajectory</h3>
+            </div>
+            <p className="tab-card-desc">
+              Projects daily bank balance trajectories over the next 30 days using machine learning, pointing out potential deficit drop dates.
+            </p>
+            <div className="tab-details-list">
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#a855f7" />
+                <span><strong>LightGBM Forecaster:</strong> Predicts daily balance trajectory using histogram-based gradient boosting.</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#a855f7" />
+                <span><strong>DBSCAN Bill Clustering:</strong> Automatically flags monthly recurring bills (rent, utilities) on calendar dates.</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#a855f7" />
+                <span><strong>Risk Alert:</strong> Highlights projected cash crunch dates with exact recommended savings buffers.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Simulate Tab */}
+          <div className="tab-explain-card">
+            <div className="tab-card-header">
+              <div className="tab-badge simulate-badge">
+                <Sliders size={16} />
+                <span>SIMULATE TAB</span>
+              </div>
+              <h3>What-If Scenario Engine & Spendable AI</h3>
+            </div>
+            <p className="tab-card-desc">
+              Allows users to test hypothetical purchases, salary delays, or expense spikes in real-time, coupled with our Spendable AI chat assistant.
+            </p>
+            <div className="tab-details-list">
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#ec4899" />
+                <span><strong>In-Memory Simulation:</strong> Recalculates Spendable Capacity instantly without touching underlying DB tables.</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#ec4899" />
+                <span><strong>Delta Evaluation:</strong> Shows immediate Δ Spendable impact (e.g. buying a $350 phone drops Spendable by $350).</span>
+              </div>
+              <div className="detail-item">
+                <CheckCircle2 size={16} color="#ec4899" />
+                <span><strong>Spendable AI Integration:</strong> Ask Spendable AI questions about your financial context with full guardrails.</span>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Stage 4 Card */}
-        <div className={`inspect-stage-card ${activeStage === 4 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
-              <ShieldCheck size={22} />
-            </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.3)' }}>STAGE 4</span>
-              <h3>Deterministic Spendable Liquidity Engine</h3>
-            </div>
+      {/* 4. DEEP DIVE: OUR MACHINE LEARNING MODELS */}
+      <section className="inspect-section">
+        <div className="section-header-row">
+          <div className="section-icon-bubble">
+            <Cpu size={22} color="#a855f7" />
           </div>
-
-          <p className="stage-desc-text">
-            Enforces strict responsible AI separation: **Financial calculations are 100% deterministic code**. Never uses LLMs for arithmetic or money balances.
-          </p>
-
-          <div className="stage-formula-card">
-            <span className="formula-title">Authoritative Spendable Capacity Formula:</span>
-            <div className="math-code-box">
-              {"\\text{Spendable} = \\max\\left(0, \\text{Balance} - \\text{Upcoming Commitments} - \\text{Safety Reserve}\\right)"}
-            </div>
+          <div>
+            <h2 className="section-title">Machine Learning Model Ensemble Breakdown</h2>
+            <p className="section-subtitle">How we trained our models, how detection works, and why we use specialized ML algorithms</p>
           </div>
         </div>
 
-        {/* Stage 5 Card */}
-        <div className={`inspect-stage-card ${activeStage === 5 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
-              <Sliders size={22} />
+        <div className="ml-models-deepdive-grid">
+          {/* XGBoost Card */}
+          <div className="ml-model-card">
+            <div className="model-card-top">
+              <div className="model-icon-box xgboost-icon">
+                <BarChart3 size={24} />
+              </div>
+              <div>
+                <span className="model-tag">CLASSIFIER</span>
+                <h3>XGBoost Liquidity Distress Predictor</h3>
+              </div>
             </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#ec4899', borderColor: 'rgba(236, 72, 153, 0.3)' }}>STAGE 5</span>
-              <h3>What-If Scenario Simulator Engine</h3>
+            <p className="model-desc">
+              Evaluates non-linear feature interactions to predict the probability of liquidity distress over a 30-day horizon (P(distress) ∈ [0, 1]).
+            </p>
+            <div className="model-specs-grid">
+              <div className="spec-box">
+                <span className="spec-lbl">Algorithm</span>
+                <span className="spec-val">Gradient Boosted Decision Trees</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Primary Features</span>
+                <span className="spec-val">14-day spending volatility (σ), cash flow buffer ratio</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Hyper-Parameters</span>
+                <span className="spec-val">100 trees, learning rate 0.05, max depth 6</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Training Method</span>
+                <span className="spec-val">5-fold cross-validation on 6-month transaction series</span>
+              </div>
             </div>
           </div>
 
-          <p className="stage-desc-text">
-            Evaluates hypothetical purchases, salary delays, or percent changes in memory without mutating base database tables. Computes exact Δ Spendable and tracks state transitions.
-          </p>
-        </div>
-
-        {/* Stage 6 Card */}
-        <div className={`inspect-stage-card ${activeStage === 6 ? 'stage-card-active' : ''}`}>
-          <div className="stage-card-header">
-            <div className="stage-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-              <Bot size={22} />
+          {/* LightGBM Card */}
+          <div className="ml-model-card">
+            <div className="model-card-top">
+              <div className="model-icon-box lightgbm-icon">
+                <TrendingUp size={24} />
+              </div>
+              <div>
+                <span className="model-tag">FORECASTER</span>
+                <h3>LightGBM Daily Balance Forecaster</h3>
+              </div>
             </div>
-            <div>
-              <span className="stage-badge-tag" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.3)' }}>STAGE 6</span>
-              <h3>Responsible AI Safeguards & Spendable AI Layer</h3>
+            <p className="model-desc">
+              Predicts daily closing balances for each day t in range [1, 30] into the future with fast, histogram-based tree splitting.
+            </p>
+            <div className="model-specs-grid">
+              <div className="spec-box">
+                <span className="spec-lbl">Algorithm</span>
+                <span className="spec-val">Histogram-based Gradient Boosting</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Primary Features</span>
+                <span className="spec-val">Day-of-week, day-of-month, 7d/30d moving average balance</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Optimization Metric</span>
+                <span className="spec-val">Mean Absolute Error (MAE)</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Execution Speed</span>
+                <span className="spec-val">&lt; 15ms inference latency</span>
+              </div>
             </div>
           </div>
 
-          <p className="stage-desc-text">
-            Ingests structured account context JSON into Google Gemini SDK. Identifies strictly as "Spendable AI" and enforces strict financial scope guardrails to reject out-of-scope prompts.
-          </p>
+          {/* DBSCAN Card */}
+          <div className="ml-model-card">
+            <div className="model-card-top">
+              <div className="model-icon-box dbscan-icon">
+                <Calendar size={24} />
+              </div>
+              <div>
+                <span className="model-tag">CLUSTERING</span>
+                <h3>DBSCAN Recurring Commitment Detector</h3>
+              </div>
+            </div>
+            <p className="model-desc">
+              Unsupervised spatial clustering that detects recurring monthly bills (rent, Spotify, utilities) without hardcoded rules.
+            </p>
+            <div className="model-specs-grid">
+              <div className="spec-box">
+                <span className="spec-lbl">Algorithm</span>
+                <span className="spec-val">Density-Based Spatial Clustering (DBSCAN)</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Clustering Space</span>
+                <span className="spec-val">Inter-arrival time (Δt ≈ 30 days) & amount variance</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Parameters</span>
+                <span className="spec-val">Epsilon ε = 3.0 days, Min Samples = 2</span>
+              </div>
+              <div className="spec-box">
+                <span className="spec-lbl">Output</span>
+                <span className="spec-val">Auto-tagged recurring bills & expected due dates</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* 5. RESPONSIBLE AI ARCHITECTURE */}
+      <section className="inspect-section responsible-ai-banner">
+        <div className="responsible-header">
+          <div className="responsible-icon-box">
+            <ShieldCheck size={28} color="#00e5a3" />
+          </div>
+          <div>
+            <h3>Responsible AI Architecture — 100% Deterministic Financial Calculations</h3>
+            <p>Why we strictly separate money calculations from LLM Generative AI</p>
+          </div>
+        </div>
+
+        <div className="responsible-content-grid">
+          <div className="responsible-col">
+            <div className="col-tag math-tag">DETERMINISTIC MATH ENGINE (100% CODE)</div>
+            <h4>Calculates All Financial Figures</h4>
+            <p>All numbers, Spendable balances, 30-day bill totals, and scenario deltas are computed in pure Python code using hardcoded formulas:</p>
+            <div className="formula-code-badge">
+              <code>Spendable = Max(0, Current Balance - 30-Day Commitments - Safety Buffer)</code>
+            </div>
+            <p className="sub-note">✓ Guarantees 0% math error and 0% financial hallucination.</p>
+          </div>
+
+          <div className="responsible-col">
+            <div className="col-tag llm-tag">SPENDABLE AI (GEMINI LLM LAYER)</div>
+            <h4>Natural Language Guidance & Explanations</h4>
+            <p>Receives exact calculated facts from the Deterministic Engine and translates them into friendly conversational advice:</p>
+            <div className="prompt-facts-badge">
+              <span>Injected Facts: <code>Account Balance = $1,850</code> | <code>Upcoming Rent = $850</code> | <code>Spendable = $700</code></span>
+            </div>
+            <p className="sub-note">✓ Identifies as Spendable AI and stays strictly on money management topics.</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
