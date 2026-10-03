@@ -17,8 +17,9 @@ from app.services.spendable_service import SpendableService
 SPENDABLE_AI_SYSTEM_INSTRUCTION = """You are "Spendable AI", the official intelligent personal financial liquidity assistant embedded inside the Spendable application.
 
 YOUR IDENTITY & NAME:
-- You MUST ALWAYS identify yourself as "Spendable AI".
-- NEVER refer to yourself as "Gemini", "Google Gemini", "ChatGPT", or "an AI trained by Google". You are "Spendable AI".
+- You MUST identify yourself as "Spendable AI".
+- NEVER refer to yourself as "Gemini", "Google Gemini", "ChatGPT", or "an AI trained by Google".
+- INTRODUCTORY GREETING RULE: Include the introduction "I am Spendable AI, your personal financial liquidity assistant" ONLY in your FIRST reply in a conversation. On all subsequent messages/replies, DO NOT repeat "I am Spendable AI..." or re-introduce yourself — answer the user's question directly without repeating your intro greeting line.
 
 YOUR PURPOSE & CAPABILITIES:
 - Help users analyze their current liquid balance, safe spendable amount, 30-day forecasted balance trajectory, upcoming recurring commitments, ML liquidity risk predictions (XGBoost/LightGBM risk assessments), and hypothetical What-If scenario simulations.
@@ -29,8 +30,10 @@ STRICT SCOPE & SAFETY GUARDRAILS:
    - You are strictly dedicated to personal finance, money management, spending runway analysis, budgeting, cash flow forecasts, recurring commitments, and what-if financial scenario simulations.
 2. REJECT OUT-OF-SCOPE / IRRELEVANT REQUESTS:
    - If the user asks for non-financial or irrelevant tasks (such as "write me a story", "write python code", "who won the game", "tell me a joke", "what is the capital of France", "help with math homework", or any general non-financial prompt), YOU MUST POLITELY DECLINE.
-   - You MUST respond with:
+   - For a first prompt refusal, say:
      "I am Spendable AI, your personal financial liquidity assistant. I can only assist with questions related to your spending, finances, money management, or scenario simulations. How can I help you analyze your finances today?"
+   - For subsequent prompt refusals, omit the intro and say:
+     "I can only assist with questions related to your spending, finances, money management, or scenario simulations. How can I help you analyze your finances today?"
 3. TRUTHFULNESS & DATA FAITHFULNESS:
    - Base your answers strictly on the REAL account context provided in the prompt.
    - Always format money amounts using the Bangladeshi Taka symbol (৳).
@@ -110,6 +113,7 @@ class SpendableAIChatEngine:
     ) -> ChatResponse:
         """Generate response via Gemini SDK or fallback engine."""
         msg_lower = user_message.strip().lower()
+        is_first_turn = not chat_history or len(chat_history) <= 1
 
         # Keyword pre-check for obvious out-of-scope non-financial queries
         out_of_scope_triggers = [
@@ -119,14 +123,15 @@ class SpendableAIChatEngine:
             "essay", "poem", "recipe", "sing a song"
         ]
         if any(trigger in msg_lower for trigger in out_of_scope_triggers):
+            refusal_prefix = "I am Spendable AI, your personal financial liquidity assistant. " if is_first_turn else ""
             return ChatResponse(
-                reply="I am Spendable AI, your personal financial liquidity assistant. I can only assist with questions related to your spending, finances, money management, or scenario simulations. How can I help you analyze your finances today?",
+                reply=f"{refusal_prefix}I can only assist with questions related to your spending, finances, money management, or scenario simulations. How can I help you analyze your finances today?",
                 agent_name="Spendable AI",
                 context_used={"status": "out_of_scope_rejected"}
             )
 
         if not self.api_key or self.api_key.strip() == "":
-            return self._generate_fallback(user_message, account_context)
+            return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn)
 
         try:
             from google import genai
@@ -148,6 +153,8 @@ class SpendableAIChatEngine:
 RECENT CONVERSATION HISTORY:
 {history_str if history_str else "None"}
 
+IS_FIRST_REPLY_IN_CONVERSATION: {is_first_turn}
+
 USER QUESTION:
 {user_message}
 """
@@ -163,7 +170,7 @@ USER QUESTION:
 
             reply_text = response.text or ""
             if not reply_text.strip():
-                return self._generate_fallback(user_message, account_context)
+                return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn)
 
             return ChatResponse(
                 reply=reply_text.strip(),
@@ -172,12 +179,13 @@ USER QUESTION:
             )
         except Exception as e:
             # Fallback if Gemini API call fails or hits capacity limits
-            return self._generate_fallback(user_message, account_context, error_str=str(e))
+            return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn, error_str=str(e))
 
     def _generate_fallback(
         self,
         user_message: str,
         account_context: Dict[str, Any],
+        is_first_turn: bool = True,
         error_str: Optional[str] = None,
     ) -> ChatResponse:
         """Deterministic intelligent fallback when Gemini API key is missing or fails."""
@@ -191,7 +199,8 @@ USER QUESTION:
         scen = account_context.get("active_simulated_scenario")
 
         reply_parts = []
-        reply_parts.append(f"Hello! I am **Spendable AI**, your personal financial liquidity assistant.\n")
+        if is_first_turn:
+            reply_parts.append("Hello! I am **Spendable AI**, your personal financial liquidity assistant.\n")
 
         if scen:
             scen_type = scen.get("scenario_type", "SIMULATION")
@@ -216,3 +225,4 @@ USER QUESTION:
             agent_name="Spendable AI",
             context_used=account_context,
         )
+
