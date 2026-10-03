@@ -30,7 +30,7 @@ The application features 5 main pages accessible from the persistent top navigat
 
 ## 🛠️ Key Components
 
-- **`Header.tsx`**: Navigation menu, mobile drawer, account badge, and demo persona selector (`acc_supan`, `acc_tanvir`, `acc_sarah`, `acc_fatima`).
+- **`Header.tsx`**: Navigation menu, mobile drawer, account badge, and demo persona selector (`acc_supan`, `acc_meraj`, `acc_sohana`, `acc_noman`, `acc_refat`).
 - **`CalculationModal.tsx`**: Mathematical formula modal detailing the non-double-counting Spendable equation.
 - **`LoginModal.tsx`**: Custom account creation, login, and instant demo account quick-selector.
 - **`ConfirmModal.tsx`**: Reusable confirmation modal for account deletions and critical actions.

@@ -27,7 +27,7 @@ By combining point-in-time machine learning cash-flow forecasting, automated rec
 - **Live Application URL for Judges**: [https://spendable.supanroy.com/](https://spendable.supanroy.com/)
 - **API Health Check Endpoint**: [https://spendable.supanroy.com/api/v1/health](https://spendable.supanroy.com/api/v1/health)
 
-*(Note: The live deployment includes pre-configured demo personas (`acc_supan`, `acc_tanvir`, `acc_sarah`, `acc_fatima`) allowing judges to explore all features instantly without registration).*
+*(Note: The live deployment includes pre-configured demo personas (`acc_supan`, `acc_meraj`, `acc_sohana`, `acc_noman`, `acc_refat`) allowing judges to explore all features instantly without registration).*
 
 ---
 
@@ -195,11 +195,12 @@ $env:PYTHONPATH='backend'; python -m pytest backend/tests/test_scenario_simulati
 ## ⚙️ Other Configuration & Access Requirements
 
 ### Demo Persona Quick-Selectors
-Spendable requires **zero manual registration** to evaluate. The app includes 4 pre-loaded financial personas with diverse transaction profiles:
-- **`acc_supan` (Supan Roy)**: Standard salaried professional persona with regular monthly income and bill commitments.
-- **`acc_tanvir` (Tanvir Ahmed)**: Variable-income freelancer persona with irregular inflows and high spending volatility.
-- **`acc_sarah` (Sarah Khan)**: High-net-worth persona with multi-channel investments and luxury commitments.
-- **`acc_fatima` (Fatima Begum)**: Tight-liquidity persona vulnerable to low-cash drop dates.
+Spendable requires **zero manual registration** to evaluate. The app includes 5 pre-loaded canonical demo accounts:
+- **`acc_supan` (Supan)**: Stable cash flow profile with regular monthly income and bill commitments (Current Balance: ৳321,000).
+- **`acc_meraj` (Meraj)**: Tight liquidity persona with low-cash drawdown risk (Current Balance: ৳27,000).
+- **`acc_sohana` (Sohana)**: Dynamic spending changes & variable category allocations (Current Balance: ৳308,000).
+- **`acc_noman` (Noman)**: Variable income / freelance inflow persona (Current Balance: ৳321,000).
+- **`acc_refat` (Refat)**: High recurring commitment burden persona (Current Balance: ৳192,000).
 
 Switch between demo personas instantly using the top header dropdown or the Login modal quick-selector.
 
