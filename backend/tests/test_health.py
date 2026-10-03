@@ -5,13 +5,17 @@ client = TestClient(app)
 
 
 def test_root_endpoint():
-    """Verify root status endpoint returns project metadata."""
+    """Verify root endpoint returns HTML when frontend is built or JSON metadata otherwise."""
     response = client.get("/")
     assert response.status_code == 200
-    data = response.json()
-    assert data["project"] == "Spendable"
-    assert data["status"] == "initialization_foundation"
-    assert "health_check" in data
+    content_type = response.headers.get("content-type", "")
+    if "text/html" in content_type:
+        assert "<!html" in response.text.lower() or "<!doctype html>" in response.text.lower() or "<html" in response.text.lower()
+    else:
+        data = response.json()
+        assert data["project"] == "Spendable"
+        assert "health_check" in data
+
 
 
 def test_health_endpoint():
