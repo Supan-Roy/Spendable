@@ -123,15 +123,27 @@ export const ForecastPage: React.FC = () => {
   // Extract daily trajectory points from top-level daily_trajectory or item fallback
   const rawTrajectory =
     forecastData?.daily_trajectory ||
-    currentForecastItem?.daily_balances ||
+    (currentForecastItem as any)?.daily_balances ||
     [];
 
-  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item) => ({
-    date: item.date || '',
-    balance: typeof item.balance === 'number' ? item.balance : 0,
-  }));
+  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item: any) => {
+    const rawDate = item.date_str || item.date || '';
+    const rawBal =
+      typeof item.projected_balance === 'number'
+        ? item.projected_balance
+        : typeof item.balance === 'number'
+        ? item.balance
+        : typeof item.minimum_balance === 'number'
+        ? item.minimum_balance
+        : 0;
 
-  // Fallback for empty trajectory: create flat line from current_balance
+    return {
+      date: rawDate,
+      balance: rawBal,
+    };
+  });
+
+  // Fallback for empty trajectory: create trajectory line from current_balance
   if (dailyBalances.length === 0) {
     const today = new Date();
     const curBal = (forecastData as any)?.current_balance || 0;
@@ -147,7 +159,7 @@ export const ForecastPage: React.FC = () => {
 
   // Render SVG Chart calculations
   const minVal = Math.min(...dailyBalances.map((d: DailyTrajectoryItem) => d.balance), minProjBal, 0);
-  const maxVal = Math.max(...dailyBalances.map((d: DailyTrajectoryItem) => d.balance), 10000);
+  const maxVal = Math.max(...dailyBalances.map((d: DailyTrajectoryItem) => d.balance), safetyReserve * 1.2, 10000);
   const range = maxVal - minVal || 1;
 
   const chartWidth = 760;
@@ -307,16 +319,23 @@ export const ForecastPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {dailyBalances.map((item: DailyTrajectoryItem, idx: number) => (
-                <tr key={idx}>
-                  <td className="font-mono">{formatShortDate(item.date)}</td>
-                  <td className="font-mono bold-text">{formatCurrency(item.balance)}</td>
-                  <td className="font-mono">{formatCurrency(safetyReserve)}</td>
-                  <td>
-                    <span className="status-pill healthy">Normal</span>
-                  </td>
-                </tr>
-              ))}
+              {dailyBalances.map((item: DailyTrajectoryItem, idx: number) => {
+                const isCritical = item.balance < (safetyReserve * 0.5);
+                const isLow = item.balance < safetyReserve;
+                const statusLabel = isCritical ? 'Critical' : isLow ? 'Low Cushion' : 'Optimal';
+                const statusClass = isCritical ? 'danger' : isLow ? 'warning' : 'healthy';
+
+                return (
+                  <tr key={idx}>
+                    <td className="font-mono">{formatShortDate(item.date) || item.date}</td>
+                    <td className="font-mono bold-text">{formatCurrency(item.balance)}</td>
+                    <td className="font-mono">{formatCurrency(safetyReserve)}</td>
+                    <td>
+                      <span className={`status-pill ${statusClass}`}>{statusLabel}</span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

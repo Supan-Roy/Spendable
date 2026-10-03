@@ -165,6 +165,17 @@ class SpendableService:
             feats = snap_data.get("features", {"current_balance": snap_data.get("current_balance", 0.0), "account_id": user_id})
             forecast = self.data_provider.forecast_model.predict_snapshot(feats)
 
+        sp_out = self.calculator.calculate(
+            user_id=snap_data["user_id"],
+            snapshot_time=snap_data["snapshot_time"],
+            current_balance=snap_data["current_balance"],
+            features=snap_data["features"],
+            commitments=snap_data["commitments"],
+            forecast=snap_data["forecast"],
+        )
+
+        effective_safety = sp_out.safety_reserve if sp_out.safety_reserve > 0 else forecast.safety_threshold_bdt
+
         res = SpendableForecastResponse(
             user_id=forecast.user_id,
             snapshot_time=forecast.snapshot_time,
@@ -173,7 +184,7 @@ class SpendableService:
             forecast_14d=forecast.forecast_14d,
             forecast_30d=forecast.forecast_30d,
             daily_trajectory=forecast.daily_trajectory,
-            safety_threshold_bdt=forecast.safety_threshold_bdt,
+            safety_threshold_bdt=effective_safety,
         )
         self._forecast_cache[cache_key] = (now, res)
         return res
