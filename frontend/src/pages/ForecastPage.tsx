@@ -262,11 +262,11 @@ export const ForecastPage: React.FC = () => {
         </div>
 
         <div className="svg-chart-wrapper">
-          <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="trajectory-svg">
+          <svg key={`${selectedHorizon}-${currentUser?.account_id}`} viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="trajectory-svg">
             <defs>
               <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#00e5a3" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#00e5a3" stopOpacity="0.01" />
+                <stop offset="0%" stopColor="#00e5a3" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#00e5a3" stopOpacity="0.0" />
               </linearGradient>
             </defs>
 
@@ -299,11 +299,21 @@ export const ForecastPage: React.FC = () => {
               />
             )}
 
-            {/* Area Gradient Fill */}
-            {areaD && <path d={areaD} fill="url(#chartAreaGradient)" />}
+            {/* Area Gradient Fill with Fade-in Animation */}
+            {areaD && <path d={areaD} fill="url(#chartAreaGradient)" className="trajectory-area-animated" />}
 
-            {/* Main Balance Line */}
-            {pathD && <path d={pathD} fill="none" stroke="#00e5a3" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />}
+            {/* Main Balance Line with Progressive Stroke Draw Animation */}
+            {pathD && (
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#00e5a3"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="trajectory-path-animated"
+              />
+            )}
 
             {/* Point circles */}
             {points.map((p: { x: number; y: number; balance: number; date: string }, idx: number) => (
@@ -318,7 +328,7 @@ export const ForecastPage: React.FC = () => {
 
             {/* Lowest Drawdown Callout */}
             {lowestPoint && lowestPoint.y > paddingTop + 10 && (
-              <g>
+              <g className="trajectory-callout-animated">
                 <circle cx={lowestPoint.x} cy={lowestPoint.y} r={5} fill="#f59e0b" stroke="#0f172a" strokeWidth="2" />
                 <text x={lowestPoint.x} y={Math.max(paddingTop + 12, lowestPoint.y - 10)} fill="#f59e0b" fontSize="10" fontWeight="700" fontFamily="var(--font-mono)" textAnchor="middle">
                   Min {formatCurrency(lowestPoint.balance)}
