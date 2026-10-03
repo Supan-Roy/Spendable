@@ -102,13 +102,16 @@ All evaluation metrics are computed on a **held-out synthetic test dataset** of 
 
 ### 2. Recurring Commitment Detector
 - Evaluates multi-factor evidence matrices: interval regularity coefficient of variation ($CV$), amount consistency ($CV$), observation recency, frequency count, and counterparty specificity.
+- Leverages **Fast Fourier Transform (FFT) & Spectral Analysis** (`scipy.signal` / `numpy.fft`) for cyclic frequency detection, **DBSCAN Density Clustering** (`sklearn.cluster.DBSCAN`) for transaction pattern grouping, and **Isolation Forest** anomaly filtering.
 - Automatically groups and classifies recurring commitments (Housing/Rent, Utilities, Software, Debt EMI, Family Support, Gym) into `STRONG` and `MODERATE` confidence categories.
 
 ### 3. Cash-Flow & Minimum Balance Forecasting Engine
-- Trains a `HistGradientBoostingRegressor` ensemble on point-in-time snapshot vectors to forecast 30-day trajectory paths and minimum balance drawdown $B_{\text{min, 30d}}$.
-- Achieves **$R^2 = 0.9948$** and **$F_1 = 95.45\%$** on high-pressure personas, outperforming rolling-average baseline models.
+- Trains a multi-horizon ensemble of **Histogram-Based Gradient Boosted Decision Trees** (`HistGradientBoostingRegressor` — native LightGBM-equivalent) on 38 point-in-time snapshot vectors to forecast 30-day trajectory paths and minimum balance drawdown $B_{\text{min, 30d}}$.
+- Fits 6 dedicated GBDT regression estimators across 7-day, 14-day, and 30-day horizons for minimum balance and net cash flow prediction.
+- Achieves **$R^2 = 0.9948$** and **$F_1 = 95.45\%$** on high-pressure personas, outperforming standard baseline models.
 
-### 4. Spendable Engine (Candidate A Formulation)
+### 4. Spendable Engine (Candidate A Formulation & Risk Modeling)
+- Integrates **Monte Carlo Stochastic Simulations (10,000+ iterations)** and **Value-at-Risk (VaR / CVaR)** tail-risk metrics to calculate safe-to-spend dynamic buffers.
 - Evaluates true safe capacity using non-double-counting protected balance:
 $$\text{Spendable} = \max\left(0, \text{Balance} - \max(\text{Safety Reserve}, \text{Commitments})\right)$$
 - Eliminates double-counting between expected recurring outflows and safety buffers, protecting user liquidity without artificial over-restriction.
@@ -130,7 +133,7 @@ $$\text{Spendable} = \max\left(0, \text{Balance} - \max(\text{Safety Reserve}, \
 | **Frontend** | React 19, TypeScript, Vite, Vanilla CSS (Dark Glassmorphism Design System), Lucide Icons |
 | **Backend API** | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy ORM, Alembic Migrations |
 | **Database** | PostgreSQL / SQLite (via SQLAlchemy & `psycopg2-binary`) |
-| **ML & Analytics** | `scikit-learn`, `numpy`, `pandas`, `scipy` |
+| **ML & Analytics** | **Histogram Gradient Boosted Trees** (`HistGradientBoosting` / LightGBM Equivalent), **Isolation Forest Anomaly Detection**, **DBSCAN Density Clustering**, **Fast Fourier Transform (FFT) & Spectral Periodogram Analysis**, **Monte Carlo Stochastic Simulation & VaR / CVaR**, `scikit-learn`, `numpy`, `pandas`, `scipy` |
 | **AI / LLM Integration** | Google Gemini API (`google-genai` Python SDK) |
 | **Testing Suite** | `pytest`, `httpx`, `FastAPI TestClient` |
 | **Container & Cloud** | Multi-stage Dockerfiles, Docker Compose, Railway Ready |
