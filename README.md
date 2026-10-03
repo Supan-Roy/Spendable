@@ -2,6 +2,8 @@
 
 > **"Know what you can safely spend."**
 
+🏆 **Hackathon Track**: **Track 03: Customer Innovation & Financial Independence**
+
 Spendable is an AI-powered personal financial runway and liquidity intelligence platform. 
 
 While traditional banking apps and spreadsheets display a static balance (e.g., *"You have ৳18,400"*), **Spendable** calculates and predicts how much of that balance is realistically and safely spendable after accounting for expected short-term outflows, detected recurring commitments, behavioral spending patterns, and dynamic safety reserves.
