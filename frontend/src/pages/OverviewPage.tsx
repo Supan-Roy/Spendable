@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getOverviewApi, getRecommendationsApi } from '../api/spendable';
 import { injectSampleDataApi } from '../api/auth';
 import type { SpendableOverviewResponse, SpendableRecommendationsResponse } from '../api/types';
-import { formatCurrency, getLiquidityBadgeConfig } from '../utils/formatters';
+import { formatCurrency, formatDateTime, getLiquidityBadgeConfig } from '../utils/formatters';
 import {
   HelpCircle,
   Sliders,
@@ -195,6 +195,12 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
 
             <div className="hero-subline">
               <span>over the next {overview.planning_horizon_days || 30} days</span>
+              {overview.snapshot_time && (
+                <>
+                  <span className="status-divider">•</span>
+                  <span className="text-dim">As of {formatDateTime(overview.snapshot_time)}</span>
+                </>
+              )}
             </div>
 
             <div className="spendable-status-bar">

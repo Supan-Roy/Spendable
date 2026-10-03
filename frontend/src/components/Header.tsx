@@ -14,7 +14,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenLogin }) => {
-  const { currentUser, loginAsDemo, logout, deleteAccount, isAuthenticated, demoAccounts } = useAuth();
+  const { currentUser, loginAsDemo, deleteAccount, isAuthenticated, demoAccounts } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -156,7 +156,6 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                   className="logout-dropdown-item"
                   onClick={() => {
                     setDropdownOpen(false);
-                    logout();
                     onOpenLogin();
                   }}
                 >

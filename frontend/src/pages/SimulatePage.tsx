@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { postSimulateApi } from '../api/spendable';
 import type { ScenarioType, ScenarioResult } from '../api/types';
-import { formatCurrency, getLiquidityBadgeConfig } from '../utils/formatters';
+import { formatCurrency, formatDateTime, getLiquidityBadgeConfig } from '../utils/formatters';
 import { Sliders, ArrowRight, RotateCcw, AlertTriangle, Shield } from 'lucide-react';
 
 export const SimulatePage: React.FC = () => {
@@ -178,7 +178,14 @@ export const SimulatePage: React.FC = () => {
           ) : (
             <div className="scenario-results-card">
               <div className="results-header">
-                <h3>Scenario Impact Result</h3>
+                <div>
+                  <h3>Scenario Impact Result</h3>
+                  {result.snapshot_time && (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                      Simulated at {formatDateTime(result.snapshot_time)}
+                    </div>
+                  )}
+                </div>
                 {result.state_changed && (
                   <span className="state-changed-tag">State Changed</span>
                 )}

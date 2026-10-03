@@ -58,7 +58,7 @@ def test_strong_monthly_recurring_pattern(default_detector, base_snapshot):
     assert comm.is_commitment is True
     assert comm.recurrence_interval == RecurrenceIntervalType.MONTHLY
     assert comm.detection_status == DetectionStatus.STRONG
-    assert comm.next_expected_date in ("2026-10-01", "2026-10-02")
+    assert comm.next_expected_date.startswith(("2026-10-01", "2026-10-02"))
     assert comm.confidence_score >= 0.70
 
 

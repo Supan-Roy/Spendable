@@ -17,11 +17,36 @@ export function formatCurrencyExact(amount: number | null | undefined): string {
   return `৳${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+export function formatDateTime(isoDateStr: string | null | undefined): string {
+  if (!isoDateStr) return '—';
+  try {
+    const d = new Date(isoDateStr);
+    if (isNaN(d.getTime())) return isoDateStr;
+    const dateStr = d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    const timeStr = d.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+    return `${dateStr}, ${timeStr}`;
+  } catch {
+    return isoDateStr;
+  }
+}
+
 export function formatDate(isoDateStr: string | null | undefined): string {
   if (!isoDateStr) return '—';
   try {
     const d = new Date(isoDateStr);
     if (isNaN(d.getTime())) return isoDateStr;
+    if (isoDateStr.includes('T') || isoDateStr.includes(':')) {
+      return formatDateTime(isoDateStr);
+    }
     return d.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -29,6 +54,22 @@ export function formatDate(isoDateStr: string | null | undefined): string {
     });
   } catch {
     return isoDateStr;
+  }
+}
+
+export function formatTime(isoDateStr: string | null | undefined): string {
+  if (!isoDateStr) return '';
+  try {
+    const d = new Date(isoDateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return '';
   }
 }
 

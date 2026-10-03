@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth, DEMO_PERSONAS } from '../context/AuthContext';
 import { Sparkles, ArrowRight, UserCheck, UserPlus, AlertCircle, X } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
@@ -6,16 +6,28 @@ import { formatCurrency } from '../utils/formatters';
 interface LoginModalProps {
   isOpen: boolean;
   onClose?: () => void;
-  canClose?: boolean;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, canClose = false }) => {
+export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+
   const { loginAsDemo, loginNormal, registerNormal, isLoading, error, clearError, demoAccounts } = useAuth();
   const [activeTab, setActiveTab] = useState<'demo' | 'login' | 'register'>('demo');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -65,13 +77,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, canClos
   const currentErr = localError || error;
 
   return (
-    <div className="modal-overlay auth-modal-overlay">
-      <div className="modal-card auth-modal-card">
-        {canClose && onClose && (
-          <button className="modal-close auth-close" onClick={onClose}>
+    <div
+      className="modal-overlay auth-modal-overlay"
+      onClick={() => {
+        if (onClose) onClose();
+      }}
+    >
+      <div className="modal-card auth-modal-card" onClick={(e) => e.stopPropagation()}>
+        {onClose && (
+          <button className="modal-close auth-close" onClick={onClose} aria-label="Close modal">
             <X size={18} />
           </button>
         )}
+
 
         <div className="auth-header-section">
           <div className="auth-brand-badge">

@@ -12,10 +12,21 @@ import { CalculationModal } from './components/CalculationModal';
 import './App.css';
 
 function MainApp() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, loginAsDemo } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [showCalcModal, setShowCalcModal] = useState<boolean>(false);
+
+  const handleCloseLoginModal = async () => {
+    setShowLoginModal(false);
+    if (!isAuthenticated) {
+      try {
+        await loginAsDemo('acc_supan');
+      } catch (err) {
+        console.error('Failed fallback login on modal dismiss:', err);
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -41,9 +52,9 @@ function MainApp() {
       {!isAuthenticated || showLoginModal ? (
         <LoginModal
           isOpen={true}
-          onClose={() => setShowLoginModal(false)}
-          canClose={isAuthenticated}
+          onClose={handleCloseLoginModal}
         />
+
 
       ) : (
         <main className="main-content">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getActivityApi } from '../api/spendable';
 import type { SpendableActivityListResponse, FinancialActivityItem } from '../api/types';
-import { formatCurrency, formatDate } from '../utils/formatters';
+import { formatCurrency, formatDateTime } from '../utils/formatters';
 import { Receipt, AlertTriangle, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -120,7 +120,7 @@ export const ActivityPage: React.FC = () => {
             <table className="spendable-data-table">
               <thead>
                 <tr>
-                  <th>Date</th>
+                  <th>Date & Time (UTC)</th>
                   <th>Counterparty / Description</th>
                   <th>Category</th>
                   <th>Type</th>
@@ -134,7 +134,7 @@ export const ActivityPage: React.FC = () => {
                   const rowKey = act.transaction_id || act.id || `act_${idx}`;
                   return (
                     <tr key={rowKey}>
-                      <td className="font-mono text-dim">{formatDate(act.timestamp_utc)}</td>
+                      <td className="font-mono text-dim">{formatDateTime(act.timestamp_utc)}</td>
                       <td className="bold-text">{act.counterparty_name || 'Observed Transaction'}</td>
                       <td>
                         <span className="category-pill">

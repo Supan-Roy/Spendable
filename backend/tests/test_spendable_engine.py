@@ -78,7 +78,7 @@ def make_test_commitment(user_id: str = "user_001", category: str = "RENT", amou
         expected_amount=amount,
         recurrence_interval=RecurrenceIntervalType.MONTHLY,
         median_interval_days=30.0,
-        next_expected_date="2026-04-01",
+        next_expected_date="2026-04-01T08:00:00",
         amount_variability=0.0,
         occurrence_count=5,
         confidence_score=0.95,

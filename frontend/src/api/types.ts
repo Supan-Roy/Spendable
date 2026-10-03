@@ -121,6 +121,7 @@ export interface ScenarioRequest {
 
 export interface ScenarioResult {
   user_id: string;
+  snapshot_time?: string;
   scenario_type: ScenarioType;
   description: string;
   base_spendable: number;

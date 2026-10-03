@@ -236,7 +236,7 @@ class RecurringDetector:
         next_expected_dt = last_tx_time + timedelta(days=median_interval)
         while next_expected_dt < snapshot_time:
             next_expected_dt += timedelta(days=median_interval)
-        next_expected_date_str = next_expected_dt.strftime("%Y-%m-%d")
+        next_expected_date_str = next_expected_dt.strftime("%Y-%m-%dT%H:%M:%S")
 
         # 8. Deterministic Identifier & Semantics
         counterparty_name = key_name if group_type == "COUNTERPARTY" else None
