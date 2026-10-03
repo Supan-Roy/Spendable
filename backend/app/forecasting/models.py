@@ -176,43 +176,58 @@ class CashFlowForecastModel:
         b30 = forecasts[30].projected_balance
 
         # Calculate estimated daily scale for natural cash flow waves
-        inflow_scale = exp_inflow_feat if exp_inflow_feat > 0 else 15000.0
-        outflow_scale = exp_outflow_feat if exp_outflow_feat > 0 else 10000.0
+        inflow_scale = exp_inflow_feat if exp_inflow_feat > 0 else 25000.0
+        outflow_scale = exp_outflow_feat if exp_outflow_feat > 0 else 18000.0
+        daily_inflow_base = inflow_scale / 30.0
+        daily_outflow_base = outflow_scale / 30.0
+
+        sim_bal = current_balance
+        import math
 
         for d in range(1, 31):
-            if d <= 7:
-                alpha = d / 7.0
-                base_bal = current_balance + alpha * (b7 - current_balance)
-            elif d <= 14:
-                alpha = (d - 7) / 7.0
-                base_bal = b7 + alpha * (b14 - b7)
-            else:
-                alpha = (d - 14) / 16.0
-                base_bal = b14 + alpha * (b30 - b14)
-
-            # Intra-month cash flow dynamics (payday spikes on 1st/15th, bill dips on 5th/25th, weekend outlays)
             cal_day = (snap_dt + timedelta(days=d)).day
-            import math
-            micro_wave = math.sin(2.0 * math.pi * d / 7.0) * (outflow_scale * 0.03)
+            day_of_week = (snap_dt + timedelta(days=d)).weekday()
 
+            # Event offsets: Paydays on 1st & 15th, Rent/Bills on 5th & 25th, EMI on 12th
             event_offset = 0.0
             if cal_day in (1, 15):
-                event_offset += inflow_scale * 0.08
-            elif cal_day in (5, 25):
-                event_offset -= outflow_scale * 0.07
+                event_offset += inflow_scale * 0.45
+            elif cal_day == 5:
+                event_offset -= outflow_scale * 0.35  # Rent / Housing
+            elif cal_day == 12:
+                event_offset -= outflow_scale * 0.15  # EMI / Subscriptions
+            elif cal_day == 25:
+                event_offset -= outflow_scale * 0.20  # Utilities / Family Support
 
-            d_bal = max(0.0, base_bal + micro_wave + event_offset)
+            # Weekend outlays
+            weekend_bump = - (daily_outflow_base * 0.6) if day_of_week in (4, 5) else 0.0
+
+            # Multi-frequency cyclic spending waves
+            wave = math.sin(2.0 * math.pi * d / 7.0) * (outflow_scale * 0.04) + math.cos(2.0 * math.pi * d / 14.0) * (outflow_scale * 0.03)
+
+            # Accumulate daily balance
+            daily_net_change = (daily_inflow_base - daily_outflow_base) + event_offset + weekend_bump + wave
+            sim_bal = max(800.0, sim_bal + daily_net_change)
+
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
             d_buffer = round(safety_threshold_bdt * (0.65 + 0.35 * (d / 30.0)) + (outflow_scale * 0.04 if cal_day in (5, 25) else 0.0), 2)
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
-                    projected_balance=round(d_bal, 2),
+                    projected_balance=round(sim_bal, 2),
                     required_buffer=d_buffer,
                 )
             )
 
+        # Update min balance and liquidity flags across horizons based on real trajectory
+        min_7d = min(pt.projected_balance for pt in trajectory[:7])
+        min_14d = min(pt.projected_balance for pt in trajectory[:14])
+        min_30d = min(pt.projected_balance for pt in trajectory[:30])
+
+        for H, min_b in [(7, min_7d), (14, min_14d), (30, min_30d)]:
+            forecasts[H].minimum_projected_balance = round(min_b, 2)
+            forecasts[H].liquidity_pressure_flag = (min_b < safety_threshold_bdt)
 
         return ForecastOutput(
             user_id=user_id,
@@ -237,60 +252,75 @@ class CashFlowForecastModel:
             snapshot_features.get("total_inflow_30d")
             or snapshot_features.get("sum_inflow_30d")
             or snapshot_features.get("inflow_sum_30d")
-            or 0.0
+            or 25000.0
         )
         tot_outflow = float(
             snapshot_features.get("total_outflow_30d")
             or snapshot_features.get("sum_outflow_30d")
             or snapshot_features.get("outflow_sum_30d")
-            or 0.0
+            or 18000.0
         )
 
         net_30d = float(snapshot_features.get("net_cash_flow_30d", tot_inflow - tot_outflow))
-        daily_rate = net_30d / 30.0
-
-        forecasts = {}
-        for H in (7, 14, 30):
-            exp_net = round(daily_rate * H, 2)
-            exp_in = round(tot_inflow * (H / 30.0), 2) if tot_inflow > 0 else round(max(0.0, exp_net), 2)
-            exp_out = round(tot_outflow * (H / 30.0), 2) if tot_outflow > 0 else round(max(0.0, -exp_net), 2)
-            min_b = round(max(0.0, current_balance + min(0.0, exp_net)), 2)
-            proj_b = round(max(0.0, current_balance + exp_net), 2)
-            forecasts[H] = HorizonForecast(
-                horizon_days=H,
-                expected_inflow=exp_in,
-                expected_outflow=exp_out,
-                expected_net_cash_flow=exp_net,
-                projected_balance=proj_b,
-                minimum_projected_balance=min_b,
-                liquidity_pressure_flag=(min_b < safety_threshold_bdt),
-                estimated_range_lower=round(max(0.0, min_b - 2000.0), 2),
-                estimated_range_upper=round(min_b + 2000.0, 2),
-            )
+        daily_inflow_base = tot_inflow / 30.0
+        daily_outflow_base = tot_outflow / 30.0
 
         trajectory = []
         snap_dt = self._parse_datetime(snap_time_str)
         import math
+        sim_bal = current_balance
+
         for d in range(1, 31):
-            base_b = current_balance + daily_rate * d
             cal_day = (snap_dt + timedelta(days=d)).day
-            wave = math.sin(2.0 * math.pi * d / 7.0) * (tot_outflow * 0.03 if tot_outflow > 0 else 300.0)
+            day_of_week = (snap_dt + timedelta(days=d)).weekday()
+
             event = 0.0
             if cal_day in (1, 15):
-                event += (tot_inflow * 0.08 if tot_inflow > 0 else 1000.0)
-            elif cal_day in (5, 25):
-                event -= (tot_outflow * 0.07 if tot_outflow > 0 else 800.0)
+                event += tot_inflow * 0.45
+            elif cal_day == 5:
+                event -= tot_outflow * 0.35
+            elif cal_day == 12:
+                event -= tot_outflow * 0.15
+            elif cal_day == 25:
+                event -= tot_outflow * 0.20
 
-            d_bal = max(0.0, base_b + wave + event)
+            weekend_bump = - (daily_outflow_base * 0.6) if day_of_week in (4, 5) else 0.0
+            wave = math.sin(2.0 * math.pi * d / 7.0) * (tot_outflow * 0.04) + math.cos(2.0 * math.pi * d / 14.0) * (tot_outflow * 0.03)
+
+            daily_net_change = (daily_inflow_base - daily_outflow_base) + event + weekend_bump + wave
+            sim_bal = max(500.0, sim_bal + daily_net_change)
+
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
             d_buffer = round(safety_threshold_bdt * (0.65 + 0.35 * (d / 30.0)) + (tot_outflow * 0.04 if cal_day in (5, 25) else 0.0), 2)
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
-                    projected_balance=round(d_bal, 2),
+                    projected_balance=round(sim_bal, 2),
                     required_buffer=d_buffer,
                 )
+            )
+
+        min_7d = min(pt.projected_balance for pt in trajectory[:7])
+        min_14d = min(pt.projected_balance for pt in trajectory[:14])
+        min_30d = min(pt.projected_balance for pt in trajectory[:30])
+
+        forecasts = {}
+        for H, min_b in [(7, min_7d), (14, min_14d), (30, min_30d)]:
+            exp_net = round((tot_inflow - tot_outflow) * (H / 30.0), 2)
+            exp_in = round(tot_inflow * (H / 30.0), 2)
+            exp_out = round(tot_outflow * (H / 30.0), 2)
+            proj_b = trajectory[H-1].projected_balance
+            forecasts[H] = HorizonForecast(
+                horizon_days=H,
+                expected_inflow=exp_in,
+                expected_outflow=exp_out,
+                expected_net_cash_flow=exp_net,
+                projected_balance=proj_b,
+                minimum_projected_balance=round(min_b, 2),
+                liquidity_pressure_flag=(min_b < safety_threshold_bdt),
+                estimated_range_lower=round(max(0.0, min_b - 2000.0), 2),
+                estimated_range_upper=round(min_b + 2000.0, 2),
             )
 
 

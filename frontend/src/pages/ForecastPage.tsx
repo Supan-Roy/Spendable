@@ -115,9 +115,14 @@ export const ForecastPage: React.FC = () => {
     (forecastData as any)?.safety_threshold_bdt ??
     15000;
 
-  const liqState: LiquidityState =
-    currentForecastItem?.liquidity_state ||
-    ((currentForecastItem as any)?.liquidity_pressure_flag ? 'PRESSURED' : 'HEALTHY');
+  let liqState: LiquidityState = 'HEALTHY';
+  if (minProjBal < safetyReserve) {
+    liqState = 'PRESSURED';
+  } else if (minProjBal < safetyReserve * 1.30 || (currentForecastItem?.expected_outflow > currentForecastItem?.expected_inflow)) {
+    liqState = 'WATCH';
+  } else {
+    liqState = 'HEALTHY';
+  }
 
   const badge = getLiquidityBadgeConfig(liqState);
 
@@ -166,18 +171,21 @@ export const ForecastPage: React.FC = () => {
     });
   }
 
-  // Render SVG Chart calculations
+  // Render SVG Chart calculations with generous paddings for axes and labels
   const minVal = Math.min(...dailyBalances.map((d: DailyTrajectoryItem) => d.balance), minProjBal, 0);
   const maxVal = Math.max(...dailyBalances.map((d: DailyTrajectoryItem) => d.balance), safetyReserve * 1.2, 10000);
   const range = maxVal - minVal || 1;
 
   const chartWidth = 760;
-  const chartHeight = 220;
-  const padding = 30;
+  const chartHeight = 260;
+  const paddingLeft = 65;
+  const paddingRight = 35;
+  const paddingTop = 30;
+  const paddingBottom = 45;
 
   const points = dailyBalances.map((item: DailyTrajectoryItem, index: number) => {
-    const x = padding + (index / Math.max(dailyBalances.length - 1, 1)) * (chartWidth - padding * 2);
-    const y = chartHeight - padding - ((item.balance - minVal) / range) * (chartHeight - padding * 2);
+    const x = paddingLeft + (index / Math.max(dailyBalances.length - 1, 1)) * (chartWidth - paddingLeft - paddingRight);
+    const y = chartHeight - paddingBottom - ((item.balance - minVal) / range) * (chartHeight - paddingTop - paddingBottom);
     return { x, y, balance: item.balance, date: item.date };
   });
 
@@ -185,8 +193,29 @@ export const ForecastPage: React.FC = () => {
     ? points.reduce((acc: string, p: { x: number; y: number }, i: number) => (i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`), '')
     : '';
 
+  const areaD = points.length > 0
+    ? `${pathD} L ${points[points.length - 1].x} ${chartHeight - paddingBottom} L ${points[0].x} ${chartHeight - paddingBottom} Z`
+    : '';
+
   // Calculate SVG Y coordinate for minimum balance line
-  const minLineY = chartHeight - padding - ((minProjBal - minVal) / range) * (chartHeight - padding * 2);
+  const minLineY = chartHeight - paddingBottom - ((minProjBal - minVal) / range) * (chartHeight - paddingTop - paddingBottom);
+
+  // Lowest point callout
+  const lowestPoint = points.length > 0
+    ? points.reduce((minP, p) => (p.balance < minP.balance ? p : minP), points[0])
+    : null;
+
+  // Evenly spaced X-axis date ticks
+  const dateTickIndices = points.length > 0
+    ? [
+        0,
+        Math.floor(points.length * 0.2),
+        Math.floor(points.length * 0.4),
+        Math.floor(points.length * 0.6),
+        Math.floor(points.length * 0.8),
+        points.length - 1
+      ].filter((v, i, a) => a.indexOf(v) === i && points[v])
+    : [];
 
   return (
     <div className="tab-pane">
@@ -234,17 +263,35 @@ export const ForecastPage: React.FC = () => {
 
         <div className="svg-chart-wrapper">
           <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="trajectory-svg">
-            {/* Grid Lines */}
-            <line x1={padding} y1={padding} x2={chartWidth - padding} y2={padding} stroke="rgba(255,255,255,0.06)" />
-            <line x1={padding} y1={chartHeight / 2} x2={chartWidth - padding} y2={chartHeight / 2} stroke="rgba(255,255,255,0.06)" />
-            <line x1={padding} y1={chartHeight - padding} x2={chartWidth - padding} y2={chartHeight - padding} stroke="rgba(255,255,255,0.08)" />
+            <defs>
+              <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00e5a3" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#00e5a3" stopOpacity="0.01" />
+              </linearGradient>
+            </defs>
+
+            {/* Horizontal Grid Lines */}
+            <line x1={paddingLeft} y1={paddingTop} x2={chartWidth - paddingRight} y2={paddingTop} stroke="rgba(255,255,255,0.06)" />
+            <line x1={paddingLeft} y1={(chartHeight - paddingBottom + paddingTop) / 2} x2={chartWidth - paddingRight} y2={(chartHeight - paddingBottom + paddingTop) / 2} stroke="rgba(255,255,255,0.06)" />
+            <line x1={paddingLeft} y1={chartHeight - paddingBottom} x2={chartWidth - paddingRight} y2={chartHeight - paddingBottom} stroke="rgba(255,255,255,0.12)" />
+
+            {/* Y-Axis Balance Labels */}
+            <text x={paddingLeft - 8} y={paddingTop + 4} fill="#64748b" fontSize="10" fontFamily="var(--font-mono)" textAnchor="end">
+              {formatCurrency(maxVal)}
+            </text>
+            <text x={paddingLeft - 8} y={(chartHeight - paddingBottom + paddingTop) / 2 + 3} fill="#64748b" fontSize="10" fontFamily="var(--font-mono)" textAnchor="end">
+              {formatCurrency((maxVal + minVal) / 2)}
+            </text>
+            <text x={paddingLeft - 8} y={chartHeight - paddingBottom + 3} fill="#64748b" fontSize="10" fontFamily="var(--font-mono)" textAnchor="end">
+              {formatCurrency(minVal)}
+            </text>
 
             {/* Minimum Balance Line */}
             {!isNaN(minLineY) && (
               <line
-                x1={padding}
+                x1={paddingLeft}
                 y1={minLineY}
-                x2={chartWidth - padding}
+                x2={chartWidth - paddingRight}
                 y2={minLineY}
                 stroke="#f59e0b"
                 strokeDasharray="4 4"
@@ -252,8 +299,11 @@ export const ForecastPage: React.FC = () => {
               />
             )}
 
+            {/* Area Gradient Fill */}
+            {areaD && <path d={areaD} fill="url(#chartAreaGradient)" />}
+
             {/* Main Balance Line */}
-            {pathD && <path d={pathD} fill="none" stroke="#00e5a3" strokeWidth="3" strokeLinecap="round" />}
+            {pathD && <path d={pathD} fill="none" stroke="#00e5a3" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />}
 
             {/* Point circles */}
             {points.map((p: { x: number; y: number; balance: number; date: string }, idx: number) => (
@@ -261,10 +311,41 @@ export const ForecastPage: React.FC = () => {
                 key={idx}
                 cx={p.x}
                 cy={p.y}
-                r={idx === points.length - 1 || idx === 0 ? 5 : 2}
+                r={idx === points.length - 1 ? 5 : 2.5}
                 fill={idx === points.length - 1 ? '#00e5a3' : '#3b82f6'}
               />
             ))}
+
+            {/* Lowest Drawdown Callout */}
+            {lowestPoint && lowestPoint.y > paddingTop + 10 && (
+              <g>
+                <circle cx={lowestPoint.x} cy={lowestPoint.y} r={5} fill="#f59e0b" stroke="#0f172a" strokeWidth="2" />
+                <text x={lowestPoint.x} y={Math.max(paddingTop + 12, lowestPoint.y - 10)} fill="#f59e0b" fontSize="10" fontWeight="700" fontFamily="var(--font-mono)" textAnchor="middle">
+                  Min {formatCurrency(lowestPoint.balance)}
+                </text>
+              </g>
+            )}
+
+            {/* X-Axis Date Ticks */}
+            {dateTickIndices.map((idx) => {
+              const p = points[idx];
+              if (!p) return null;
+              return (
+                <g key={idx}>
+                  <line x1={p.x} y1={chartHeight - paddingBottom} x2={p.x} y2={chartHeight - paddingBottom + 5} stroke="rgba(255,255,255,0.2)" />
+                  <text
+                    x={p.x}
+                    y={chartHeight - 12}
+                    fill="#94a3b8"
+                    fontSize="11"
+                    fontFamily="var(--font-mono)"
+                    textAnchor="middle"
+                  >
+                    {formatShortDate(p.date) || p.date}
+                  </text>
+                </g>
+              );
+            })}
           </svg>
         </div>
 
