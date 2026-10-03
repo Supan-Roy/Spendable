@@ -38,8 +38,12 @@ export interface DailyBalance {
 }
 
 export interface DailyTrajectoryPoint {
-  date: string;
-  balance: number;
+  day_offset?: number;
+  date?: string;
+  date_str?: string;
+  balance?: number;
+  projected_balance?: number;
+  required_buffer?: number;
   minimum_balance?: number;
   is_historical?: boolean;
 }

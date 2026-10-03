@@ -38,6 +38,7 @@ class DailyTrajectoryPoint(BaseModel):
     day_offset: int = Field(..., description="Day offset relative to snapshot time T (1..30)")
     date_str: str = Field(..., description="ISO 8601 date string YYYY-MM-DD")
     projected_balance: float = Field(..., description="Estimated account balance on day d")
+    required_buffer: Optional[float] = Field(None, description="Daily dynamic safety buffer required on day d")
 
 
 class ForecastOutput(BaseModel):

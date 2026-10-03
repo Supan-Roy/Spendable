@@ -10,6 +10,7 @@ const FORECAST_CACHE_KEY_PREFIX = 'spendable_forecast_cache_';
 interface DailyTrajectoryItem {
   date: string;
   balance: number;
+  requiredBuffer: number;
 }
 
 const getCachedForecastData = (accId?: string): SpendableForecastResponse | null => {
@@ -126,7 +127,7 @@ export const ForecastPage: React.FC = () => {
     (currentForecastItem as any)?.daily_balances ||
     [];
 
-  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item: any) => {
+  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item: any, idx: number) => {
     const rawDate = item.date_str || item.date || '';
     const rawBal =
       typeof item.projected_balance === 'number'
@@ -137,9 +138,15 @@ export const ForecastPage: React.FC = () => {
         ? item.minimum_balance
         : 0;
 
+    const reqBuf =
+      typeof item.required_buffer === 'number'
+        ? item.required_buffer
+        : Math.round(safetyReserve * (0.65 + 0.35 * ((idx + 1) / horizonDays)));
+
     return {
       date: rawDate,
       balance: rawBal,
+      requiredBuffer: reqBuf,
     };
   });
 
@@ -150,9 +157,11 @@ export const ForecastPage: React.FC = () => {
     dailyBalances = Array.from({ length: horizonDays }, (_, i) => {
       const d = new Date(today);
       d.setDate(d.getDate() + i + 1);
+      const reqBuf = Math.round(safetyReserve * (0.65 + 0.35 * ((i + 1) / horizonDays)));
       return {
         date: d.toISOString().split('T')[0],
         balance: curBal,
+        requiredBuffer: reqBuf,
       };
     });
   }
@@ -315,21 +324,26 @@ export const ForecastPage: React.FC = () => {
                 <th>Date</th>
                 <th>Projected Balance</th>
                 <th>Safety Buffer Required</th>
+                <th>Net Safe Margin</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {dailyBalances.map((item: DailyTrajectoryItem, idx: number) => {
-                const isCritical = item.balance < (safetyReserve * 0.5);
-                const isLow = item.balance < safetyReserve;
-                const statusLabel = isCritical ? 'Critical' : isLow ? 'Low Cushion' : 'Optimal';
+                const netMargin = item.balance - item.requiredBuffer;
+                const isCritical = item.balance < item.requiredBuffer;
+                const isLow = item.balance < (item.requiredBuffer * 1.15);
+                const statusLabel = isCritical ? 'Critical Risk' : isLow ? 'Low Cushion' : 'Optimal';
                 const statusClass = isCritical ? 'danger' : isLow ? 'warning' : 'healthy';
 
                 return (
                   <tr key={idx}>
                     <td className="font-mono">{formatShortDate(item.date) || item.date}</td>
                     <td className="font-mono bold-text">{formatCurrency(item.balance)}</td>
-                    <td className="font-mono">{formatCurrency(safetyReserve)}</td>
+                    <td className="font-mono">{formatCurrency(item.requiredBuffer)}</td>
+                    <td className={`font-mono bold-text ${netMargin < 0 ? 'outflow-color' : 'inflow-color'}`}>
+                      {netMargin >= 0 ? `+${formatCurrency(netMargin)}` : formatCurrency(netMargin)}
+                    </td>
                     <td>
                       <span className={`status-pill ${statusClass}`}>{statusLabel}</span>
                     </td>

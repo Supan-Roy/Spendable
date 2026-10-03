@@ -203,11 +203,13 @@ class CashFlowForecastModel:
 
             d_bal = max(0.0, base_bal + micro_wave + event_offset)
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
+            d_buffer = round(safety_threshold_bdt * (0.65 + 0.35 * (d / 30.0)) + (outflow_scale * 0.04 if cal_day in (5, 25) else 0.0), 2)
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
                     projected_balance=round(d_bal, 2),
+                    required_buffer=d_buffer,
                 )
             )
 
@@ -281,11 +283,13 @@ class CashFlowForecastModel:
 
             d_bal = max(0.0, base_b + wave + event)
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
+            d_buffer = round(safety_threshold_bdt * (0.65 + 0.35 * (d / 30.0)) + (tot_outflow * 0.04 if cal_day in (5, 25) else 0.0), 2)
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
                     projected_balance=round(d_bal, 2),
+                    required_buffer=d_buffer,
                 )
             )
 
