@@ -7,6 +7,7 @@ import { OverviewPage } from './pages/OverviewPage';
 import { ForecastPage } from './pages/ForecastPage';
 import { ActivityPage } from './pages/ActivityPage';
 import { SimulatePage } from './pages/SimulatePage';
+import { InspectPage } from './pages/InspectPage';
 import { Footer } from './components/Footer';
 import { CalculationModal } from './components/CalculationModal';
 import './App.css';
@@ -16,11 +17,11 @@ const TAB_STORAGE_KEY = 'spendable_active_tab';
 const getInitialTab = (): TabType => {
   try {
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['overview', 'activity', 'forecast', 'simulate'].includes(hash)) {
+    if (['overview', 'activity', 'forecast', 'simulate', 'inspect'].includes(hash)) {
       return hash as TabType;
     }
     const stored = localStorage.getItem(TAB_STORAGE_KEY);
-    if (stored && ['overview', 'activity', 'forecast', 'simulate'].includes(stored)) {
+    if (stored && ['overview', 'activity', 'forecast', 'simulate', 'inspect'].includes(stored)) {
       return stored as TabType;
     }
   } catch {
@@ -104,6 +105,8 @@ function MainApp() {
           {activeTab === 'forecast' && <ForecastPage />}
 
           {activeTab === 'simulate' && <SimulatePage />}
+
+          {activeTab === 'inspect' && <InspectPage />}
         </main>
       )}
 

@@ -5,7 +5,7 @@ import { formatCurrency } from '../utils/formatters';
 
 import { ConfirmModal } from './ConfirmModal';
 
-export type TabType = 'overview' | 'activity' | 'forecast' | 'simulate';
+export type TabType = 'overview' | 'activity' | 'forecast' | 'simulate' | 'inspect';
 
 interface HeaderProps {
   activeTab: TabType;
@@ -98,6 +98,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
               onClick={() => setActiveTab('simulate')}
             >
               Simulate
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'inspect' ? 'active' : ''}`}
+              onClick={() => setActiveTab('inspect')}
+            >
+              Inspect ⚡
             </button>
           </nav>
         )}
@@ -257,6 +263,15 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                 }}
               >
                 Scenario Simulator
+              </button>
+              <button
+                className={`drawer-nav-item ${activeTab === 'inspect' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('inspect');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Inspect ⚡ System Architecture
               </button>
             </nav>
           </div>
