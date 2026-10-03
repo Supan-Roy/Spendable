@@ -1434,16 +1434,96 @@
 }
 
 /* ==========================================================================
-   SPENDABLE AI CHAT INTERFACE
+   SPENDABLE AI CHAT INTERFACE & CTA BANNER
    ========================================================================== */
-.spendable-ai-chat-card {
-  background: rgba(14, 19, 31, 0.75);
+.spendable-ai-cta-banner {
+  background: linear-gradient(135deg, rgba(14, 19, 31, 0.9), rgba(6, 40, 32, 0.85));
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 229, 163, 0.25);
+  border: 1px solid rgba(0, 229, 163, 0.35);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  margin-top: 2rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 163, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spendable-ai-cta-banner:hover {
+  border-color: #00e5a3;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 229, 163, 0.25);
+  transform: translateY(-2px);
+}
+
+.cta-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cta-banner-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0, 229, 163, 0.25), rgba(0, 180, 216, 0.25));
+  border: 1px solid rgba(0, 229, 163, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00e5a3;
+  box-shadow: 0 0 20px rgba(0, 229, 163, 0.3);
+}
+
+.cta-banner-text h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cta-banner-text p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cta-banner-btn {
+  background: linear-gradient(135deg, #00e5a3, #00b4d8);
+  color: #040910;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 12px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 229, 163, 0.35);
+  transition: all 0.2s ease;
+}
+
+.cta-banner-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 22px rgba(0, 229, 163, 0.5);
+}
+
+.spendable-ai-chat-card {
+  background: rgba(14, 19, 31, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 229, 163, 0.3);
   border-radius: 20px;
   padding: 1.5rem;
   margin-top: 2rem;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -1451,7 +1531,7 @@
 }
 
 .spendable-ai-chat-card:hover {
-  border-color: rgba(0, 229, 163, 0.4);
+  border-color: rgba(0, 229, 163, 0.45);
 }
 
 .chat-header-bar {
@@ -1499,6 +1579,27 @@
   margin: 0;
 }
 
+.chat-collapse-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.chat-collapse-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
 .chat-live-badge {
   display: flex;
   align-items: center;
@@ -1530,9 +1631,14 @@
 .chat-prompts-container {
   display: flex;
   gap: 0.5rem;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding-bottom: 0.25rem;
-  scrollbar-width: thin;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chat-prompts-container::-webkit-scrollbar {
+  display: none;
 }
 
 .chat-prompt-pill {

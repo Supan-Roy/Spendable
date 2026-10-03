@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { postSimulateApi, postChatApi } from '../api/spendable';
 import type { ScenarioType, ScenarioResult, ChatMessage } from '../api/types';
 import { formatCurrency, formatDateTime, getLiquidityBadgeConfig } from '../utils/formatters';
-import { Sliders, ArrowRight, RotateCcw, AlertTriangle, Shield, Bot, Sparkles, Send, MessageSquare, Zap } from 'lucide-react';
+import { Sliders, ArrowRight, RotateCcw, AlertTriangle, Shield, Bot, Sparkles, Send, MessageSquare, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const SimulatePage: React.FC = () => {
   const [scenarioType, setScenarioType] = useState<ScenarioType>('ONE_TIME_EXPENSE');
@@ -16,6 +16,7 @@ export const SimulatePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Spendable AI Chat States
+  const [isAiOpen, setIsAiOpen] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
@@ -25,14 +26,17 @@ export const SimulatePage: React.FC = () => {
   const [inputQuery, setInputQuery] = useState<string>('');
   const [isChatSending, setIsChatSending] = useState<boolean>(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const isInitialMount = useRef<boolean>(true);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chatMessages, isChatSending]);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (isAiOpen) {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, isChatSending, isAiOpen]);
 
   const handleSimulate = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -70,6 +74,8 @@ export const SimulatePage: React.FC = () => {
     const messageToSend = (overridePrompt || inputQuery).trim();
     if (!messageToSend || isChatSending) return;
 
+    if (!isAiOpen) setIsAiOpen(true);
+
     const newHistory: ChatMessage[] = [
       ...chatMessages,
       { role: 'user', content: messageToSend },
@@ -104,6 +110,45 @@ export const SimulatePage: React.FC = () => {
     'How does my 30-day liquidity risk look?',
     'What happens if my income is delayed by 10 days?',
   ];
+
+  const renderFormattedContent = (content: string) => {
+    const lines = content.split('\n');
+    return (
+      <div className="formatted-ai-text">
+        {lines.map((line, lIdx) => {
+          let trimmed = line.trim();
+          if (!trimmed) return <div key={lIdx} style={{ height: '0.4rem' }} />;
+
+          const isBullet = trimmed.startsWith('- ') || trimmed.startsWith('* ');
+          if (isBullet) {
+            trimmed = trimmed.substring(2).trim();
+          }
+
+          const parts = trimmed.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+          const parsedElements = parts.map((part, pIdx) => {
+            if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+              return <strong key={pIdx} style={{ color: '#ffffff', fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+            }
+            if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+              return <em key={pIdx} style={{ fontStyle: 'italic', color: '#cbd5e1' }}>{part.slice(1, -1)}</em>;
+            }
+            return part;
+          });
+
+          if (isBullet) {
+            return (
+              <div key={lIdx} style={{ display: 'flex', gap: '0.4rem', alignItems: 'flex-start', margin: '0.25rem 0' }}>
+                <span style={{ color: '#00e5a3', fontSize: '0.9rem', lineHeight: '1.4' }}>•</span>
+                <span style={{ flex: 1 }}>{parsedElements}</span>
+              </div>
+            );
+          }
+
+          return <p key={lIdx} style={{ margin: '0 0 0.35rem 0' }}>{parsedElements}</p>;
+        })}
+      </div>
+    );
+  };
 
   const baseBadge = result ? getLiquidityBadgeConfig(result.base_liquidity_state) : null;
   const scenarioBadge = result ? getLiquidityBadgeConfig(result.scenario_liquidity_state) : null;
@@ -296,115 +341,146 @@ export const SimulatePage: React.FC = () => {
       </div>
 
       {/* ==========================================================================
-         SPENDABLE AI ASSISTANT CHAT INTERFACE
+         SPENDABLE AI ASSISTANT SECTION (COLLAPSIBLE CTA + FULL CHAT)
          ========================================================================== */}
-      <div className="spendable-ai-chat-card">
-        <div className="chat-header-bar">
-          <div className="chat-title-group">
-            <div className="chat-ai-icon-badge">
-              <Bot size={22} />
+      {!isAiOpen ? (
+        <div className="spendable-ai-cta-banner" onClick={() => setIsAiOpen(true)}>
+          <div className="cta-banner-left">
+            <div className="cta-banner-icon">
+              <Bot size={26} />
             </div>
-            <div>
+            <div className="cta-banner-text">
               <h3>
-                Spendable AI
+                Spendable AI Financial Assistant
                 <Sparkles size={16} color="#00e5a3" />
               </h3>
-              <p>Personal Financial Intelligence & Context-Aware Assistant</p>
+              <p>Ask anything about your safe spending runway, 30-day cash-flow forecast, or scenario simulations.</p>
+            </div>
+          </div>
+          <button className="cta-banner-btn" type="button" onClick={(e) => { e.stopPropagation(); setIsAiOpen(true); }}>
+            <MessageSquare size={16} />
+            <span>Launch Spendable AI</span>
+            <ChevronDown size={16} />
+          </button>
+        </div>
+      ) : (
+        <div className="spendable-ai-chat-card">
+          <div className="chat-header-bar">
+            <div className="chat-title-group">
+              <div className="chat-ai-icon-badge">
+                <Bot size={22} />
+              </div>
+              <div>
+                <h3>
+                  Spendable AI
+                  <Sparkles size={16} color="#00e5a3" />
+                </h3>
+                <p>Personal Financial Intelligence & Context-Aware Assistant</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              {result && (
+                <div className="scenario-context-chip">
+                  <Zap size={14} />
+                  <span>Simulated Scenario Context Attached</span>
+                </div>
+              )}
+              <div className="chat-live-badge">
+                <span className="chat-status-dot"></span>
+                <span>Live Account Data Ingested</span>
+              </div>
+              <button
+                type="button"
+                className="chat-collapse-btn"
+                onClick={() => setIsAiOpen(false)}
+                title="Collapse Spendable AI Chat"
+              >
+                <ChevronUp size={14} />
+                <span>Collapse AI</span>
+              </button>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            {result && (
-              <div className="scenario-context-chip">
-                <Zap size={14} />
-                <span>Simulated Scenario Context Attached</span>
+          {/* Quick Prompt Recommendation Pills */}
+          <div className="chat-prompts-container">
+            {samplePrompts.map((promptText, idx) => (
+              <button
+                key={idx}
+                className="chat-prompt-pill"
+                onClick={() => handleSendChatMessage(promptText)}
+                disabled={isChatSending}
+              >
+                <MessageSquare size={13} color="#00e5a3" />
+                <span>{promptText}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Messages Stream */}
+          <div className="chat-messages-container">
+            {chatMessages.map((msg, index) => (
+              <div
+                key={index}
+                className={`chat-message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}
+              >
+                <div className={`chat-avatar ${msg.role === 'user' ? 'user-avatar' : 'ai-avatar'}`}>
+                  {msg.role === 'user' ? 'YOU' : <Bot size={18} />}
+                </div>
+
+                <div className={`chat-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}>
+                  {msg.role === 'assistant' && (
+                    <div className="chat-ai-name-tag">
+                      <Sparkles size={12} />
+                      <span>Spendable AI</span>
+                    </div>
+                  )}
+                  {msg.role === 'assistant' ? renderFormattedContent(msg.content) : <div>{msg.content}</div>}
+                </div>
+              </div>
+            ))}
+
+            {isChatSending && (
+              <div className="chat-message-row ai-row">
+                <div className="chat-avatar ai-avatar">
+                  <Bot size={18} />
+                </div>
+                <div className="chat-bubble ai-bubble" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#00e5a3' }}>
+                  <Sparkles size={16} className="animate-spin" />
+                  <span>Spendable AI is analyzing your transactions & liquidity context...</span>
+                </div>
               </div>
             )}
-            <div className="chat-live-badge">
-              <span className="chat-status-dot"></span>
-              <span>Live Account Data Ingested</span>
-            </div>
+            <div ref={chatBottomRef} />
           </div>
-        </div>
 
-        {/* Quick Prompt Recommendation Pills */}
-        <div className="chat-prompts-container">
-          {samplePrompts.map((promptText, idx) => (
-            <button
-              key={idx}
-              className="chat-prompt-pill"
-              onClick={() => handleSendChatMessage(promptText)}
-              disabled={isChatSending}
-            >
-              <MessageSquare size={13} color="#00e5a3" />
-              <span>{promptText}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Messages Stream */}
-        <div className="chat-messages-container">
-          {chatMessages.map((msg, index) => (
-            <div
-              key={index}
-              className={`chat-message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}
-            >
-              <div className={`chat-avatar ${msg.role === 'user' ? 'user-avatar' : 'ai-avatar'}`}>
-                {msg.role === 'user' ? 'YOU' : <Bot size={18} />}
-              </div>
-
-              <div className={`chat-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}>
-                {msg.role === 'assistant' && (
-                  <div className="chat-ai-name-tag">
-                    <Sparkles size={12} />
-                    <span>Spendable AI</span>
-                  </div>
-                )}
-                <div>{msg.content}</div>
-              </div>
-            </div>
-          ))}
-
-          {isChatSending && (
-            <div className="chat-message-row ai-row">
-              <div className="chat-avatar ai-avatar">
-                <Bot size={18} />
-              </div>
-              <div className="chat-bubble ai-bubble" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#00e5a3' }}>
-                <Sparkles size={16} className="animate-spin" />
-                <span>Spendable AI is analyzing your transactions & liquidity context...</span>
-              </div>
-            </div>
-          )}
-          <div ref={chatBottomRef} />
-        </div>
-
-        {/* Input Bar */}
-        <form
-          className="chat-input-wrapper"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendChatMessage();
-          }}
-        >
-          <input
-            type="text"
-            className="chat-text-input"
-            placeholder="Ask Spendable AI about your spending runway, recurring bills, or safe purchase limits..."
-            value={inputQuery}
-            onChange={(e) => setInputQuery(e.target.value)}
-            disabled={isChatSending}
-          />
-          <button
-            type="submit"
-            className="chat-send-btn"
-            disabled={!inputQuery.trim() || isChatSending}
+          {/* Input Bar */}
+          <form
+            className="chat-input-wrapper"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendChatMessage();
+            }}
           >
-            <span>Send</span>
-            <Send size={14} />
-          </button>
-        </form>
-      </div>
+            <input
+              type="text"
+              className="chat-text-input"
+              placeholder="Ask Spendable AI about your spending runway, recurring bills, or safe purchase limits..."
+              value={inputQuery}
+              onChange={(e) => setInputQuery(e.target.value)}
+              disabled={isChatSending}
+            />
+            <button
+              type="submit"
+              className="chat-send-btn"
+              disabled={!inputQuery.trim() || isChatSending}
+            >
+              <span>Send</span>
+              <Send size={14} />
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
