@@ -192,20 +192,24 @@ class RecurringEvaluator:
                 # 1. Identity match score
                 cp_match = False
                 if det_cp and rule_cp:
-                    cp_match = (det_cp in rule_cp) or (rule_cp in det_cp)
+                    if det_cp != rule_cp:
+                        continue
+                    cp_match = True
                 
-                cat_match = (det_cat == rule_cat) or (det_cat == rule_act)
+                cat_match = (det_cat == rule_cat)
 
                 if not (cp_match or cat_match):
                     continue
 
                 # 2. Amount similarity match
                 rel_diff = abs(det_amount - rule_amount) / max(rule_amount, 1.0)
-                if rel_diff > 0.35:
+                if rel_diff > 0.05:
                     continue
 
                 # 3. Frequency compatibility
-                freq_match = (det_interval == rule_interval) or (det_interval == "IRREGULAR")
+                freq_match = (det_interval == rule_interval)
+                if not freq_match:
+                    continue
 
                 # Match confidence score
                 match_score = (1.0 - rel_diff) * (1.5 if cp_match else 1.0) * (1.2 if freq_match else 0.8)

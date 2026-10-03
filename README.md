@@ -79,9 +79,9 @@ All evaluation metrics are computed on a **held-out synthetic test dataset** of 
 
 | Module | Evaluated Metric | Test Result | Technical Definition |
 | :--- | :--- | :---: | :--- |
-| **Recurring Commitment Detection** | F1-Score | **99.67%** | $F_1$ harmonic mean across all commitment categories |
-| | Precision | **100.00%** | Zero false positive obligations detected |
-| | Recall | **99.33%** | 298 / 300 ground-truth recurring commitments detected |
+| **Recurring Commitment Detection** | F1-Score | **97.99%** | $F_1$ harmonic mean across all commitment categories |
+| | Precision | **98.32%** | 293 TP / (293 TP + 5 FP) on held-out test data |
+| | Recall | **97.67%** | 293 TP / (293 TP + 7 FN) on held-out test data |
 | **Cash-Flow Forecasting** | R² (30-Day Horizon) | **0.9948** | 99.48% of variance in 30-day balance trajectories explained |
 | | MAE (30-Day Horizon) | **৳14,682** | Mean Absolute Error across 1,649 evaluation snapshots |
 | | RMSE (30-Day Horizon) | **৳23,903** | Root Mean Squared Error across 1,649 evaluation snapshots |

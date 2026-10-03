@@ -1,0 +1,303 @@
+{
+  "snapshot_time": "2026-10-01 00:00:00",
+  "config": {
+    "min_occurrences": 3,
+    "strong_threshold": 0.7,
+    "moderate_threshold": 0.45,
+    "weight_interval": 0.35,
+    "weight_amount": 0.3,
+    "weight_count": 0.2,
+    "weight_recency": 0.15
+  },
+  "train_metrics": {
+    "split_name": "TRAIN",
+    "direction_filter": "OUTFLOW",
+    "total_users": 350,
+    "ground_truth_rules_count": 1204,
+    "detected_commitments_count": 1198,
+    "strong_commitments_count": 1089,
+    "moderate_commitments_count": 109,
+    "true_positives": 1175,
+    "false_positives": 23,
+    "false_negatives": 29,
+    "precision": 0.9808,
+    "recall": 0.9759,
+    "f1_score": 0.9784,
+    "category_breakdown": [
+      {
+        "category": "DEBT_PAYMENT",
+        "ground_truth_count": 50,
+        "detected_count": 50,
+        "true_positives": 50,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "ENTERTAINMENT",
+        "ground_truth_count": 100,
+        "detected_count": 101,
+        "true_positives": 100,
+        "false_positives": 1,
+        "false_negatives": 0,
+        "precision": 0.9901,
+        "recall": 1.0
+      },
+      {
+        "category": "FAMILY_SUPPORT",
+        "ground_truth_count": 61,
+        "detected_count": 61,
+        "true_positives": 61,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "FITNESS",
+        "ground_truth_count": 50,
+        "detected_count": 50,
+        "true_positives": 50,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "HOUSING",
+        "ground_truth_count": 350,
+        "detected_count": 349,
+        "true_positives": 346,
+        "false_positives": 3,
+        "false_negatives": 4,
+        "precision": 0.9914,
+        "recall": 0.9886
+      },
+      {
+        "category": "SOFTWARE",
+        "ground_truth_count": 50,
+        "detected_count": 50,
+        "true_positives": 50,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "TELECOM",
+        "ground_truth_count": 123,
+        "detected_count": 122,
+        "true_positives": 122,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": 1.0,
+        "recall": 0.9919
+      },
+      {
+        "category": "UTILITIES",
+        "ground_truth_count": 420,
+        "detected_count": 415,
+        "true_positives": 396,
+        "false_positives": 19,
+        "false_negatives": 24,
+        "precision": 0.9542,
+        "recall": 0.9429
+      }
+    ]
+  },
+  "validation_metrics": {
+    "split_name": "VALIDATION",
+    "direction_filter": "OUTFLOW",
+    "total_users": 75,
+    "ground_truth_rules_count": 297,
+    "detected_commitments_count": 297,
+    "strong_commitments_count": 260,
+    "moderate_commitments_count": 37,
+    "true_positives": 295,
+    "false_positives": 2,
+    "false_negatives": 2,
+    "precision": 0.9933,
+    "recall": 0.9933,
+    "f1_score": 0.9933,
+    "category_breakdown": [
+      {
+        "category": "DEBT_PAYMENT",
+        "ground_truth_count": 18,
+        "detected_count": 18,
+        "true_positives": 18,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "ENTERTAINMENT",
+        "ground_truth_count": 36,
+        "detected_count": 36,
+        "true_positives": 36,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "FAMILY_SUPPORT",
+        "ground_truth_count": 10,
+        "detected_count": 10,
+        "true_positives": 10,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "FITNESS",
+        "ground_truth_count": 18,
+        "detected_count": 18,
+        "true_positives": 18,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "HOUSING",
+        "ground_truth_count": 75,
+        "detected_count": 75,
+        "true_positives": 75,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "SOFTWARE",
+        "ground_truth_count": 18,
+        "detected_count": 18,
+        "true_positives": 18,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "TELECOM",
+        "ground_truth_count": 28,
+        "detected_count": 28,
+        "true_positives": 28,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "UTILITIES",
+        "ground_truth_count": 94,
+        "detected_count": 94,
+        "true_positives": 92,
+        "false_positives": 2,
+        "false_negatives": 2,
+        "precision": 0.9787,
+        "recall": 0.9787
+      }
+    ]
+  },
+  "test_metrics": {
+    "split_name": "TEST",
+    "direction_filter": "OUTFLOW",
+    "total_users": 75,
+    "ground_truth_rules_count": 300,
+    "detected_commitments_count": 298,
+    "strong_commitments_count": 267,
+    "moderate_commitments_count": 31,
+    "true_positives": 293,
+    "false_positives": 5,
+    "false_negatives": 7,
+    "precision": 0.9832,
+    "recall": 0.9767,
+    "f1_score": 0.9799,
+    "category_breakdown": [
+      {
+        "category": "DEBT_PAYMENT",
+        "ground_truth_count": 14,
+        "detected_count": 14,
+        "true_positives": 14,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "ENTERTAINMENT",
+        "ground_truth_count": 28,
+        "detected_count": 27,
+        "true_positives": 27,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": 1.0,
+        "recall": 0.9643
+      },
+      {
+        "category": "FAMILY_SUPPORT",
+        "ground_truth_count": 17,
+        "detected_count": 17,
+        "true_positives": 17,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "FITNESS",
+        "ground_truth_count": 14,
+        "detected_count": 14,
+        "true_positives": 14,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "HOUSING",
+        "ground_truth_count": 75,
+        "detected_count": 75,
+        "true_positives": 75,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "SOFTWARE",
+        "ground_truth_count": 14,
+        "detected_count": 14,
+        "true_positives": 14,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "TELECOM",
+        "ground_truth_count": 34,
+        "detected_count": 34,
+        "true_positives": 34,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "category": "UTILITIES",
+        "ground_truth_count": 104,
+        "detected_count": 103,
+        "true_positives": 98,
+        "false_positives": 5,
+        "false_negatives": 6,
+        "precision": 0.9515,
+        "recall": 0.9423
+      }
+    ]
+  }
+}
