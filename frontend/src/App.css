@@ -1223,10 +1223,18 @@
 
 /* User Account Badge Truncation */
 .user-name-text {
-  max-width: 120px;
+  max-width: 140px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.desktop-user-name {
+  display: inline-block;
+}
+
+.mobile-user-name {
+  display: none;
 }
 
 /* Mobile Media Queries & Responsive Bounds */
@@ -1235,12 +1243,24 @@
     display: none !important;
   }
 
+  .desktop-user-name {
+    display: none !important;
+  }
+
+  .mobile-user-name {
+    display: inline-block !important;
+  }
+
   .mobile-menu-toggle-btn {
     display: flex !important;
   }
 
   .app-header {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .header-right {
+    gap: 0.4rem;
   }
 
   .brand-name {
@@ -1248,11 +1268,11 @@
   }
 
   .account-badge-btn {
-    padding: 0.35rem 0.6rem;
+    padding: 0.35rem 0.5rem;
   }
 
   .user-name-text {
-    max-width: 80px;
+    max-width: 90px;
   }
 
   /* Core Layout Grid Collapses */

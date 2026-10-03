@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth, DEMO_PERSONAS } from '../context/AuthContext';
-import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2, Menu, X as CloseIcon } from 'lucide-react';
+import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2, MoreVertical, X as CloseIcon } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 import { ConfirmModal } from './ConfirmModal';
@@ -52,6 +52,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
   const getFirstName = (name?: string | null, username?: string | null, accId?: string | null) => {
     const raw = name || username || accId || 'User';
     return raw.trim().split(' ')[0] || raw;
+  };
+
+  const getFullName = (name?: string | null, username?: string | null, accId?: string | null) => {
+    return name || username || accId || 'User';
   };
 
   return (
@@ -110,7 +114,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
               <span className="user-icon-circle">
                 <User size={14} color="#00e5a3" />
               </span>
-              <span className="user-name-text">
+              <span className="user-name-text desktop-user-name">
+                {getFullName(currentUser.display_name, currentUser.username, currentUser.account_id)}
+              </span>
+              <span className="user-name-text mobile-user-name">
                 {getFirstName(currentUser.display_name, currentUser.username, currentUser.account_id)}
               </span>
               {currentUser.is_demo_account && (
@@ -190,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <CloseIcon size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <CloseIcon size={20} /> : <MoreVertical size={20} />}
           </button>
         )}
       </div>
