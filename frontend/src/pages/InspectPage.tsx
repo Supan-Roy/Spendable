@@ -15,7 +15,8 @@ import {
   Eye,
   Zap,
   Calendar,
-  DollarSign
+  DollarSign,
+  CornerDownLeft
 } from 'lucide-react';
 
 export const InspectPage: React.FC = () => {
@@ -83,17 +84,15 @@ export const InspectPage: React.FC = () => {
           </div>
           <div>
             <h2 className="section-title">End-to-End System Architecture Flow</h2>
-            <p className="section-subtitle">A sequential 5-stage data processing pipeline connecting data ingestion to Spendable AI</p>
+            <p className="section-subtitle">A connected 5-stage processing pipeline passing context down to Spendable AI</p>
           </div>
         </div>
 
-        <div className="architecture-flow-container">
-          <div className="flow-track-line"></div>
-          
-          <div className="architecture-flow-grid">
+        <div className="architecture-rounded-flow">
+          {/* Row 1: Stages 1 to 3 */}
+          <div className="flow-row row-3-cols">
             {/* Stage 1 */}
             <div className="flow-node-card node-data glow-card">
-              <div className="card-pulse-ring"></div>
               <div className="node-header-flex">
                 <span className="node-step-tag badge-blue">STAGE 01</span>
                 <span className="step-arrow-indicator">➔</span>
@@ -108,7 +107,6 @@ export const InspectPage: React.FC = () => {
 
             {/* Stage 2 */}
             <div className="flow-node-card node-features glow-card">
-              <div className="card-pulse-ring"></div>
               <div className="node-header-flex">
                 <span className="node-step-tag badge-purple">STAGE 02</span>
                 <span className="step-arrow-indicator">➔</span>
@@ -123,10 +121,9 @@ export const InspectPage: React.FC = () => {
 
             {/* Stage 3 */}
             <div className="flow-node-card node-ml glow-card">
-              <div className="card-pulse-ring"></div>
               <div className="node-header-flex">
                 <span className="node-step-tag badge-green">STAGE 03</span>
-                <span className="step-arrow-indicator">➔</span>
+                <span className="step-arrow-indicator loop-down">↴</span>
               </div>
               <div className="node-icon-header">
                 <Cpu size={24} color="#00e5a3" />
@@ -135,10 +132,20 @@ export const InspectPage: React.FC = () => {
               <p>XGBoost predicts risk distress, LightGBM forecasts 30-day daily balance trajectories, and DBSCAN clusters recurring monthly bills.</p>
               <div className="node-tech-badge">XGBoost / LightGBM / DBSCAN</div>
             </div>
+          </div>
 
+          {/* Rounded Loop Connector Line */}
+          <div className="rounded-loop-connector">
+            <div className="connector-pill-badge">
+              <CornerDownLeft size={15} color="#00e5a3" />
+              <span>PIPELINE DATA FLOW LOOP</span>
+            </div>
+          </div>
+
+          {/* Row 2: Stages 4 & 5 */}
+          <div className="flow-row row-2-cols">
             {/* Stage 4 */}
             <div className="flow-node-card node-engine glow-card">
-              <div className="card-pulse-ring"></div>
               <div className="node-header-flex">
                 <span className="node-step-tag badge-amber">STAGE 04</span>
                 <span className="step-arrow-indicator">➔</span>
@@ -153,7 +160,6 @@ export const InspectPage: React.FC = () => {
 
             {/* Stage 5 */}
             <div className="flow-node-card node-ai glow-card">
-              <div className="card-pulse-ring"></div>
               <div className="node-header-flex">
                 <span className="node-step-tag badge-pink">STAGE 05</span>
                 <span className="step-arrow-indicator">✓</span>

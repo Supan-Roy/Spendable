@@ -1958,18 +1958,59 @@
 
 /* ARCHITECTURE DIAGRAM FLOW CARDS */
 
-.architecture-flow-container {
-  position: relative;
+/* ARCHITECTURE DIAGRAM ROUNDED 2-ROW FLOW */
+
+.architecture-rounded-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
-  overflow-x: auto;
-  padding: 0.5rem 0 1rem 0;
 }
 
-.architecture-flow-grid {
+.flow-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
-  gap: 1.25rem;
+  gap: 1.5rem;
   align-items: stretch;
+  width: 100%;
+}
+
+.row-3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.row-2-cols {
+  grid-template-columns: repeat(2, 1fr);
+  width: 66.666%;
+}
+
+@media (max-width: 900px) {
+  .row-3-cols, .row-2-cols {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+}
+
+.rounded-loop-connector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8%;
+  margin: -0.25rem 0;
+}
+
+.connector-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 229, 163, 0.1);
+  border: 1px solid rgba(0, 229, 163, 0.35);
+  color: #00e5a3;
+  padding: 0.4rem 0.95rem;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 15px rgba(0, 229, 163, 0.2);
 }
 
 .flow-node-card {
@@ -2027,10 +2068,15 @@
 .badge-pink { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3); }
 
 .step-arrow-indicator {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #00e5a3;
-  opacity: 0.8;
+  opacity: 0.9;
+}
+
+.step-arrow-indicator.loop-down {
+  font-size: 1.3rem;
+  color: #a855f7;
 }
 
 @keyframes cardAuraPulse {
