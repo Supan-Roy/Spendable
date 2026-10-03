@@ -12,7 +12,6 @@ import {
   GitBranch,
   Lock,
   CheckCircle2,
-  ArrowRight,
   Eye,
   Zap,
   Calendar,
@@ -59,8 +58,8 @@ export const InspectPage: React.FC = () => {
               <Lock size={20} />
             </div>
             <div>
-              <span className="stat-val">Zero</span>
-              <span className="stat-lbl">Hallucination Risk (Zero Math in LLM)</span>
+              <span className="stat-val">Zero Risk</span>
+              <span className="stat-lbl">Code-Enforced Financial Calculations</span>
             </div>
           </div>
 
@@ -84,80 +83,88 @@ export const InspectPage: React.FC = () => {
           </div>
           <div>
             <h2 className="section-title">End-to-End System Architecture Flow</h2>
-            <p className="section-subtitle">How data flows from multi-channel inputs through ML intelligence down to the UI and Spendable AI</p>
+            <p className="section-subtitle">A sequential 5-stage data processing pipeline connecting data ingestion to Spendable AI</p>
           </div>
         </div>
 
-        <div className="architecture-flow-diagram">
-          {/* Node 1 */}
-          <div className="flow-node-card node-data">
-            <div className="node-step-tag">STAGE 1</div>
-            <div className="node-icon-header">
-              <Database size={24} color="#38bdf8" />
-              <h3>Data Ingestion Layer</h3>
+        <div className="architecture-flow-container">
+          <div className="flow-track-line"></div>
+          
+          <div className="architecture-flow-grid">
+            {/* Stage 1 */}
+            <div className="flow-node-card node-data glow-card">
+              <div className="card-pulse-ring"></div>
+              <div className="node-header-flex">
+                <span className="node-step-tag badge-blue">STAGE 01</span>
+                <span className="step-arrow-indicator">➔</span>
+              </div>
+              <div className="node-icon-header">
+                <Database size={24} color="#38bdf8" />
+                <h3>Data Ingestion Layer</h3>
+              </div>
+              <p>Ingests real-time transactions from Bank APIs, bKash, Upay, & card POS. Standardizes schemas to UTC timestamps & classifies cash directions.</p>
+              <div className="node-tech-badge">Plaid / Bank API / Pydantic</div>
             </div>
-            <p>Ingests real-time transactions from Bank APIs, bKash, Upay, & card POS. Standardizes schemas to UTC timestamps & classifies cash directions.</p>
-            <div className="node-tech-badge">Plaid / Bank API / Pydantic</div>
-          </div>
 
-          <div className="flow-connector-line">
-            <ArrowRight size={20} color="#64748b" />
-          </div>
-
-          {/* Node 2 */}
-          <div className="flow-node-card node-features">
-            <div className="node-step-tag">STAGE 2</div>
-            <div className="node-icon-header">
-              <Layers size={24} color="#a855f7" />
-              <h3>Rolling Feature Store</h3>
+            {/* Stage 2 */}
+            <div className="flow-node-card node-features glow-card">
+              <div className="card-pulse-ring"></div>
+              <div className="node-header-flex">
+                <span className="node-step-tag badge-purple">STAGE 02</span>
+                <span className="step-arrow-indicator">➔</span>
+              </div>
+              <div className="node-icon-header">
+                <Layers size={24} color="#a855f7" />
+                <h3>Rolling Feature Store</h3>
+              </div>
+              <p>Computes 7d/14d/30d rolling windows, spending volatility (σ), recency-weighted cash flow ratios, and category concentrations.</p>
+              <div className="node-tech-badge">Pandas / NumPy Feature Matrix</div>
             </div>
-            <p>Computes 7d/14d/30d rolling windows, spending volatility (σ), recency-weighted cash flow ratios, and category concentrations.</p>
-            <div className="node-tech-badge">Pandas / NumPy Feature Matrix</div>
-          </div>
 
-          <div className="flow-connector-line">
-            <ArrowRight size={20} color="#64748b" />
-          </div>
-
-          {/* Node 3 */}
-          <div className="flow-node-card node-ml">
-            <div className="node-step-tag">STAGE 3</div>
-            <div className="node-icon-header">
-              <Cpu size={24} color="#00e5a3" />
-              <h3>ML Model Ensemble</h3>
+            {/* Stage 3 */}
+            <div className="flow-node-card node-ml glow-card">
+              <div className="card-pulse-ring"></div>
+              <div className="node-header-flex">
+                <span className="node-step-tag badge-green">STAGE 03</span>
+                <span className="step-arrow-indicator">➔</span>
+              </div>
+              <div className="node-icon-header">
+                <Cpu size={24} color="#00e5a3" />
+                <h3>ML Model Ensemble</h3>
+              </div>
+              <p>XGBoost predicts risk distress, LightGBM forecasts 30-day daily balance trajectories, and DBSCAN clusters recurring monthly bills.</p>
+              <div className="node-tech-badge">XGBoost / LightGBM / DBSCAN</div>
             </div>
-            <p>XGBoost predicts risk distress, LightGBM forecasts 30-day daily balance trajectories, and DBSCAN clusters recurring monthly bills.</p>
-            <div className="node-tech-badge">XGBoost / LightGBM / DBSCAN</div>
-          </div>
 
-          <div className="flow-connector-line">
-            <ArrowRight size={20} color="#64748b" />
-          </div>
-
-          {/* Node 4 */}
-          <div className="flow-node-card node-engine">
-            <div className="node-step-tag">STAGE 4</div>
-            <div className="node-icon-header">
-              <ShieldCheck size={24} color="#f59e0b" />
-              <h3>Deterministic Engine</h3>
+            {/* Stage 4 */}
+            <div className="flow-node-card node-engine glow-card">
+              <div className="card-pulse-ring"></div>
+              <div className="node-header-flex">
+                <span className="node-step-tag badge-amber">STAGE 04</span>
+                <span className="step-arrow-indicator">➔</span>
+              </div>
+              <div className="node-icon-header">
+                <ShieldCheck size={24} color="#f59e0b" />
+                <h3>Deterministic Engine</h3>
+              </div>
+              <p>Calculates exact Spendable Capacity: Spendable = Max(0, Balance - Upcoming Commitments - Safety Reserve). 100% hardcoded math.</p>
+              <div className="node-tech-badge">Python Core Math Engine</div>
             </div>
-            <p>Calculates exact Spendable Capacity: Spendable = Max(0, Balance - Upcoming Commitments - Safety Reserve). 100% hardcoded math.</p>
-            <div className="node-tech-badge">Python Core Math Engine</div>
-          </div>
 
-          <div className="flow-connector-line">
-            <ArrowRight size={20} color="#64748b" />
-          </div>
-
-          {/* Node 5 */}
-          <div className="flow-node-card node-ai">
-            <div className="node-step-tag">STAGE 5</div>
-            <div className="node-icon-header">
-              <Bot size={24} color="#ec4899" />
-              <h3>Spendable AI Layer</h3>
+            {/* Stage 5 */}
+            <div className="flow-node-card node-ai glow-card">
+              <div className="card-pulse-ring"></div>
+              <div className="node-header-flex">
+                <span className="node-step-tag badge-pink">STAGE 05</span>
+                <span className="step-arrow-indicator">✓</span>
+              </div>
+              <div className="node-icon-header">
+                <Bot size={24} color="#ec4899" />
+                <h3>Spendable AI Layer</h3>
+              </div>
+              <p>Injects calculated context into Gemini LLM. Identifies as Spendable AI to answer liquidity queries with zero hallucination.</p>
+              <div className="node-tech-badge">Gemini SDK + Context Injector</div>
             </div>
-            <p>Injects calculated context into Gemini LLM. Identifies as Spendable AI to answer liquidity queries with zero hallucination.</p>
-            <div className="node-tech-badge">Gemini SDK + Context Injector</div>
           </div>
         </div>
       </section>

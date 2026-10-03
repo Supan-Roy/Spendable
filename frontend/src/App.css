@@ -1958,46 +1958,89 @@
 
 /* ARCHITECTURE DIAGRAM FLOW CARDS */
 
-.architecture-flow-diagram {
+.architecture-flow-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem 0;
+}
+
+.architecture-flow-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  gap: 1.25rem;
   align-items: stretch;
 }
 
-@media (max-width: 1024px) {
-  .architecture-flow-diagram {
-    grid-template-columns: 1fr;
-  }
-  .flow-connector-line {
-    transform: rotate(90deg);
-    margin: 0.5rem auto;
-  }
-}
-
 .flow-node-card {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
   backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  overflow: hidden;
+}
+
+/* Card Glow & Border Pulse Animations */
+
+.glow-card {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  animation: cardAuraPulse 4s ease-in-out infinite alternate;
 }
 
 .flow-node-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(0, 229, 163, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 229, 163, 0.2);
 }
 
 .node-data { border-top: 4px solid #38bdf8; }
 .node-features { border-top: 4px solid #a855f7; }
 .node-ml { border-top: 4px solid #00e5a3; }
 .node-engine { border-top: 4px solid #f59e0b; }
+.node-ai { border-top: 4px solid #ec4899; }
+
+.node-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.node-step-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+}
+
+.badge-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+.badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+.badge-green { background: rgba(0, 229, 163, 0.15); color: #00e5a3; border: 1px solid rgba(0, 229, 163, 0.3); }
+.badge-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-pink { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3); }
+
+.step-arrow-indicator {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #00e5a3;
+  opacity: 0.8;
+}
+
+@keyframes cardAuraPulse {
+  0% {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0, 229, 163, 0.02);
+  }
+  100% {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 229, 163, 0.08);
+  }
+}
 .node-ai { border-top: 4px solid #ec4899; }
 
 .node-step-tag {
