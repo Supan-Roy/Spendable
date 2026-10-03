@@ -2282,41 +2282,37 @@
 
 .ml-models-deepdive-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
-}
-
-@media (max-width: 1024px) {
-  .ml-models-deepdive-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .ml-model-card {
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  padding: 1.75rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
   backdrop-filter: blur(12px);
+  min-width: 0;
 }
 
 .model-card-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 }
 
 .model-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .xgboost-icon { background: rgba(0, 229, 163, 0.15); color: #00e5a3; border: 1px solid rgba(0, 229, 163, 0.3); }
@@ -2324,55 +2320,73 @@
 .dbscan-icon { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
 
 .model-tag {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: #94a3b8;
   text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
 }
 
 .model-card-top h3 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #ffffff;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .model-desc {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: #cbd5e1;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .model-specs-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.65rem;
   margin-top: auto;
 }
 
 .spec-box {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 0.75rem;
+  padding: 0.75rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.spec-box.full-width {
+  grid-column: 1 / -1;
 }
 
 .spec-lbl {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #94a3b8;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .spec-val {
   font-size: 0.8rem;
-  color: #ffffff;
-  font-weight: 700;
-  line-height: 1.3;
+  color: #f8fafc;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.spec-code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  color: #38bdf8;
+  word-break: break-all;
 }
 
 /* 5. RESPONSIBLE AI BANNER */

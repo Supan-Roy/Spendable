@@ -319,7 +319,7 @@ export const InspectPage: React.FC = () => {
           <div className="ml-model-card">
             <div className="model-card-top">
               <div className="model-icon-box lightgbm-icon">
-                <TrendingUp size={24} />
+                <TrendingUp size={22} />
               </div>
               <div>
                 <span className="model-tag">SUPERVISED REGRESSOR</span>
@@ -330,9 +330,9 @@ export const InspectPage: React.FC = () => {
               Supervised gradient boosted regression models predicting multi-horizon (7d, 14d, 30d) minimum balances and 30-day daily trajectory points.
             </p>
             <div className="model-specs-grid">
-              <div className="spec-box">
+              <div className="spec-box full-width">
                 <span className="spec-lbl">Algorithm</span>
-                <span className="spec-val">sklearn.ensemble.HistGradientBoostingRegressor</span>
+                <span className="spec-val spec-code">sklearn.ensemble.HistGradientBoostingRegressor</span>
               </div>
               <div className="spec-box">
                 <span className="spec-lbl">Primary Features</span>
@@ -340,9 +340,9 @@ export const InspectPage: React.FC = () => {
               </div>
               <div className="spec-box">
                 <span className="spec-lbl">Hyper-Parameters</span>
-                <span className="spec-val">max_iter=150, min_samples_leaf=20, random_seed=42</span>
+                <span className="spec-val spec-code">max_iter=150, min_samples_leaf=20, random_seed=42</span>
               </div>
-              <div className="spec-box">
+              <div className="spec-box full-width">
                 <span className="spec-lbl">Evaluation Metric</span>
                 <span className="spec-val">Weighted Absolute Percentage Error (WAPE) & MAE</span>
               </div>
@@ -353,10 +353,10 @@ export const InspectPage: React.FC = () => {
           <div className="ml-model-card">
             <div className="model-card-top">
               <div className="model-icon-box dbscan-icon">
-                <Calendar size={24} />
+                <Calendar size={22} />
               </div>
               <div>
-                <span className="model-tag">DETERMINISTIC PATTERN SCORING</span>
+                <span className="model-tag">PATTERN SCORING ENGINE</span>
                 <h3>Point-in-Time Recurring Commitment Detector</h3>
               </div>
             </div>
@@ -370,7 +370,7 @@ export const InspectPage: React.FC = () => {
               </div>
               <div className="spec-box">
                 <span className="spec-lbl">Metrics Scored</span>
-                <span className="spec-val">Inter-arrival Coefficient of Variation (CV_Δt), Amount CV, Category Priors</span>
+                <span className="spec-val">Inter-arrival CV (CV_Δt), Amount CV, Category Priors</span>
               </div>
               <div className="spec-box">
                 <span className="spec-lbl">Category Classes</span>
@@ -387,7 +387,7 @@ export const InspectPage: React.FC = () => {
           <div className="ml-model-card">
             <div className="model-card-top">
               <div className="model-icon-box xgboost-icon">
-                <BarChart3 size={24} />
+                <BarChart3 size={22} />
               </div>
               <div>
                 <span className="model-tag">IN-MEMORY SIMULATOR</span>
