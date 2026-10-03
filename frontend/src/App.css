@@ -1812,6 +1812,62 @@
   font-weight: 600;
 }
 
+/* SCENARIO METRICS IMPACT GRID */
+
+.scenario-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .scenario-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-impact-card {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.metric-impact-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-impact-vals {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.metric-impact-vals .prev-val {
+  color: #94a3b8;
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+.metric-impact-vals .arr {
+  color: #00e5a3;
+  font-size: 0.85rem;
+}
+
+.metric-impact-vals .curr-val {
+  color: #ffffff;
+}
+
 /* ==========================================================================
    INSPECT VISUALIZER PAGE STYLES (Clean Top-to-Bottom Flow)
    ========================================================================== */

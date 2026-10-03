@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { postSimulateApi, postChatApi } from '../api/spendable';
 import type { ScenarioType, ScenarioResult, ChatMessage } from '../api/types';
-import { formatCurrency, formatDateTime, getLiquidityBadgeConfig } from '../utils/formatters';
+import { formatCurrency, getLiquidityBadgeConfig } from '../utils/formatters';
 import { Sliders, ArrowRight, RotateCcw, AlertTriangle, Shield, Bot, Sparkles, Send, MessageSquare, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const SimulatePage: React.FC = () => {
@@ -283,22 +283,22 @@ export const SimulatePage: React.FC = () => {
               <div className="results-header">
                 <div>
                   <h3>Scenario Impact Result</h3>
-                  {result.snapshot_time && (
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                      Simulated at {formatDateTime(result.snapshot_time)}
-                    </div>
-                  )}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                    {result.scenario_description || result.description || 'Hypothetical financial simulation result'}
+                  </div>
                 </div>
-                {result.state_changed && (
-                  <span className="state-changed-tag">State Changed</span>
+                {result.base_liquidity_state !== result.scenario_liquidity_state && (
+                  <span className="state-changed-tag">State Changed: {result.base_liquidity_state} ➔ {result.scenario_liquidity_state}</span>
                 )}
               </div>
 
-              {/* Before vs After Visual Comparison */}
+              {/* 1. Primary Spendable Capacity Comparison */}
               <div className="before-after-grid">
                 <div className="comparison-box before-box">
-                  <span className="box-title">BEFORE (BASE)</span>
-                  <span className="box-amount">{formatCurrency(result.base_spendable)}</span>
+                  <span className="box-title">BEFORE (SPENDABLE)</span>
+                  <span className="box-amount">
+                    {formatCurrency(result.base_spendable_amount ?? result.base_spendable ?? 0)}
+                  </span>
                   {baseBadge && (
                     <span className="mini-status-badge" style={{ color: baseBadge.color }}>
                       {baseBadge.label}
@@ -316,7 +316,9 @@ export const SimulatePage: React.FC = () => {
 
                 <div className="comparison-box after-box">
                   <span className="box-title">AFTER (SCENARIO)</span>
-                  <span className="box-amount scenario-highlight">{formatCurrency(result.scenario_spendable)}</span>
+                  <span className="box-amount scenario-highlight">
+                    {formatCurrency(result.scenario_spendable_amount ?? result.scenario_spendable ?? 0)}
+                  </span>
                   {scenarioBadge && (
                     <span className="mini-status-badge" style={{ color: scenarioBadge.color }}>
                       {scenarioBadge.label}
@@ -325,16 +327,62 @@ export const SimulatePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Scenario Explanation */}
-              {result.explanation && (
-                <div className="scenario-explanation-box">
-                  <div className="explanation-header">
-                    <Shield size={16} color="#00e5a3" />
-                    <h4>Impact Analysis</h4>
+              {/* 2. Detailed Multi-Metric Financial Breakdown Grid */}
+              <div className="scenario-metrics-grid">
+                <div className="metric-impact-card">
+                  <span className="metric-impact-label">Account Balance</span>
+                  <div className="metric-impact-vals">
+                    <span className="prev-val">{formatCurrency(result.base_current_balance ?? 0)}</span>
+                    <span className="arr">➔</span>
+                    <span className="curr-val">{formatCurrency(result.scenario_current_balance ?? 0)}</span>
                   </div>
-                  <p>{result.explanation}</p>
                 </div>
-              )}
+
+                <div className="metric-impact-card">
+                  <span className="metric-impact-label">30-Day Minimum Runway</span>
+                  <div className="metric-impact-vals">
+                    <span className="prev-val">{formatCurrency(result.base_forecasted_minimum_balance ?? 0)}</span>
+                    <span className="arr">➔</span>
+                    <span className="curr-val" style={{ color: (result.scenario_forecasted_minimum_balance ?? 0) < 0 ? '#ef4444' : '#00e5a3' }}>
+                      {formatCurrency(result.scenario_forecasted_minimum_balance ?? 0)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="metric-impact-card">
+                  <span className="metric-impact-label">Protected Safety Buffer</span>
+                  <div className="metric-impact-vals">
+                    <span className="prev-val">{formatCurrency(result.base_safety_reserve ?? 0)}</span>
+                    <span className="arr">➔</span>
+                    <span className="curr-val">{formatCurrency(result.scenario_safety_reserve ?? 0)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Scenario Insights & Actionable Guidance */}
+              <div className="scenario-explanation-box">
+                <div className="explanation-header">
+                  <Shield size={16} color="#00e5a3" />
+                  <h4>Financial Impact Analysis</h4>
+                </div>
+                <p>
+                  {result.explanation ||
+                    `Simulating this scenario changes your immediate spendable capacity by ${formatCurrency(result.spendable_delta)}. Your 30-day minimum projected balance shifts from ${formatCurrency(result.base_forecasted_minimum_balance ?? 0)} to ${formatCurrency(result.scenario_forecasted_minimum_balance ?? 0)}.`}
+                </p>
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="secondary-btn compact"
+                    onClick={() => {
+                      setIsAiOpen(true);
+                      handleSendChatMessage(`How does this simulated scenario (${result.scenario_description || 'scenario'}) affect my 30-day liquidity and recurring bill payments?`);
+                    }}
+                  >
+                    <Bot size={14} color="#00e5a3" />
+                    <span>Ask Spendable AI about this scenario</span>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

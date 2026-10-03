@@ -138,15 +138,24 @@ export interface ScenarioResult {
   user_id: string;
   snapshot_time?: string;
   scenario_type: ScenarioType;
-  description: string;
-  base_spendable: number;
-  scenario_spendable: number;
+  scenario_description?: string;
+  description?: string;
+  base_spendable_amount: number;
+  scenario_spendable_amount: number;
   spendable_delta: number;
+  base_current_balance: number;
+  scenario_current_balance: number;
+  base_forecasted_minimum_balance: number;
+  scenario_forecasted_minimum_balance: number;
+  base_safety_reserve: number;
+  scenario_safety_reserve: number;
   base_liquidity_state: LiquidityState;
   scenario_liquidity_state: LiquidityState;
-  state_changed: boolean;
-  horizon_days: number;
-  scenario_factors: Record<string, number | string>;
+  assumptions?: Record<string, any>;
+  factors?: FactorItem[];
+  // Backwards compatibility fallbacks
+  base_spendable?: number;
+  scenario_spendable?: number;
   explanation?: string;
 }
 
