@@ -344,6 +344,23 @@ class DatabaseDataProvider(BaseDataProvider):
                     "activities": [],
                 }
 
+            from datetime import datetime, timezone, timedelta
+
+            now_dt = datetime.now(timezone.utc)
+            latest_act = query.order_by(FinancialActivityModel.timestamp_utc.desc()).first()
+            shift_td = timedelta(days=0)
+            if latest_act and latest_act.timestamp_utc:
+                latest_ts = latest_act.timestamp_utc
+                if hasattr(latest_ts, "tzinfo") and latest_ts.tzinfo is None:
+                    latest_ts = latest_ts.replace(tzinfo=timezone.utc)
+                if isinstance(latest_ts, str):
+                    try:
+                        latest_ts = datetime.fromisoformat(latest_ts.replace("Z", "+00:00"))
+                    except Exception:
+                        latest_ts = None
+                if latest_ts and now_dt > latest_ts:
+                    shift_td = now_dt - latest_ts
+
             db_acts = (
                 query.order_by(FinancialActivityModel.timestamp_utc.desc())
                 .offset(offset)
@@ -353,10 +370,26 @@ class DatabaseDataProvider(BaseDataProvider):
 
             activities = []
             for a in db_acts:
+                raw_ts = a.timestamp_utc
+                if hasattr(raw_ts, "tzinfo") and raw_ts.tzinfo is None:
+                    raw_ts = raw_ts.replace(tzinfo=timezone.utc)
+                if isinstance(raw_ts, str):
+                    try:
+                        parsed_ts = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
+                    except Exception:
+                        parsed_ts = now_dt
+                else:
+                    parsed_ts = raw_ts
+
+                try:
+                    final_ts = (parsed_ts + shift_td).isoformat()
+                except Exception:
+                    final_ts = now_dt.isoformat()
+
                 activities.append({
                     "transaction_id": str(a.id),
                     "account_id": str(a.account_id),
-                    "timestamp_utc": a.timestamp_utc.isoformat() if hasattr(a.timestamp_utc, "isoformat") else str(a.timestamp_utc),
+                    "timestamp_utc": final_ts,
                     "amount": float(a.amount),
                     "direction": a.direction.value if hasattr(a.direction, "value") else str(a.direction),
                     "category": str(a.category or "GENERAL"),

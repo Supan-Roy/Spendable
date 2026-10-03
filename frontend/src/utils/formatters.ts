@@ -30,7 +30,6 @@ export function formatDateTime(isoDateStr: string | null | undefined): string {
     const timeStr = d.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: true,
     });
     return `${dateStr}, ${timeStr}`;
@@ -65,7 +64,6 @@ export function formatTime(isoDateStr: string | null | undefined): string {
     return d.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: true,
     });
   } catch {
