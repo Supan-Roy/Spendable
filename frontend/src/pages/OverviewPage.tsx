@@ -14,8 +14,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 interface OverviewPageProps {
+
   onNavigateTab: (tab: 'forecast' | 'simulate' | 'activity') => void;
   onOpenCalcModal: () => void;
 }
@@ -85,6 +87,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
     fetchData();
   }, [currentUser?.account_id]);
 
+  const [injectErrorMsg, setInjectErrorMsg] = useState<string | null>(null);
+
   const handleInjectSampleData = async () => {
     setIsInjecting(true);
     try {
@@ -92,11 +96,12 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
       await refreshUser();
       await fetchData();
     } catch (err: any) {
-      alert(err.message || 'Failed to inject sample transaction data');
+      setInjectErrorMsg(err.message || 'Failed to inject sample transaction data');
     } finally {
       setIsInjecting(false);
     }
   };
+
 
   if (isLoading) {
     return (
@@ -344,6 +349,18 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
           </div>
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!injectErrorMsg}
+        title="Sample Data Injection Notice"
+        message={injectErrorMsg || ''}
+        confirmText="OK"
+        cancelText="Close"
+        variant="warning"
+        onConfirm={() => setInjectErrorMsg(null)}
+        onCancel={() => setInjectErrorMsg(null)}
+      />
     </div>
   );
 };
+

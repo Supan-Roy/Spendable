@@ -3,6 +3,8 @@ import { useAuth, DEMO_PERSONAS } from '../context/AuthContext';
 import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
+import { ConfirmModal } from './ConfirmModal';
+
 export type TabType = 'overview' | 'activity' | 'forecast' | 'simulate';
 
 interface HeaderProps {
@@ -14,6 +16,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenLogin }) => {
   const { currentUser, loginAsDemo, logout, deleteAccount, isAuthenticated, demoAccounts } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -32,15 +36,18 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
     await loginAsDemo(accountId);
   };
 
-  const handleDeleteAccount = async () => {
-    const accName = currentUser?.display_name || currentUser?.username || 'account';
-    const confirmed = window.confirm(
-      `Are you sure you want to permanently delete your account (${accName})?\n\nAll database entries and financial records for this account will be erased with no trace.`
-    );
-    if (!confirmed) return;
-    setDropdownOpen(false);
-    await deleteAccount();
+  const confirmDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteAccount();
+      setShowDeleteConfirm(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
+    }
   };
+
 
   return (
     <header className="app-header">
@@ -135,7 +142,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                 {!currentUser.is_demo_account && (
                   <button
                     className="delete-account-dropdown-item"
-                    onClick={handleDeleteAccount}
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      setShowDeleteConfirm(true);
+                    }}
                   >
                     <Trash2 size={14} color="#ef4444" />
                     <span>Delete account</span>
@@ -163,7 +173,20 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
           </button>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Account?"
+        message={`Are you sure you want to permanently delete your account (${currentUser?.display_name || currentUser?.username})?\n\nAll database entries and financial records for this account will be erased with no trace.`}
+        confirmText="Delete Account"
+        cancelText="Keep Account"
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={confirmDeleteAccount}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </header>
   );
 };
+
 
