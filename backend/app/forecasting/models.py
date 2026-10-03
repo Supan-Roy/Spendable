@@ -135,6 +135,9 @@ class CashFlowForecastModel:
 
         X = np.array([x_vec])
 
+        exp_inflow_feat = float(snapshot_features.get("total_inflow_30d") or snapshot_features.get("sum_inflow_30d") or snapshot_features.get("inflow_sum_30d") or 0.0)
+        exp_outflow_feat = float(snapshot_features.get("total_outflow_30d") or snapshot_features.get("sum_outflow_30d") or snapshot_features.get("outflow_sum_30d") or 0.0)
+
         forecasts: Dict[int, HorizonForecast] = {}
         for H in (7, 14, 30):
             pred_min_bal = float(self.models_min_bal[H].predict(X)[0])
@@ -144,11 +147,9 @@ class CashFlowForecastModel:
             min_bal = round(max(0.0, pred_min_bal), 2)
             proj_bal = round(max(0.0, current_balance + pred_net_flow), 2)
 
-            exp_inflow_feat = float(snapshot_features.get("total_inflow_30d") or snapshot_features.get("sum_inflow_30d") or snapshot_features.get("inflow_sum_30d") or 0.0)
-            exp_outflow_feat = float(snapshot_features.get("total_outflow_30d") or snapshot_features.get("sum_outflow_30d") or snapshot_features.get("outflow_sum_30d") or 0.0)
-
             exp_inflow = round(max(0.0, exp_inflow_feat * (H / 30.0)), 2)
             exp_outflow = round(max(0.0, exp_outflow_feat * (H / 30.0)), 2) if exp_outflow_feat > 0 else round(max(0.0, exp_inflow - pred_net_flow), 2)
+
 
             r_std = self.residual_std.get(H, 2000.0)
             lower_bound = round(max(0.0, min_bal - 1.645 * r_std), 2)
@@ -271,12 +272,12 @@ class CashFlowForecastModel:
         for d in range(1, 31):
             base_b = current_balance + daily_rate * d
             cal_day = (snap_dt + timedelta(days=d)).day
-            wave = math.sin(2.0 * math.pi * d / 7.0) * (exp_outflow_feat * 0.03 if exp_outflow_feat > 0 else 300.0)
+            wave = math.sin(2.0 * math.pi * d / 7.0) * (tot_outflow * 0.03 if tot_outflow > 0 else 300.0)
             event = 0.0
             if cal_day in (1, 15):
-                event += (exp_inflow_feat * 0.08 if exp_inflow_feat > 0 else 1000.0)
+                event += (tot_inflow * 0.08 if tot_inflow > 0 else 1000.0)
             elif cal_day in (5, 25):
-                event -= (exp_outflow_feat * 0.07 if exp_outflow_feat > 0 else 800.0)
+                event -= (tot_outflow * 0.07 if tot_outflow > 0 else 800.0)
 
             d_bal = max(0.0, base_b + wave + event)
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
@@ -287,6 +288,7 @@ class CashFlowForecastModel:
                     projected_balance=round(d_bal, 2),
                 )
             )
+
 
 
         return ForecastOutput(
