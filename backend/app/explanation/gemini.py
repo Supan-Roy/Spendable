@@ -4,8 +4,10 @@ Converts structured ExplanationContext into human-readable explanations using th
 If Gemini is unavailable or fails, returns a deterministic fallback explanation ensuring zero service disruption.
 """
 
+import hashlib
 import json
 import os
+import time
 from typing import Dict, List, Optional, Any
 
 from app.config import settings
@@ -17,7 +19,10 @@ from app.explanation.prompts import SYSTEM_INSTRUCTION, build_explanation_prompt
 
 
 class ExplanationGenerator:
-    """Generates structured explanations via Gemini API with deterministic fallback."""
+    """Generates structured explanations via Gemini API with deterministic fallback and smart SHA256 response caching."""
+
+    _cache: Dict[str, tuple[float, GeminiExplanationResponse]] = {}
+    _cache_ttl: float = 600.0  # 10 minutes cache window
 
     def __init__(self, api_key: Optional[str] = None, model_name: Optional[str] = None):
         if api_key is not None:
@@ -75,6 +80,16 @@ class ExplanationGenerator:
         if not self.api_key or self.api_key.strip() == "":
             return self.generate_fallback_explanation(context)
 
+        # Compute deterministic cache key from financial context fields
+        cache_payload = f"{context.user_id}:{context.current_balance}:{context.spendable_amount}:{context.protected_amount}:{context.upcoming_commitments}:{context.liquidity_state}:{context.scenario}"
+        cache_key = hashlib.sha256(cache_payload.encode()).hexdigest()
+        now = time.time()
+
+        if cache_key in ExplanationGenerator._cache:
+            cached_time, cached_resp = ExplanationGenerator._cache[cache_key]
+            if now - cached_time < ExplanationGenerator._cache_ttl:
+                return cached_resp
+
         try:
             from google import genai
             from google.genai import types
@@ -95,7 +110,7 @@ class ExplanationGenerator:
             text = response.text or ""
             parsed = json.loads(text)
             
-            return GeminiExplanationResponse(
+            res = GeminiExplanationResponse(
                 summary=str(parsed.get("summary", "")),
                 why=[str(x) for x in parsed.get("why", [])],
                 key_factors=[str(x) for x in parsed.get("key_factors", [])],
@@ -104,6 +119,9 @@ class ExplanationGenerator:
                 disclaimer=str(parsed.get("disclaimer", "Based on observed account activity.")),
                 is_fallback=False,
             )
+
+            ExplanationGenerator._cache[cache_key] = (now, res)
+            return res
         except Exception:
             # On any API error, rate limit, or invalid response JSON -> Fallback
             return self.generate_fallback_explanation(context)

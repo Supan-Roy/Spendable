@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getOverviewApi, getRecommendationsApi } from '../api/spendable';
+import { getOverviewApi } from '../api/spendable';
 import { injectSampleDataApi } from '../api/auth';
-import type { SpendableOverviewResponse, SpendableRecommendationsResponse } from '../api/types';
+import type { SpendableOverviewResponse } from '../api/types';
 import { formatCurrency, formatDateTime, getLiquidityBadgeConfig } from '../utils/formatters';
 import {
   HelpCircle,
@@ -45,7 +45,6 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
   const [overview, setOverview] = useState<SpendableOverviewResponse | null>(() =>
     getCachedOverviewData(currentUser?.account_id)
   );
-  const [recs, setRecs] = useState<SpendableRecommendationsResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedOverviewData(currentUser?.account_id));
   const [isInjecting, setIsInjecting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,12 +68,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
     }
     setError(null);
     try {
-      const [overviewRes, recsRes] = await Promise.all([
-        getOverviewApi(),
-        getRecommendationsApi().catch(() => null),
-      ]);
+      const overviewRes = await getOverviewApi();
       setOverview(overviewRes);
-      setRecs(recsRes);
       if (currentUser?.account_id) {
         try {
           localStorage.setItem(`${OVERVIEW_CACHE_KEY_PREFIX}${currentUser.account_id}`, JSON.stringify(overviewRes));
@@ -278,14 +273,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
           </section>
 
           {/* Section: Pay Attention To (Deterministic Recommendations + Gemini Explanation) */}
-          {recs && (recs.recommendations.length > 0 || recs.explanation) && (
+          {((overview.recommendations && overview.recommendations.length > 0) || overview.explanation_summary) && (
             <section className="product-section">
               <div className="section-header">
                 <h3>Pay Attention To</h3>
               </div>
 
               <div className="recommendations-container">
-                {recs.recommendations.map((rec) => (
+                {overview.recommendations?.map((rec) => (
                   <div key={rec.rule_id} className={`recommendation-card priority-${rec.priority.toLowerCase()}`}>
                     <div className="rec-badge-icon">
                       {rec.priority === 'HIGH' ? (
@@ -307,23 +302,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigateTab, onOpe
                 ))}
 
                 {/* Gemini Explanation Integration Block */}
-                {recs.explanation && recs.explanation.summary && (
+                {overview.explanation_summary && (
                   <div className="gemini-explanation-box">
                     <div className="explanation-header">
                       <ShieldCheck size={18} color="#00e5a3" />
                       <h4>Why this matters</h4>
-                      {recs.explanation.is_fallback && (
-                        <span className="fallback-tag">Standard Insight</span>
-                      )}
                     </div>
-                    <p className="explanation-text">{recs.explanation.summary}</p>
-                    {recs.explanation.bullet_points && recs.explanation.bullet_points.length > 0 && (
-                      <ul className="explanation-bullets">
-                        {recs.explanation.bullet_points.map((pt, idx) => (
-                          <li key={idx}>{pt}</li>
-                        ))}
-                      </ul>
-                    )}
+                    <p className="explanation-text">{overview.explanation_summary}</p>
                   </div>
                 )}
               </div>
