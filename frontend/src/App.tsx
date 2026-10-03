@@ -41,9 +41,10 @@ function MainApp() {
       {!isAuthenticated || showLoginModal ? (
         <LoginModal
           isOpen={true}
-          onClose={isAuthenticated ? () => setShowLoginModal(false) : undefined}
+          onClose={() => setShowLoginModal(false)}
           canClose={isAuthenticated}
         />
+
       ) : (
         <main className="main-content">
           {activeTab === 'overview' && (
