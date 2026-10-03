@@ -76,7 +76,6 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
-  user-drag: none;
 }
 
 .brand-name {
@@ -591,7 +590,6 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
-  user-drag: none;
 }
 
 .footer-brand-text {
