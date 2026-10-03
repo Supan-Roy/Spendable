@@ -24,6 +24,19 @@
   padding: 0;
 }
 
+/* Custom Text Selection Highlighter */
+::selection {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+::-moz-selection {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-main);
