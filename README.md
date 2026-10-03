@@ -2,18 +2,217 @@
 
 > **"Know what you can safely spend."**
 
-🏆 **Hackathon Track**: **Track 03: Customer Innovation & Financial Independence**
-
-Spendable is an AI-powered personal financial runway and liquidity intelligence platform. 
-
-While traditional banking apps and spreadsheets display a static balance (e.g., *"You have ৳18,400"*), **Spendable** calculates and predicts how much of that balance is realistically and safely spendable after accounting for expected short-term outflows, detected recurring commitments, behavioral spending patterns, and dynamic safety reserves.
+🏆 **Hackathon Track**: **Track 03: Customer Innovation & Financial Independence**  
+🌐 **Live Deployment URL**: [https://spendable-production.up.railway.app](https://spendable-production.up.railway.app)
 
 ---
 
-## 📐 System Architecture
+## 📌 Project Overview
 
-Spendable enforces a strict separation between **Deterministic Financial Computation** and **Generative LLM Explanation**. Financial calculations, feature extraction, and ML predictions are computed purely in Python/C++ code; Google Gemini is invoked exclusively to synthesize natural-language explanations from structured engine outputs with strict financial guardrails.
+### The Problem Addressed
+Traditional banking applications, e-wallets, and personal finance tools present users with static account balances (e.g., *"Current Balance: ৳59,835"*). This creates a dangerous illusion of liquidity, leading users to overspend because it ignores upcoming bills, recurring subscriptions, rent, variable living expenses, and safety reserves. Users frequently experience end-of-month cash crunches, overdraft fees, and missed financial commitments.
 
+### Proposed Solution & Purpose
+**Spendable** solves this liquidity illusion by shifting the financial paradigm from *"What is my balance?"* to *"What can I safely spend today?"*. 
+
+Spendable is an AI-powered personal financial runway and liquidity intelligence platform that calculates a real-time, non-double-counting **Spendable Capacity**:
+$$\text{Spendable} = \max\left(0, \text{Current Balance} - \max(\text{Safety Reserve}, \text{Commitments})\right)$$
+
+By combining point-in-time machine learning cash-flow forecasting, automated recurring commitment detection, What-If scenario simulation, and responsible Spendable AI guidance, Spendable empowers users to achieve true financial independence and confidence.
+
+---
+
+## 🌐 Live Deployment URL
+
+- **Live Application URL for Judges**: [https://spendable-production.up.railway.app](https://spendable-production.up.railway.app)
+- **API Health Check Endpoint**: [https://spendable-production.up.railway.app/api/v1/health](https://spendable-production.up.railway.app/api/v1/health)
+
+*(Note: The live deployment includes pre-configured demo personas (`acc_supan`, `acc_tanvir`, `acc_sarah`, `acc_fatima`) allowing judges to explore all features instantly without registration).*
+
+---
+
+## ⚡ Features & AI Components Usage
+
+Spendable delivers 5 primary application tabs, seamlessly integrating specialized AI & ML components:
+
+### 1. Overview Tab (Real-Time Liquidity Dashboard)
+- **Implemented Features**: Displays your **Safe Spendable Capacity today** (e.g., *"৳22,552.76 Safely Spendable out of ৳59,835.05 balance"*), real-time progress indicators, protected safety buffer metrics, and an upcoming 30-day bill timeline.
+- **AI Component Usage**: Uses the **Point-in-Time Recurring Commitment Detector** to automatically identify upcoming bills and feed them into the deterministic Spendable capacity calculation engine.
+
+### 2. Activity Tab (Multi-Channel Ingestion Feed)
+- **Implemented Features**: Ingests and categorizes transaction activity across multi-channel bank and mobile wallet accounts with direction classification (`INFLOW` vs `OUTFLOW`), category tagging, search, pagination, and ISO 8601 UTC formatting.
+- **AI Component Usage**: Standardizes raw financial activity feeds into a 38-feature rolling window feature store for machine learning model inference.
+
+### 3. Forecast Tab (30-Day Predictive Cash Flow Runway)
+- **Implemented Features**: Projects daily balance trajectories over the next 30 days, highlights low-liquidity crunch dates where balances cross safety thresholds, and compares ML forecasts against reference baselines.
+- **AI Component Usage**: Multi-horizon **`HistGradientBoostingRegressor`** machine learning models trained on 38 rolling window features to predict 7-day, 14-day, and 30-day minimum balance drawdowns and daily balance paths.
+
+### 4. Simulate Tab (What-If Scenario Engine & Spendable AI)
+- **Implemented Features**: Evaluates 5 hypothetical scenarios in real-time (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) without mutating underlying database tables, rendering a Multi-Metric Impact Dashboard.
+- **AI Component Usage**: **Spendable AI** (Google Gemini 2.5 Flash / 1.5 Flash), a context-grounded conversational assistant that receives pre-computed financial facts to answer user queries with zero LLM arithmetic execution.
+
+### 5. Inspect ⚡ System Visualizer Tab (Architecture Walkthrough)
+- **Implemented Features**: Step-by-step technical visualizer detailing the connected 5-stage processing pipeline (`STAGE 01 Ingestion ➔ STAGE 02 Feature Store ➔ STAGE 03 ML Engine ➔ STAGE 04 Deterministic Math ➔ STAGE 05 Spendable AI`).
+- **AI Component Usage**: Renders a zero-API client-side topology visualizer showing live data flow, model parameters, and responsible AI boundaries.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Component | Technologies / Libraries Used |
+| :--- | :--- | :--- |
+| **Languages** | Core Languages | Python 3.12+, TypeScript 5.7+, HTML5, CSS3 |
+| **Frontend Framework** | Web Application | React 19, Vite v6, Vanilla Glassmorphism CSS, Lucide React Icons |
+| **Backend Framework** | REST API Server | FastAPI v0.115+, Uvicorn, Pydantic v2 |
+| **Database & ORM** | Data Persistence | PostgreSQL / SQLite, SQLAlchemy v2.0+, Alembic Migrations |
+| **Machine Learning** | Predictive Engine | `scikit-learn` (`HistGradientBoostingRegressor`), `pandas`, `numpy`, `scipy` |
+| **AI / LLM Integration** | Explainable AI | Google Gemini API (`google-genai` v1.0+ SDK) |
+| **Testing Suite** | Quality Assurance | `pytest` v8.4+, `httpx`, `pytest-asyncio`, `FastAPI TestClient` |
+| **Container & Cloud** | Deployment | Multi-stage Dockerfile, Docker Compose, Railway Platform |
+
+---
+
+## 📋 Requirements & Prerequisites
+
+Before setting up Spendable locally, ensure your system meets the following prerequisites:
+
+- **Python**: Version `3.12.0` or higher
+- **Node.js**: Version `20.0.0` or `22.0.0+`
+- **Package Manager**: `pnpm` (v9+) or `npm` (v10+)
+- **Docker & Docker Compose** *(Optional, for PostgreSQL database container)*: Docker Engine v24+
+- **Git**: For cloning the codebase
+
+---
+
+## 🔑 Environment Variables
+
+Spendable uses environment variables for configuration. Create a `.env` file in the `backend/` directory or root folder.
+
+| Variable Name | Purpose | Configuration Instructions / Default Placeholder |
+| :--- | :--- | :--- |
+| `GEMINI_API_KEY` | Google Gemini API key for Spendable AI chat assistant | `GEMINI_API_KEY=your_google_gemini_api_key_here` *(Optional: If unconfigured, Spendable AI uses a rule-based fallback synthesizer)* |
+| `DATABASE_URL` | SQLAlchemy database connection string | `DATABASE_URL=sqlite:///./spendable.db` *(Default local)* or `postgresql://user:pass@localhost:5432/spendable_db` |
+| `ENVIRONMENT` | Application deployment environment | `ENVIRONMENT=development` *(Options: `development`, `production`, `testing`)* |
+| `PORT` | Backend server HTTP port | `PORT=8000` |
+| `SECRET_KEY` | Application secret key for session security | `SECRET_KEY=your_secret_key_placeholder_change_in_production` |
+
+---
+
+## 📥 Installation and Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Supan-Roy/Spendable.git
+cd Spendable
+```
+
+### 2. Backend Setup & Virtual Environment
+```bash
+# Create Python virtual environment
+python -m venv venv
+
+# Activate virtual environment (Windows PowerShell)
+.\venv\Scripts\activate
+
+# Activate virtual environment (Linux / macOS)
+# source venv/bin/activate
+
+# Install Python dependencies
+pip install -r backend/requirements.txt
+```
+
+### 3. Frontend Setup
+```bash
+# Install node dependencies using pnpm
+pnpm install
+```
+
+### 4. Database Setup & Initial Seeding
+```bash
+# Run database migrations and seed pre-configured demo accounts
+python backend/app/seed.py
+```
+
+---
+
+## 🚀 Run and Build Commands
+
+### 1. Local Development Command (Concurrently Starts All Services)
+To launch the **entire application** (PostgreSQL container, FastAPI backend, and React Vite frontend concurrently):
+```bash
+pnpm run dev
+```
+
+### 2. Manual Development Execution (Separate Terminals)
+- **Backend API Server**:
+  ```bash
+  $env:PYTHONPATH='backend'; uvicorn app.main:app --reload --port 8000
+  ```
+- **Frontend Vite Dev Server**:
+  ```bash
+  pnpm --prefix frontend dev
+  ```
+
+### 3. Production Build Commands
+- **Compile Frontend Production Bundle**:
+  ```bash
+  pnpm --prefix frontend build
+  ```
+- **Run Production Application Server**:
+  ```bash
+  cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
+  ```
+
+---
+
+## 🧪 Testing Instructions
+
+### 1. Run Backend Unit Test Suite (Pytest)
+Run the full 118-item test suite covering API endpoints, Spendable engine calculations, ML forecasting models, scenario simulation laws, and Gemini explanation fallbacks:
+
+```bash
+# Windows PowerShell
+$env:PYTHONPATH='backend'; python -m pytest backend/tests
+
+# Linux / macOS
+PYTHONPATH=backend python -m pytest backend/tests
+```
+
+### 2. Run Frontend Production Type Check & Build Verification
+Verify TypeScript type safety and Vite bundle compilation:
+```bash
+pnpm --prefix frontend build
+```
+
+### 3. Automated Scenario Monotonicity & Sanity Check
+Run the 700-rule scenario simulation mathematical validation suite:
+```bash
+$env:PYTHONPATH='backend'; python -m pytest backend/tests/test_scenario_simulation.py
+```
+
+---
+
+## ⚙️ Other Configuration & Access Requirements
+
+### Demo Persona Quick-Selectors
+Spendable requires **zero manual registration** to evaluate. The app includes 4 pre-loaded financial personas with diverse transaction profiles:
+- **`acc_supan` (Supan Roy)**: Standard salaried professional persona with regular monthly income and bill commitments.
+- **`acc_tanvir` (Tanvir Ahmed)**: Variable-income freelancer persona with irregular inflows and high spending volatility.
+- **`acc_sarah` (Sarah Khan)**: High-net-worth persona with multi-channel investments and luxury commitments.
+- **`acc_fatima` (Fatima Begum)**: Tight-liquidity persona vulnerable to low-cash drop dates.
+
+Switch between demo personas instantly using the top header dropdown or the Login modal quick-selector.
+
+### Zero-API Fallback Mode
+If `GEMINI_API_KEY` is not provided:
+- The Spendable Engine, ML Forecaster, Recurring Detector, Scenario Engine, and Inspect visualizer function **100% normally**.
+- Spendable AI chat uses a **Deterministic Rule-Based Fallback Synthesizer** to generate natural language advice from exact calculated facts.
+
+---
+
+## 📐 Technical Architecture & Model Metrics
+
+### System Architecture Topology
 ```mermaid
 graph TD
     subgraph Frontend["Frontend Layer (React 19 + TypeScript + Vite)"]
@@ -56,40 +255,6 @@ graph TD
     SpendableAI --> UI
 ```
 
----
-
-## ⚡ Key Features & Application Tabs
-
-Spendable features 5 core application tabs accessible from the top navigation bar:
-
-1. **Overview Tab (Real-Time Spendable Liquidity Dashboard)**:
-   - Displays your **Safe Spendable Capacity today** (e.g., *"৳22,552.76 Safely Spendable out of ৳59,835.05 balance"*).
-   - Real-time progress indicators, protected safety buffer metrics, and upcoming 30-day bill timeline.
-
-2. **Activity Tab (Multi-Channel Financial Ingestion)**:
-   - Ingests and categorizes transaction activity across multi-channel bank and mobile wallet accounts.
-   - Standardizes timestamps to ISO 8601 UTC strings and classifies direction (`INFLOW` vs `OUTFLOW`).
-
-3. **Forecast Tab (30-Day Projected Cash Flow Runway)**:
-   - Predicts 30-day daily balance trajectories using **HistGradientBoostingRegressor** models.
-   - Evaluates recurring commitments via point-in-time regularity scoring and highlights low-liquidity crunch dates.
-
-4. **Simulate Tab (What-If Scenario Engine & Spendable AI)**:
-   - Evaluates 5 hypothetical scenarios in real-time (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) without mutating underlying database tables.
-   - Renders a **Multi-Metric Scenario Impact Dashboard** (Spendable Shift, Account Balance Shift, 30-Day Minimum Runway Shift, Protected Buffer).
-   - Houses **Spendable AI**, a context-grounded conversational assistant powered by Google Gemini with strict financial scope guardrails.
-
-5. **Inspect ⚡ System Visualizer Tab (Hackathon Video Demo & Architecture Walkthrough)**:
-   - A 100% client-side visualizer built for hackathon recording and technical demonstration (consumes **0 Gemini API credits**).
-   - Features a sequential **5-stage architecture flow** (`STAGE 01 Ingestion ➔ STAGE 02 Feature Store ➔ STAGE 03 ML Engine ➔ STAGE 04 Deterministic Math ➔ STAGE 05 Spendable AI`).
-   - Deep-dive cards detailing training methods, hyperparameters, and responsible AI code-enforced boundaries.
-
----
-
-## 📊 Machine Learning & Model Evaluation Breakdown
-
-All evaluation metrics are computed on a **held-out synthetic test dataset** of **500 diverse financial personas** comprising **98,886 second-precision timezone-aware transactions**.
-
 ### Model Performance Summary (Held-Out Test Set)
 
 | Module | Evaluated Metric | Test Result | Technical Definition |
@@ -109,50 +274,7 @@ All evaluation metrics are computed on a **held-out synthetic test dataset** of 
 
 ---
 
-## 🧠 Technical Component Architecture
-
-### 1. Point-in-Time Feature Builder (`FeatureBuilder`)
-- Guarantees **STRICT ZERO LEAKAGE**: at snapshot timestamp $T$, features are computed exclusively from transactions with timestamps $t \le T$.
-- Computes **40+ temporal and behavioral features**, including rolling liquidity windows (7d, 14d, 30d), inflow/outflow volatility ($\sigma_{\text{outflow}}$), Herfindahl-Hirschman category concentration index, and time-of-day indicators.
-
-### 2. Recurring Commitment Detector (Point-in-Time Regularity & Category Priors)
-- Evaluates multi-factor evidence matrices: interval regularity coefficient of variation ($CV_{\Delta t}$), amount consistency ($CV_{\text{amount}}$), observation recency, frequency count, and category priors (`CORE_COMMITMENT_CATEGORIES` vs `DISCRETIONARY_CATEGORIES`).
-- Automatically groups recurring commitments (Housing/Rent, Utilities, Subscriptions, Debt EMI) and income streams into `STRONG` and `MODERATE` confidence categories without relying on future transaction data.
-
-### 3. Cash-Flow & Minimum Balance Forecasting Engine (HistGradientBoostingRegressor)
-- Trains a multi-horizon ensemble of **Histogram-Based Gradient Boosted Decision Trees** (`sklearn.ensemble.HistGradientBoostingRegressor`) on 38 point-in-time snapshot vectors to forecast 30-day trajectory paths and minimum balance drawdown $B_{\text{min, 30d}}$.
-- Achieves **$R^2 = 0.9948$** and **$F_1 = 95.45\%$** on high-pressure personas.
-
-### 4. Spendable Engine (Authoritative Formulation & Risk Modeling)
-- Enforces non-double-counting protected balance:
-$$\text{Spendable} = \max\left(0, \text{Balance} - \max(\text{Safety Reserve}, \text{Commitments})\right)$$
-- Eliminates double-counting between expected recurring outflows and safety buffers, protecting user liquidity without artificial over-restriction.
-
-### 5. What-If Scenario Simulation Engine
-- Evaluates 5 hypothetical scenarios (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) in memory.
-- Passed **100% of 700 validation scenarios** across mathematical monotonicity laws, non-negative spendable constraints, and zero state mutation guarantees.
-
-### 6. Spendable AI & Responsible AI Guardrails
-- **100% Code-Enforced Financial Calculations**: All numbers, Spendable balances, and scenario deltas are computed in pure Python code.
-- **Context Injection**: Pre-computed financial facts are passed to Gemini LLM to synthesize plain-language explanations with zero LLM arithmetic execution.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend** | React 19, TypeScript, Vite, Vanilla CSS (Dark Glassmorphism System), Lucide Icons |
-| **Backend API** | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy ORM, Alembic Migrations |
-| **Database** | PostgreSQL / SQLite (via SQLAlchemy & `psycopg2-binary`) |
-| **ML & Analytics** | **HistGradientBoostingRegressor (`scikit-learn`)**, **Point-in-Time Recurring Detector**, `numpy`, `pandas`, `scipy` |
-| **AI / LLM Integration** | Google Gemini API (`google-genai` Python SDK) |
-| **Testing Suite** | `pytest` (118 passed test suites), `httpx`, `FastAPI TestClient` |
-| **Container & Cloud** | Multi-stage Dockerfiles, Docker Compose, Railway Ready |
-
----
-
-## 📁 Repository Structure
+## 📁 Repository Directory Structure
 
 ```
 Spendable/
@@ -183,42 +305,3 @@ Spendable/
     │   └── utils/              # Date & Time, BDT Currency, and Status formatters
     └── vite.config.ts          # Vite React build configuration
 ```
-
----
-
-## ⚡ Quickstart (`pnpm run dev`)
-
-Launch the **entire application** (PostgreSQL container, FastAPI backend, and React Vite frontend concurrently):
-
-```bash
-pnpm run dev
-```
-
-This single command automatically:
-1. Starts the PostgreSQL container via Docker Compose (`docker compose up -d postgres`).
-2. Activates the Python virtual environment (`venv`) and starts the FastAPI backend server.
-3. Launches the Vite React frontend with Hot Module Replacement (HMR).
-
----
-
-## 🧪 Running Verification Suites
-
-Backend unit tests are run via `pytest` using the project virtual environment:
-
-```bash
-$env:PYTHONPATH='backend'; python -m pytest backend/tests
-```
-
-Frontend production build and type checking:
-
-```bash
-pnpm --prefix frontend build
-```
-
----
-
-## 🚀 Deployment (Railway Monorepo)
-
-The repository includes a containerized multi-stage [`Dockerfile`](Dockerfile) designed for **zero-fail single-instance deployment** on Railway:
-1. **Stage 1 (Frontend Build)**: Builds static SPA assets using Node 22 and `pnpm`.
-2. **Stage 2 (Python Runtime)**: Installs Python 3.12 requirements, copies compiled frontend static files to `/app/frontend/dist`, runs database migrations, and serves both FastAPI API endpoints and static SPA routing on `${PORT:-8000}`.
