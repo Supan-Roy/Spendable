@@ -8,21 +8,6 @@ While traditional banking apps and spreadsheets display a static balance (e.g., 
 
 ---
 
-## ⚡ Quickstart (`pnpm run dev`)
-
-Launch the **entire application** (PostgreSQL container, FastAPI backend, and React Vite frontend concurrently):
-
-```bash
-pnpm run dev
-```
-
-This single command automatically:
-1. Starts the PostgreSQL container via Docker Compose (`docker compose up -d postgres`).
-2. Activates the Python virtual environment (`venv`) and starts the FastAPI backend server.
-3. Launches the Vite React frontend with Hot Module Replacement (HMR).
-
----
-
 ## 📐 System Architecture
 
 Spendable enforces a strict separation between **Deterministic Financial Computation** and **Generative LLM Explanation**. Financial calculations, feature extraction, and ML predictions are computed purely in Python/C++ code; Google Gemini is invoked exclusively to synthesize natural-language explanations from structured engine outputs.
@@ -170,6 +155,21 @@ Spendable/
     │   └── utils/              # Date & Time, BDT Currency, and Status formatters
     └── vite.config.ts          # Vite React build configuration
 ```
+
+---
+
+## ⚡ Quickstart (`pnpm run dev`)
+
+Launch the **entire application** (PostgreSQL container, FastAPI backend, and React Vite frontend concurrently):
+
+```bash
+pnpm run dev
+```
+
+This single command automatically:
+1. Starts the PostgreSQL container via Docker Compose (`docker compose up -d postgres`).
+2. Activates the Python virtual environment (`venv`) and starts the FastAPI backend server.
+3. Launches the Vite React frontend with Hot Module Replacement (HMR).
 
 ---
 
