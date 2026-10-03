@@ -18,7 +18,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.add_column('user_accounts', sa.Column('username', sa.String(length=64), nullable=True))
     op.add_column('user_accounts', sa.Column('password_hash', sa.String(length=255), nullable=True))
-    op.add_column('user_accounts', sa.Column('is_demo_account', sa.Boolean(), nullable=False, server_default=sa.text('0')))
+    op.add_column('user_accounts', sa.Column('is_demo_account', sa.Boolean(), nullable=False, server_default=sa.text('false')))
     op.create_index('ix_user_accounts_username', 'user_accounts', ['username'], unique=True)
 
 
