@@ -124,7 +124,7 @@ class SpendableService:
 
         recs = self.rec_engine.generate_recommendations(sp_out)
         context = self.expl_generator.build_context(sp_out, recs)
-        explanation = self.expl_generator.explain(context)
+        explanation = self.expl_generator.generate_fallback_explanation(context)
 
         res = SpendableOverviewResponse(
             user_id=sp_out.user_id,
@@ -207,7 +207,7 @@ class SpendableService:
     def get_recommendations(
         self, user_id: Optional[str] = None, snapshot_time: Optional[str] = None
     ) -> SpendableRecommendationsResponse:
-        """Return deterministic recommendations and Gemini explanation with TTL caching."""
+        """Return deterministic recommendations and explanation with TTL caching."""
         cache_key = f"{user_id or 'default'}:{snapshot_time or 'latest'}"
         now = time.time()
         if cache_key in self._recs_cache:
@@ -228,7 +228,7 @@ class SpendableService:
 
         recs = self.rec_engine.generate_recommendations(sp_out)
         context = self.expl_generator.build_context(sp_out, recs)
-        explanation = self.expl_generator.explain(context)
+        explanation = self.expl_generator.generate_fallback_explanation(context)
 
         res = SpendableRecommendationsResponse(
             user_id=sp_out.user_id,
