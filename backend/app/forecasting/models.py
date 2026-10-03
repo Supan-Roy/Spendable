@@ -166,7 +166,7 @@ class CashFlowForecastModel:
                 estimated_range_upper=upper_bound,
             )
 
-        # Build 30-day daily projected trajectory
+        # Build 30-day daily projected trajectory with realistic cash flow dynamics
         trajectory: List[DailyTrajectoryPoint] = []
         snap_dt = self._parse_datetime(snap_time_str) if snap_time_str else datetime.now()
 
@@ -174,25 +174,42 @@ class CashFlowForecastModel:
         b14 = forecasts[14].projected_balance
         b30 = forecasts[30].projected_balance
 
+        # Calculate estimated daily scale for natural cash flow waves
+        inflow_scale = exp_inflow_feat if exp_inflow_feat > 0 else 15000.0
+        outflow_scale = exp_outflow_feat if exp_outflow_feat > 0 else 10000.0
+
         for d in range(1, 31):
             if d <= 7:
                 alpha = d / 7.0
-                d_bal = current_balance + alpha * (b7 - current_balance)
+                base_bal = current_balance + alpha * (b7 - current_balance)
             elif d <= 14:
                 alpha = (d - 7) / 7.0
-                d_bal = b7 + alpha * (b14 - b7)
+                base_bal = b7 + alpha * (b14 - b7)
             else:
                 alpha = (d - 14) / 16.0
-                d_bal = b14 + alpha * (b30 - b14)
+                base_bal = b14 + alpha * (b30 - b14)
 
+            # Intra-month cash flow dynamics (payday spikes on 1st/15th, bill dips on 5th/25th, weekend outlays)
+            cal_day = (snap_dt + timedelta(days=d)).day
+            import math
+            micro_wave = math.sin(2.0 * math.pi * d / 7.0) * (outflow_scale * 0.03)
+
+            event_offset = 0.0
+            if cal_day in (1, 15):
+                event_offset += inflow_scale * 0.08
+            elif cal_day in (5, 25):
+                event_offset -= outflow_scale * 0.07
+
+            d_bal = max(0.0, base_bal + micro_wave + event_offset)
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
-                    projected_balance=round(max(0.0, d_bal), 2),
+                    projected_balance=round(d_bal, 2),
                 )
             )
+
 
         return ForecastOutput(
             user_id=user_id,
@@ -250,15 +267,27 @@ class CashFlowForecastModel:
 
         trajectory = []
         snap_dt = self._parse_datetime(snap_time_str)
+        import math
         for d in range(1, 31):
+            base_b = current_balance + daily_rate * d
+            cal_day = (snap_dt + timedelta(days=d)).day
+            wave = math.sin(2.0 * math.pi * d / 7.0) * (exp_outflow_feat * 0.03 if exp_outflow_feat > 0 else 300.0)
+            event = 0.0
+            if cal_day in (1, 15):
+                event += (exp_inflow_feat * 0.08 if exp_inflow_feat > 0 else 1000.0)
+            elif cal_day in (5, 25):
+                event -= (exp_outflow_feat * 0.07 if exp_outflow_feat > 0 else 800.0)
+
+            d_bal = max(0.0, base_b + wave + event)
             d_date = (snap_dt + timedelta(days=d)).strftime("%Y-%m-%d")
             trajectory.append(
                 DailyTrajectoryPoint(
                     day_offset=d,
                     date_str=d_date,
-                    projected_balance=round(max(0.0, current_balance + daily_rate * d), 2),
+                    projected_balance=round(d_bal, 2),
                 )
             )
+
 
         return ForecastOutput(
             user_id=user_id,
