@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import type { TabType } from './components/Header';
@@ -11,11 +11,47 @@ import { Footer } from './components/Footer';
 import { CalculationModal } from './components/CalculationModal';
 import './App.css';
 
+const TAB_STORAGE_KEY = 'spendable_active_tab';
+
+const getInitialTab = (): TabType => {
+  try {
+    const hash = window.location.hash.replace('#', '').toLowerCase();
+    if (['overview', 'activity', 'forecast', 'simulate'].includes(hash)) {
+      return hash as TabType;
+    }
+    const stored = localStorage.getItem(TAB_STORAGE_KEY);
+    if (stored && ['overview', 'activity', 'forecast', 'simulate'].includes(stored)) {
+      return stored as TabType;
+    }
+  } catch {
+    // fallback
+  }
+  return 'overview';
+};
+
 function MainApp() {
   const { isAuthenticated, isLoading, loginAsDemo } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [activeTab, setActiveTabState] = useState<TabType>(getInitialTab);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [showCalcModal, setShowCalcModal] = useState<boolean>(false);
+
+  const changeTab = (tab: TabType) => {
+    setActiveTabState(tab);
+    try {
+      localStorage.setItem(TAB_STORAGE_KEY, tab);
+      window.location.hash = tab;
+    } catch {}
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const newTab = getInitialTab();
+      setActiveTabState(newTab);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleCloseLoginModal = async () => {
     setShowLoginModal(false);
@@ -44,7 +80,7 @@ function MainApp() {
       {/* Top Application Header */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={changeTab}
         onOpenLogin={() => setShowLoginModal(true)}
       />
 
@@ -54,13 +90,11 @@ function MainApp() {
           isOpen={true}
           onClose={handleCloseLoginModal}
         />
-
-
       ) : (
         <main className="main-content">
           {activeTab === 'overview' && (
             <OverviewPage
-              onNavigateTab={(tab) => setActiveTab(tab)}
+              onNavigateTab={(tab) => changeTab(tab)}
               onOpenCalcModal={() => setShowCalcModal(true)}
             />
           )}
