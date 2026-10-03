@@ -1,32 +1,48 @@
-# React + TypeScript + Vite
+# Spendable Frontend — React 19 + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A high-performance, dark glassmorphism web application built with **React 19**, **TypeScript**, **Vite**, and **Vanilla CSS**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ⚡ Navigation Tabs & Features
 
-## React Compiler
+The application features 5 main pages accessible from the persistent top navigation header:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Overview (`OverviewPage.tsx`)**:
+   - Live Spendable Capacity progress bar, safe daily spending limit, upcoming 30-day bill timeline cards, and recommendation widgets.
 
-## Expanding the Oxlint configuration
+2. **Activity (`ActivityPage.tsx`)**:
+   - Ingested multi-channel financial transaction activity stream with pagination, search, category filters, and ISO 8601 UTC timestamp formatting.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+3. **Forecast (`ForecastPage.tsx`)**:
+   - 30-day cash flow runway trajectory chart, LightGBM projected minimum balance drawdowns, and DBSCAN recurring bill dates.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+4. **Simulate (`SimulatePage.tsx`)**:
+   - What-If Scenario Engine supporting 5 scenario types (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`).
+   - Multi-Metric Impact Dashboard comparing Spendable Shift, Current Balance Shift, 30-Day Minimum Runway, and Protected Buffer.
+   - Collapsible **Spendable AI** chat assistant with formatted markdown rendering and context attachment.
+
+5. **Inspect ⚡ (`InspectPage.tsx`)**:
+   - Hackathon system visualizer showing the end-to-end 5-stage processing pipeline in a connected 2-row rounded flow layout.
+   - Deep-dive cards detailing XGBoost, LightGBM, DBSCAN hyperparameters, and 100% code-enforced financial math boundaries (0 Gemini API calls consumed).
+
+---
+
+## 🛠️ Key Components
+
+- **`Header.tsx`**: Navigation menu, mobile drawer, account badge, and demo persona selector (`acc_supan`, `acc_tanvir`, `acc_sarah`, `acc_fatima`).
+- **`CalculationModal.tsx`**: Mathematical formula modal detailing the non-double-counting Spendable equation.
+- **`LoginModal.tsx`**: Custom account creation, login, and instant demo account quick-selector.
+- **`ConfirmModal.tsx`**: Reusable confirmation modal for account deletions and critical actions.
+
+---
+
+## 🚀 Development & Build
+
+```bash
+# Run local dev server (port 5173 with proxy to backend port 8000)
+pnpm run dev
+
+# Build production bundle & check TypeScript compilation
+pnpm --prefix frontend build
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

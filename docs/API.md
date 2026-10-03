@@ -7,7 +7,7 @@ The FastAPI backend exposes versioned product-oriented endpoints (`/api/v1/...`)
 - **Spendable Engine (Stage 4)**
 - **Scenario Simulation Engine (Stage 5)**
 - **Recommendation Engine (Stage 6)**
-- **Gemini Explanation Layer (Stage 6)**
+- **Gemini Explanation & Spendable AI Layer (Stage 6)**
 
 The FastAPI layer acts as an application orchestrator. All domain calculations remain isolated inside authoritative backend domain modules under `backend/app/engine/`, `backend/app/scenario/`, `backend/app/recommendation/`, and `backend/app/explanation/`.
 
@@ -38,19 +38,8 @@ Returns the main dashboard overview state.
   "upcoming_commitments": 10000.0,
   "forecasted_minimum_balance": 34284.50,
   "safety_reserve": 11731.74,
-  "recommendations": [
-    {
-      "type": "INCOME_IRREGULARITY",
-      "priority": "INFO",
-      "title": "Adaptive Volatility Buffer Active",
-      "message": "Your recent cash flow has shown variability, so your safety buffer has been expanded.",
-      "supporting_amount": 5514.07,
-      "supporting_metric": "volatility_addon",
-      "reason": "Safety reserve includes an additional ৳5,514.07 buffer due to cash flow volatility.",
-      "action": "Maintain liquidity buffer to cushion against income fluctuations."
-    }
-  ],
-  "factors": [...],
+  "recommendations": [ ... ],
+  "factors": [ ... ],
   "explanation_summary": "You have ৳22,552.76 safely spendable out of your ৳59,835.05 account balance over the next 30 days."
 }
 ```
@@ -60,30 +49,6 @@ Returns the main dashboard overview state.
 ### 2. GET `/api/v1/forecast` (and `/api/v1/spendable/forecast`)
 
 Returns multi-horizon cash flow forecasts (7d, 14d, 30d) and 30-day daily projected balance trajectory.
-
-**Response (`SpendableForecastResponse`):**
-```json
-{
-  "user_id": "ACC-0497",
-  "snapshot_time": "2026-01-31T08:00:09+00:00",
-  "current_balance": 59835.05,
-  "forecast_7d": {
-    "horizon_days": 7,
-    "expected_inflow": 10000.0,
-    "expected_outflow": 5000.0,
-    "expected_net_cash_flow": 5000.0,
-    "projected_balance": 64835.05,
-    "minimum_projected_balance": 55000.0,
-    "liquidity_pressure_flag": false,
-    "estimated_range_lower": 50000.0,
-    "estimated_range_upper": 70000.0
-  },
-  "forecast_14d": { ... },
-  "forecast_30d": { ... },
-  "daily_trajectory": [ ... ],
-  "safety_threshold_bdt": 15000.0
-}
-```
 
 ---
 
@@ -98,15 +63,16 @@ Returns recent observed transaction activity with pagination.
 
 ---
 
-### 4. GET `/api/v1/recommendations` (and `/api/v1/spendable/recommendations`)
-
-Returns prioritized deterministic recommendations alongside Gemini explanation (or fallback).
-
----
-
-### 5. POST `/api/v1/simulate` (and `/api/v1/spendable/simulate`)
+### 4. POST `/api/v1/simulate` (and `/api/v1/spendable/simulate`)
 
 Simulates a hypothetical scenario without mutating base state.
+
+**Supported `scenario_type` Values:**
+- `ONE_TIME_EXPENSE` (One-time expense deduction)
+- `ADDITIONAL_INCOME` (One-time income inflow addition)
+- `ADDITIONAL_COMMITMENT` (New recurring bill/rent obligation)
+- `SPENDING_REDUCTION` (Percentage reduction in discretionary spending)
+- `INCOME_DELAY` (Delayed income inflow)
 
 **Request Body (`ScenarioInput`):**
 ```json
@@ -117,7 +83,50 @@ Simulates a hypothetical scenario without mutating base state.
 }
 ```
 
-**Response (`ScenarioResult`):** Returns base spendable, scenario spendable, delta, and recalculated liquidity states.
+**Response (`ScenarioResult`):**
+```json
+{
+  "user_id": "acc_supan",
+  "snapshot_time": "2026-10-03T17:30:00+00:00",
+  "scenario_type": "ONE_TIME_EXPENSE",
+  "scenario_description": "Spend ৳5,000 today",
+  "base_spendable_amount": 22552.76,
+  "scenario_spendable_amount": 17552.76,
+  "spendable_delta": -5000.0,
+  "base_current_balance": 59835.05,
+  "scenario_current_balance": 54835.05,
+  "base_forecasted_minimum_balance": 34284.50,
+  "scenario_forecasted_minimum_balance": 29284.50,
+  "base_safety_reserve": 11731.74,
+  "scenario_safety_reserve": 11731.74,
+  "base_liquidity_state": "HEALTHY",
+  "scenario_liquidity_state": "HEALTHY"
+}
+```
+
+---
+
+### 5. POST `/api/v1/chat`
+
+Conversational assistant endpoint powered by Spendable AI (Gemini SDK).
+
+**Request Body (`ChatRequest`):**
+```json
+{
+  "message": "Can I afford a ৳15,000 purchase right now?",
+  "chat_history": [ ... ],
+  "scenario_result": { ... }
+}
+```
+
+**Response (`ChatResponse`):**
+```json
+{
+  "reply": "Hello! I am **Spendable AI**. Based on your current balance of ৳59,835.05 and ৳10,000 upcoming bill commitments, your safe spendable capacity is ৳22,552.76. A ৳15,000 purchase is safely within your spendable margin!",
+  "model_used": "gemini-2.5-flash",
+  "is_fallback": false
+}
+```
 
 ---
 
@@ -130,9 +139,8 @@ Returns Gemini explanation response (or deterministic fallback).
 ## Local Startup Instructions
 
 ```bash
-# Set PYTHONPATH and start uvicorn dev server
 $env:PYTHONPATH="backend"
-.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
 - API Base URL: `http://localhost:8000`

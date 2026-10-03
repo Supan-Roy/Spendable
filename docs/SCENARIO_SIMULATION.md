@@ -10,13 +10,13 @@ The **Scenario Simulation Engine** (Stage 5) provides a thin, deterministic, non
 
 ## 1. Supported Scenario Types & Transformations
 
-| Scenario Type | User Question Example | State Transformation Logic |
-| :--- | :--- | :--- |
-| `ONE_TIME_EXPENSE` | *"What if I spend ৳3,000 today?"* | $B'_0 = \max(0, B_0 - \text{expense})$<br>$B'_{\min} = \max(0, B_{\min} - \text{expense})$ |
-| `ADDITIONAL_INCOME` | *"What if I receive an extra ৳5,000?"* | $B'_0 = B_0 + \text{income}$<br>$B'_{\min} = B_{\min} + \text{income}$<br>$\text{expected\_inflow}' = \text{expected\_inflow} + \text{income}$ |
-| `ADDITIONAL_COMMITMENT` | *"What if I take on ৳4,000 monthly bill?"* | $C'_{\text{commitments}} = C_{\text{commitments}} + \text{amount}$ |
-| `SPENDING_REDUCTION` | *"What if I reduce spending by 20%?"* | $\text{outflow}' = \text{outflow} \times (1 - \frac{p}{100})$<br>$B'_{\min} = B_{\min} + \Delta_{\text{savings}}$ |
-| `INCOME_DELAY` | *"What if expected income is delayed?"* | $\text{expected\_inflow}' = \max(0, \text{expected\_inflow} - \text{delayed})$<br>$B'_{\min} = \max(0, B_{\min} - \text{delayed})$ |
+| Scenario Type | User Form Label | Input Parameters | State Transformation Logic |
+| :--- | :--- | :--- | :--- |
+| `ONE_TIME_EXPENSE` | *"Spend money (One-time expense)"* | `amount` (BDT) | $B'_0 = \max(0, B_0 - \text{expense})$<br>$B'_{\min} = \max(0, B_{\min} - \text{expense})$ |
+| `ADDITIONAL_INCOME` | *"Receive money (One-time inflow)"* | `amount` (BDT) | $B'_0 = B_0 + \text{income}$<br>$B'_{\min} = B_{\min} + \text{income}$<br>$\text{expected\_inflow}' = \text{expected\_inflow} + \text{income}$ |
+| `ADDITIONAL_COMMITMENT` | *"Add commitment (Monthly bill/rent)"* | `amount` (BDT) | $C'_{\text{commitments}} = C_{\text{commitments}} + \text{amount}$ |
+| `SPENDING_REDUCTION` | *"Reduce spending (%)"* | `percentage` (%) | $\text{outflow}' = \text{outflow} \times (1 - \frac{p}{100})$<br>$B'_{\min} = B_{\min} + \Delta_{\text{savings}}$ |
+| `INCOME_DELAY` | *"Delay income (Amount)"* | `amount` (BDT) | $\text{expected\_inflow}' = \max(0, \text{expected\_inflow} - \text{delayed})$<br>$B'_{\min} = \max(0, B_{\min} - \text{delayed})$ |
 
 ---
 
@@ -33,7 +33,7 @@ The **Scenario Simulation Engine** (Stage 5) provides a thin, deterministic, non
                         (calculator.calculate)
                                   │
                                   ▼
-                           ScenarioResult
+                            ScenarioResult
 ```
 
 1. **Zero Base Mutation**: Base snapshot features, detected commitments, and forecast outputs are deep-copied prior to modification.
@@ -41,7 +41,21 @@ The **Scenario Simulation Engine** (Stage 5) provides a thin, deterministic, non
 
 ---
 
-## 3. Financial Sanity & Monotonicity Laws
+## 3. Multi-Metric Impact Dashboard Output
+
+When a scenario is simulated, the backend produces a structured `ScenarioResult` payload containing full before-and-after financial metrics:
+
+- `base_spendable_amount` vs `scenario_spendable_amount` (with `spendable_delta`)
+- `base_current_balance` vs `scenario_current_balance`
+- `base_forecasted_minimum_balance` vs `scenario_forecasted_minimum_balance`
+- `base_safety_reserve` vs `scenario_safety_reserve`
+- `base_liquidity_state` vs `scenario_liquidity_state`
+
+This structured result feeds directly into the frontend **Scenario Impact Dashboard** and can be passed to **Spendable AI** for context-grounded conversational insights.
+
+---
+
+## 4. Financial Sanity & Monotonicity Laws
 
 The `ScenarioValidator` enforces 10 mandatory financial sanity rules across all simulated scenarios:
 
@@ -58,7 +72,7 @@ The `ScenarioValidator` enforces 10 mandatory financial sanity rules across all 
 
 ---
 
-## 4. Evaluation Summary (700 Scenarios Tested)
+## 5. Evaluation Summary (700 Scenarios Tested)
 
 - **Total Snapshots Evaluated**: 100
 - **Total Scenarios Executed**: 700
@@ -69,10 +83,10 @@ The `ScenarioValidator` enforces 10 mandatory financial sanity rules across all 
 
 ---
 
-## 5. How to Reproduce
+## 6. How to Reproduce
 
 ```bash
 $env:PYTHONPATH="backend"
-.\venv\Scripts\pytest backend/tests
-.\venv\Scripts\python.exe -m app.scenario.cli --output-report reports/scenario_simulation_evaluation.json
+python -m pytest backend/tests
+python -m app.scenario.cli --output-report reports/scenario_simulation_evaluation.json
 ```

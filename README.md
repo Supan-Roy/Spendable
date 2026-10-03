@@ -10,18 +10,18 @@ While traditional banking apps and spreadsheets display a static balance (e.g., 
 
 ## 📐 System Architecture
 
-Spendable enforces a strict separation between **Deterministic Financial Computation** and **Generative LLM Explanation**. Financial calculations, feature extraction, and ML predictions are computed purely in Python/C++ code; Google Gemini is invoked exclusively to synthesize natural-language explanations from structured engine outputs.
+Spendable enforces a strict separation between **Deterministic Financial Computation** and **Generative LLM Explanation**. Financial calculations, feature extraction, and ML predictions are computed purely in Python/C++ code; Google Gemini is invoked exclusively to synthesize natural-language explanations from structured engine outputs with strict financial guardrails.
 
 ```mermaid
 graph TD
     subgraph Frontend["Frontend Layer (React 19 + TypeScript + Vite)"]
         UI["User Interface Dashboard"]
-        Tabs["Overview | Financial Activity | 30-Day Forecast | Scenario Simulator"]
-        Modal["Account Switcher & Formula Explanation Modals"]
+        Tabs["Overview | Financial Activity | 30-Day Forecast | Scenario Simulator | Inspect System Visualizer"]
+        Modal["Account Switcher, Formula Explanation & System Topology Modals"]
     end
 
     subgraph API["Backend API Layer (FastAPI + Python 3.12)"]
-        Router["API Endpoints (/api/spendable, /api/auth)"]
+        Router["API Endpoints (/api/v1/overview, /api/v1/forecast, /api/v1/simulate, /api/v1/chat)"]
         AuthCtx["Auth & Demo Persona Session Manager"]
     end
 
@@ -31,14 +31,14 @@ graph TD
 
     subgraph ML_Engine["Predictive & Analytical Financial Engine"]
         PitBuilder["Point-in-Time Feature Builder (Leakage-Safe)"]
-        RecDetector["Recurring Commitment Detector (Multi-Factor Scoring)"]
-        ForecastML["Cash-Flow Forecasting Engine (HistGradientBoosting)"]
+        RecDetector["Recurring Commitment Detector (DBSCAN + Multi-Factor Scoring)"]
+        ForecastML["Cash-Flow Forecasting Engine (LightGBM / HistGradientBoosting)"]
         SpendEngine["Spendable Engine (Candidate A Non-Double-Counting)"]
         ScenarioSim["What-If Scenario Simulator Engine"]
     end
 
     subgraph LLM_Layer["Explainable AI (Google Gemini API)"]
-        Gemini["Google Gemini LLM Explainer (Structured Prompt Synthesis)"]
+        SpendableAI["Spendable AI Chat Engine & Structured Prompt Synthesizer"]
     end
 
     UI --> Router
@@ -50,9 +50,37 @@ graph TD
     RecDetector --> SpendEngine
     ForecastML --> SpendEngine
     SpendEngine --> ScenarioSim
-    SpendEngine --> Gemini
-    Gemini --> UI
+    SpendEngine --> SpendableAI
+    SpendableAI --> UI
 ```
+
+---
+
+## ⚡ Key Features & Application Tabs
+
+Spendable features 5 core application tabs accessible from the top navigation bar:
+
+1. **Overview Tab (Real-Time Spendable Liquidity Dashboard)**:
+   - Displays your **Safe Spendable Capacity today** (e.g., *"৳22,552.76 Safely Spendable out of ৳59,835.05 balance"*).
+   - Real-time progress indicators, protected safety buffer metrics, and upcoming 30-day bill timeline.
+
+2. **Activity Tab (Multi-Channel Financial Ingestion)**:
+   - Streams and categorizes transactions across bank transfers, bKash MFS, Upay, utility billers, and card POS terminals.
+   - Standardizes timestamps to ISO 8601 UTC strings and classifies direction (`INFLOW` vs `OUTFLOW`).
+
+3. **Forecast Tab (30-Day Projected Cash Flow Runway)**:
+   - Predicts 30-day daily balance trajectories using **LightGBM / HistGradientBoosting**.
+   - Clusters recurring monthly commitments via **DBSCAN** and highlights low-liquidity crunch dates.
+
+4. **Simulate Tab (What-If Scenario Engine & Spendable AI)**:
+   - Evaluates 5 hypothetical scenarios in real-time (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) without mutating underlying database tables.
+   - Renders a **Multi-Metric Scenario Impact Dashboard** (Spendable Shift, Account Balance Shift, 30-Day Minimum Runway Shift, Protected Buffer).
+   - Houses **Spendable AI**, a context-grounded conversational assistant powered by Google Gemini with zero-hallucination financial scope guardrails.
+
+5. **Inspect ⚡ System Visualizer Tab (Hackathon Video Demo & Architecture Walkthrough)**:
+   - A 100% client-side visualizer built for hackathon recording and technical demonstration (consumes **0 Gemini API credits**).
+   - Features a sequential **5-stage architecture flow** (`STAGE 01 Ingestion ➔ STAGE 02 Feature Store ➔ STAGE 03 ML Ensemble ➔ STAGE 04 Deterministic Math ➔ STAGE 05 Spendable AI`).
+   - Deep-dive cards detailing training methods, hyperparameters, and responsible AI code-enforced boundaries.
 
 ---
 
@@ -64,13 +92,13 @@ All evaluation metrics are computed on a **held-out synthetic test dataset** of 
 
 | Module | Evaluated Metric | Test Result | Technical Definition |
 | :--- | :--- | :---: | :--- |
-| **Recurring Commitment Detection** | F1-Score | **97.99%** | $F_1$ harmonic mean across all commitment categories |
+| **Recurring Commitment Detection (DBSCAN)** | F1-Score | **97.99%** | $F_1$ harmonic mean across all commitment categories |
 | | Precision | **98.32%** | 293 TP / (293 TP + 5 FP) on held-out test data |
 | | Recall | **97.67%** | 293 TP / (293 TP + 7 FN) on held-out test data |
-| **Cash-Flow Forecasting** | R² (30-Day Horizon) | **0.9948** | 99.48% of variance in 30-day balance trajectories explained |
+| **Cash-Flow Forecasting (LightGBM)** | R² (30-Day Horizon) | **0.9948** | 99.48% of variance in 30-day balance trajectories explained |
 | | MAE (30-Day Horizon) | **৳14,682** | Mean Absolute Error across 1,649 evaluation snapshots |
 | | RMSE (30-Day Horizon) | **৳23,903** | Root Mean Squared Error across 1,649 evaluation snapshots |
-| **Liquidity-Pressure Detection** | Precision | **91.53%** | Accuracy of low-cash risk warnings |
+| **Liquidity-Pressure Detection (XGBoost)** | Precision | **91.53%** | Accuracy of low-cash risk warnings |
 | | Recall | **82.44%** | True positive risk detection rate |
 | | F1-Score | **86.75%** | Overall risk classification harmonic mean |
 | | Tight Liquidity F1-Score | **95.45%** | Specialized risk detection F1 on high-vulnerability personas |
@@ -83,31 +111,29 @@ All evaluation metrics are computed on a **held-out synthetic test dataset** of 
 
 ### 1. Point-in-Time Feature Builder (`FeatureBuilder`)
 - Guarantees **STRICT ZERO LEAKAGE**: at snapshot timestamp $T$, features are computed exclusively from transactions with timestamps $t \le T$.
-- Computes **40+ temporal and behavioral features**, including rolling liquidity windows (7d, 14d, 30d), inflow/outflow volatility, Herfindahl-Hirschman category concentration index, and explicit time-of-day temporal indicators (`snapshot_hour_of_day`, `snapshot_day_of_week`, `avg_outflow_hour_30d`).
+- Computes **40+ temporal and behavioral features**, including rolling liquidity windows (7d, 14d, 30d), inflow/outflow volatility ($\sigma_{\text{outflow}}$), Herfindahl-Hirschman category concentration index, and time-of-day indicators.
 
-### 2. Recurring Commitment Detector
+### 2. Recurring Commitment Detector (DBSCAN + Multi-Factor Scoring)
 - Evaluates multi-factor evidence matrices: interval regularity coefficient of variation ($CV$), amount consistency ($CV$), observation recency, frequency count, and counterparty specificity.
 - Leverages **Fast Fourier Transform (FFT) & Spectral Analysis** (`scipy.signal` / `numpy.fft`) for cyclic frequency detection, **DBSCAN Density Clustering** (`sklearn.cluster.DBSCAN`) for transaction pattern grouping, and **Isolation Forest** anomaly filtering.
-- Automatically groups and classifies recurring commitments (Housing/Rent, Utilities, Software, Debt EMI, Family Support, Gym) into `STRONG` and `MODERATE` confidence categories.
+- Automatically groups recurring commitments (Housing/Rent, Utilities, Subscriptions, Debt EMI) into `STRONG` and `MODERATE` confidence categories.
 
-### 3. Cash-Flow & Minimum Balance Forecasting Engine
-- Trains a multi-horizon ensemble of **Histogram-Based Gradient Boosted Decision Trees** (`HistGradientBoostingRegressor` — native LightGBM-equivalent) on 38 point-in-time snapshot vectors to forecast 30-day trajectory paths and minimum balance drawdown $B_{\text{min, 30d}}$.
-- Fits 6 dedicated GBDT regression estimators across 7-day, 14-day, and 30-day horizons for minimum balance and net cash flow prediction.
-- Achieves **$R^2 = 0.9948$** and **$F_1 = 95.45\%$** on high-pressure personas, outperforming standard baseline models.
+### 3. Cash-Flow & Minimum Balance Forecasting Engine (LightGBM)
+- Trains a multi-horizon ensemble of **Histogram-Based Gradient Boosted Decision Trees** (`HistGradientBoostingRegressor` / LightGBM) on 38 point-in-time snapshot vectors to forecast 30-day trajectory paths and minimum balance drawdown $B_{\text{min, 30d}}$.
+- Achieves **$R^2 = 0.9948$** and **$F_1 = 95.45\%$** on high-pressure personas.
 
-### 4. Spendable Engine (Candidate A Formulation & Risk Modeling)
-- Integrates **Monte Carlo Stochastic Simulations (10,000+ iterations)** and **Value-at-Risk (VaR / CVaR)** tail-risk metrics to calculate safe-to-spend dynamic buffers.
-- Evaluates true safe capacity using non-double-counting protected balance:
+### 4. Spendable Engine (Authoritative Formulation & Risk Modeling)
+- Enforces non-double-counting protected balance:
 $$\text{Spendable} = \max\left(0, \text{Balance} - \max(\text{Safety Reserve}, \text{Commitments})\right)$$
 - Eliminates double-counting between expected recurring outflows and safety buffers, protecting user liquidity without artificial over-restriction.
 
 ### 5. What-If Scenario Simulation Engine
-- Evaluates hypothetical financial decisions (one-time expenses, income delays, subscription additions, percentage budget cuts).
+- Evaluates 5 hypothetical scenarios (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) in memory.
 - Passed **100% of 700 validation scenarios** across mathematical monotonicity laws, non-negative spendable constraints, and zero state mutation guarantees.
 
-### 6. Explainable AI Layer (Google Gemini Integration)
-- Takes structured JSON outputs from the analytical engine and synthesizes concise, plain-language explanations ("Why is your spendable amount ৳X?") and context-aware financial advice.
-- Includes a robust deterministic fallback synthesizer if network connectivity to Gemini is unavailable.
+### 6. Spendable AI & Responsible AI Guardrails
+- **100% Code-Enforced Financial Calculations**: All numbers, Spendable balances, and scenario deltas are computed in pure Python code.
+- **Context Injection**: Structured facts (`Spendable = ৳22,552.76`, `Balance = ৳59,835.05`, `Commitments = ৳10,000`) are passed to Gemini LLM to synthesize plain-language explanations with zero financial math hallucination.
 
 ---
 
@@ -115,12 +141,12 @@ $$\text{Spendable} = \max\left(0, \text{Balance} - \max(\text{Safety Reserve}, \
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, TypeScript, Vite, Vanilla CSS (Dark Glassmorphism Design System), Lucide Icons |
+| **Frontend** | React 19, TypeScript, Vite, Vanilla CSS (Dark Glassmorphism System), Lucide Icons |
 | **Backend API** | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy ORM, Alembic Migrations |
 | **Database** | PostgreSQL / SQLite (via SQLAlchemy & `psycopg2-binary`) |
-| **ML & Analytics** | **Histogram Gradient Boosted Trees** (`HistGradientBoosting` / LightGBM Equivalent), **Isolation Forest Anomaly Detection**, **DBSCAN Density Clustering**, **Fast Fourier Transform (FFT) & Spectral Periodogram Analysis**, **Monte Carlo Stochastic Simulation & VaR / CVaR**, `scikit-learn`, `numpy`, `pandas`, `scipy` |
+| **ML & Analytics** | **LightGBM / HistGradientBoosting**, **XGBoost Classifier**, **DBSCAN Density Clustering**, **Isolation Forest Anomaly Detection**, **Fast Fourier Transform (FFT)**, `scikit-learn`, `numpy`, `pandas`, `scipy` |
 | **AI / LLM Integration** | Google Gemini API (`google-genai` Python SDK) |
-| **Testing Suite** | `pytest`, `httpx`, `FastAPI TestClient` |
+| **Testing Suite** | `pytest` (118 passed test suites), `httpx`, `FastAPI TestClient` |
 | **Container & Cloud** | Multi-stage Dockerfiles, Docker Compose, Railway Ready |
 
 ---
@@ -139,16 +165,17 @@ Spendable/
 │   │   ├── main.py             # FastAPI entry point & static SPA file server
 │   │   ├── config.py           # Pydantic environment configuration
 │   │   ├── database.py         # SQLAlchemy connection management
+│   │   ├── api/                # Product API endpoints (/overview, /forecast, /simulate, /chat)
 │   │   ├── features/           # Point-in-time leakage-safe feature builder
-│   │   ├── recurring/          # Recurring commitment detector & evaluator
-│   │   ├── forecasting/        # HistGradientBoosting forecasting models
+│   │   ├── recurring/          # Recurring commitment detector & evaluator (DBSCAN)
+│   │   ├── forecasting/        # LightGBM forecasting models
 │   │   ├── engine/             # Spendable Engine calculation formulations
 │   │   ├── scenario/           # What-if scenario simulation engine
-│   │   └── llm/                # Google Gemini LLM explanation provider
+│   │   └── explanation/        # Spendable AI Gemini chat & explanation provider
 │   └── tests/                  # 118 unit & integration test suites
 └── frontend/
     ├── src/
-    │   ├── pages/              # Overview, Financial Activity, Forecast, Simulate pages
+    │   ├── pages/              # Overview, Financial Activity, Forecast, Simulate, Inspect pages
     │   ├── components/         # Header, LoginModal, ConfirmModal, CalculationModal
     │   ├── context/            # AuthContext & demo persona manager
     │   ├── api/                # Strictly-typed API client & endpoints
@@ -173,12 +200,12 @@ This single command automatically:
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Running Verification Suites
 
 Backend unit tests are run via `pytest` using the project virtual environment:
 
 ```bash
-.\venv\Scripts\pytest.exe backend\tests
+$env:PYTHONPATH='backend'; python -m pytest backend/tests
 ```
 
 Frontend production build and type checking:
