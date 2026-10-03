@@ -216,26 +216,14 @@ class DatabaseDataProvider(BaseDataProvider):
 
             if not db_acts:
                 from datetime import datetime, timezone
-                now_iso = datetime.now(timezone.utc).isoformat()
-                empty_feats = {
-                    "account_id": account_id,
-                    "user_id": account_id,
-                    "snapshot_time": now_iso,
-                    "current_balance": current_balance,
-                    "mean_inflow_30d": 0.0,
-                    "sum_inflow_30d": 0.0,
-                    "mean_outflow_30d": 0.0,
-                    "sum_outflow_30d": 0.0,
-                    "std_outflow_30d": 0.0,
-                    "count_outflow_30d": 0,
-                    "count_inflow_30d": 0,
-                    "net_cash_flow_30d": 0.0,
-                    "days_since_last_inflow": 999.0,
-                    "days_since_last_outflow": 999.0,
-                    "volatility_ratio_30d": 0.0,
-                    "liquidity_cushion_days": 0.0,
-                    "balance_trend_30d": 0.0,
-                }
+                now_dt = datetime.now(timezone.utc)
+                now_iso = now_dt.isoformat()
+                
+                builder = FeatureBuilder([])
+                empty_feats = builder._build_empty_feature_dict(now_dt)
+                empty_feats["account_id"] = account_id
+                empty_feats["current_balance"] = current_balance
+                
                 empty_forecast = self.forecast_model.predict_snapshot(empty_feats)
                 return {
                     "user_id": account_id,

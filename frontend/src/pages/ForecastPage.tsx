@@ -121,14 +121,14 @@ export const ForecastPage: React.FC = () => {
   const badge = getLiquidityBadgeConfig(liqState);
 
   // Extract daily trajectory points from top-level daily_trajectory or item fallback
-  const rawTrajectory: any[] =
-    (forecastData as any)?.daily_trajectory ||
-    (currentForecastItem as any)?.daily_balances ||
+  const rawTrajectory =
+    forecastData?.daily_trajectory ||
+    currentForecastItem?.daily_balances ||
     [];
 
-  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item: any) => ({
-    date: item.date_str || item.date || '',
-    balance: typeof item.projected_balance === 'number' ? item.projected_balance : item.balance || 0,
+  let dailyBalances: DailyTrajectoryItem[] = rawTrajectory.slice(0, horizonDays).map((item) => ({
+    date: item.date || '',
+    balance: typeof item.balance === 'number' ? item.balance : 0,
   }));
 
   // Fallback for empty trajectory: create flat line from current_balance

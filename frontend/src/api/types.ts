@@ -27,13 +27,21 @@ export interface SpendableOverviewResponse {
   liquidity_state: LiquidityState;
   explanation_summary: string;
   factors: FactorItem[];
+  recommendations?: RecommendationItem[];
 }
 
 export interface DailyBalance {
   date: string;
   balance: number;
-  minimum_balance: number;
-  is_historical: boolean;
+  minimum_balance?: number;
+  is_historical?: boolean;
+}
+
+export interface DailyTrajectoryPoint {
+  date: string;
+  balance: number;
+  minimum_balance?: number;
+  is_historical?: boolean;
 }
 
 export interface SpendableForecastItem {
@@ -49,9 +57,12 @@ export interface SpendableForecastItem {
 
 export interface SpendableForecastResponse {
   user_id: string;
+  snapshot_time?: string;
   forecast_7d: SpendableForecastItem;
   forecast_14d: SpendableForecastItem;
   forecast_30d: SpendableForecastItem;
+  daily_trajectory?: DailyTrajectoryPoint[];
+  safety_threshold_bdt?: number;
 }
 
 export interface FinancialActivityItem {
