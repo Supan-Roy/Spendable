@@ -49,7 +49,7 @@ Spendable delivers 5 primary application tabs, seamlessly integrating specialize
 
 ### 4. Simulate Tab (What-If Scenario Engine & Spendable AI)
 - **Implemented Features**: Evaluates 5 hypothetical scenarios in real-time (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`) without mutating underlying database tables, rendering a Multi-Metric Impact Dashboard.
-- **AI Component Usage**: **Spendable AI** (Google Gemini 2.5 Flash / 1.5 Flash), a context-grounded conversational assistant that receives pre-computed financial facts to answer user queries with zero LLM arithmetic execution.
+- **AI Component Usage**: **Spendable AI** (Google Gemini 3.5 Flash Lite), a context-grounded conversational assistant that receives pre-computed financial facts to answer user queries with zero LLM arithmetic execution.
 
 ### 5. Inspect ⚡ System Visualizer Tab (Architecture Walkthrough)
 - **Implemented Features**: Step-by-step technical visualizer detailing the connected 5-stage processing pipeline (`STAGE 01 Ingestion ➔ STAGE 02 Feature Store ➔ STAGE 03 ML Engine ➔ STAGE 04 Deterministic Math ➔ STAGE 05 Spendable AI`).
