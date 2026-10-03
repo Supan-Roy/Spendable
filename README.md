@@ -3,7 +3,7 @@
 > **"Know what you can safely spend."**
 
 🏆 **Hackathon Track**: **Track 03: Customer Innovation & Financial Independence**  
-🌐 **Live Deployment URL**: [https://spendable-production.up.railway.app](https://spendable-production.up.railway.app)
+🌐 **Live Deployment URL**: [https://spendable.supanroy.com/](https://spendable.supanroy.com/)
 
 ---
 
@@ -24,8 +24,8 @@ By combining point-in-time machine learning cash-flow forecasting, automated rec
 
 ## 🌐 Live Deployment URL
 
-- **Live Application URL for Judges**: [https://spendable-production.up.railway.app](https://spendable-production.up.railway.app)
-- **API Health Check Endpoint**: [https://spendable-production.up.railway.app/api/v1/health](https://spendable-production.up.railway.app/api/v1/health)
+- **Live Application URL for Judges**: [https://spendable.supanroy.com/](https://spendable.supanroy.com/)
+- **API Health Check Endpoint**: [https://spendable.supanroy.com/api/v1/health](https://spendable.supanroy.com/api/v1/health)
 
 *(Note: The live deployment includes pre-configured demo personas (`acc_supan`, `acc_tanvir`, `acc_sarah`, `acc_fatima`) allowing judges to explore all features instantly without registration).*
 
