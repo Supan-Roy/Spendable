@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth, DEMO_PERSONAS } from '../context/AuthContext';
-import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2 } from 'lucide-react';
+import { User, ChevronDown, LogOut, Sparkles, ShieldCheck, Trash2, Menu, X as CloseIcon } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 import { ConfirmModal } from './ConfirmModal';
@@ -16,6 +16,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenLogin }) => {
   const { currentUser, loginAsDemo, deleteAccount, isAuthenticated, demoAccounts } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,17 +49,28 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
     }
   };
 
+  const getFirstName = (name?: string | null, username?: string | null, accId?: string | null) => {
+    const raw = name || username || accId || 'User';
+    return raw.trim().split(' ')[0] || raw;
+  };
 
   return (
     <header className="app-header">
       <div className="header-left">
-        <div className="logo-group" onClick={() => setActiveTab('overview')} style={{ cursor: 'pointer' }}>
+        <div
+          className="logo-group"
+          onClick={() => {
+            setActiveTab('overview');
+            setMobileMenuOpen(false);
+          }}
+          style={{ cursor: 'pointer' }}
+        >
           <img src="/logo.svg" alt="Spendable Logo" className="logo-img" draggable={false} />
           <span className="brand-name">SPENDABLE</span>
         </div>
 
         {isAuthenticated && (
-          <nav className="top-nav">
+          <nav className="top-nav desktop-top-nav">
             <button
               className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
               onClick={() => setActiveTab('overview')}
@@ -99,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
                 <User size={14} color="#00e5a3" />
               </span>
               <span className="user-name-text">
-                {currentUser.display_name || currentUser.username || currentUser.account_id}
+                {getFirstName(currentUser.display_name, currentUser.username, currentUser.account_id)}
               </span>
               {currentUser.is_demo_account && (
                 <span className="demo-tag">D</span>
@@ -171,7 +183,78 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenL
             <span>Sign In / Select Account</span>
           </button>
         )}
+
+        {isAuthenticated && (
+          <button
+            className="mobile-menu-toggle-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <CloseIcon size={20} /> : <Menu size={20} />}
+          </button>
+        )}
       </div>
+
+      {/* Mobile Navigation Drawer Sidebar */}
+      {isAuthenticated && mobileMenuOpen && (
+        <div className="mobile-drawer-backdrop" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-drawer-header">
+              <div className="logo-group">
+                <img src="/logo.svg" alt="Spendable Logo" className="logo-img" />
+                <span className="brand-name">SPENDABLE</span>
+              </div>
+              <button className="modal-close" onClick={() => setMobileMenuOpen(false)}>
+                <CloseIcon size={20} />
+              </button>
+            </div>
+
+            <div className="mobile-user-greeting">
+              <User size={16} color="#00e5a3" />
+              <span>Logged in as <strong>{getFirstName(currentUser?.display_name, currentUser?.username, currentUser?.account_id)}</strong></span>
+            </div>
+
+            <nav className="mobile-drawer-nav">
+              <button
+                className={`drawer-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('overview');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Overview
+              </button>
+              <button
+                className={`drawer-nav-item ${activeTab === 'activity' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('activity');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Financial Activity
+              </button>
+              <button
+                className={`drawer-nav-item ${activeTab === 'forecast' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('forecast');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                30-Day Forecast
+              </button>
+              <button
+                className={`drawer-nav-item ${activeTab === 'simulate' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('simulate');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Scenario Simulator
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={showDeleteConfirm}
