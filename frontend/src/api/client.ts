@@ -67,11 +67,15 @@ export async function apiFetch<T>(
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new ApiError(
-        response.status,
-        errData.detail || `HTTP Error ${response.status}`,
-        errData
-      );
+      let msg = `HTTP Error ${response.status}`;
+      if (typeof errData.detail === 'string') {
+        msg = errData.detail;
+      } else if (Array.isArray(errData.detail)) {
+        msg = errData.detail.map((e: any) => e.msg || JSON.stringify(e)).join('; ');
+      } else if (errData.detail) {
+        msg = JSON.stringify(errData.detail);
+      }
+      throw new ApiError(response.status, msg, errData);
     }
 
     return (await response.json()) as T;

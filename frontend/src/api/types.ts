@@ -121,16 +121,15 @@ export interface SpendableRecommendationsResponse {
 
 export type ScenarioType =
   | 'ONE_TIME_EXPENSE'
-  | 'ONE_TIME_INCOME'
-  | 'RECURRING_EXPENSE'
-  | 'INCOME_CHANGE'
+  | 'ADDITIONAL_INCOME'
+  | 'ADDITIONAL_COMMITMENT'
+  | 'SPENDING_REDUCTION'
   | 'INCOME_DELAY';
 
 export interface ScenarioRequest {
   scenario_type: ScenarioType;
   amount?: number;
-  change_percentage?: number;
-  delay_days?: number;
+  percentage?: number;
   description?: string;
 }
 

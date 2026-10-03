@@ -8,7 +8,6 @@ export const SimulatePage: React.FC = () => {
   const [scenarioType, setScenarioType] = useState<ScenarioType>('ONE_TIME_EXPENSE');
   const [amount, setAmount] = useState<string>('5000');
   const [changePercentage, setChangePercentage] = useState<string>('10');
-  const [delayDays, setDelayDays] = useState<string>('7');
   const [description, setDescription] = useState<string>('');
 
   const [result, setResult] = useState<ScenarioResult | null>(null);
@@ -45,13 +44,11 @@ export const SimulatePage: React.FC = () => {
     try {
       const numAmt = parseFloat(amount) || 0;
       const numPct = parseFloat(changePercentage) || 0;
-      const numDays = parseInt(delayDays, 10) || 0;
 
       const res = await postSimulateApi({
         scenario_type: scenarioType,
-        amount: scenarioType === 'ONE_TIME_EXPENSE' || scenarioType === 'ONE_TIME_INCOME' || scenarioType === 'RECURRING_EXPENSE' ? numAmt : undefined,
-        change_percentage: scenarioType === 'INCOME_CHANGE' ? numPct : undefined,
-        delay_days: scenarioType === 'INCOME_DELAY' ? numDays : undefined,
+        amount: scenarioType === 'SPENDING_REDUCTION' ? 0 : numAmt,
+        percentage: scenarioType === 'SPENDING_REDUCTION' ? numPct : 0,
         description: description.trim() || undefined,
       });
 
@@ -67,6 +64,7 @@ export const SimulatePage: React.FC = () => {
     setResult(null);
     setError(null);
     setAmount('5000');
+    setChangePercentage('10');
     setDescription('');
   };
 
@@ -180,18 +178,18 @@ export const SimulatePage: React.FC = () => {
                 disabled={isLoading}
               >
                 <option value="ONE_TIME_EXPENSE">Spend money (One-time expense)</option>
-                <option value="ONE_TIME_INCOME">Receive money (One-time inflow)</option>
-                <option value="RECURRING_EXPENSE">Add commitment (Monthly bill/rent)</option>
-                <option value="INCOME_CHANGE">Income change (%)</option>
-                <option value="INCOME_DELAY">Delay income (Days)</option>
+                <option value="ADDITIONAL_INCOME">Receive money (One-time inflow)</option>
+                <option value="ADDITIONAL_COMMITMENT">Add commitment (Monthly bill/rent)</option>
+                <option value="SPENDING_REDUCTION">Reduce spending (%)</option>
+                <option value="INCOME_DELAY">Delay income (Amount)</option>
               </select>
             </div>
 
-            {(scenarioType === 'ONE_TIME_EXPENSE' ||
-              scenarioType === 'ONE_TIME_INCOME' ||
-              scenarioType === 'RECURRING_EXPENSE') && (
+            {scenarioType !== 'SPENDING_REDUCTION' && (
               <div className="form-group">
-                <label>Amount (৳)</label>
+                <label>
+                  {scenarioType === 'INCOME_DELAY' ? 'Delayed Amount (৳)' : 'Amount (৳)'}
+                </label>
                 <div className="input-currency-wrapper">
                   <span className="input-symbol">৳</span>
                   <input
@@ -207,30 +205,17 @@ export const SimulatePage: React.FC = () => {
               </div>
             )}
 
-            {scenarioType === 'INCOME_CHANGE' && (
+            {scenarioType === 'SPENDING_REDUCTION' && (
               <div className="form-group">
-                <label>Income Change (%)</label>
+                <label>Spending Reduction (%)</label>
                 <input
                   type="number"
+                  min="0.1"
+                  max="100"
                   step="any"
                   value={changePercentage}
                   onChange={(e) => setChangePercentage(e.target.value)}
-                  placeholder="-10 or +15"
-                  disabled={isLoading}
-                />
-              </div>
-            )}
-
-            {scenarioType === 'INCOME_DELAY' && (
-              <div className="form-group">
-                <label>Delay (Days)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={delayDays}
-                  onChange={(e) => setDelayDays(e.target.value)}
-                  placeholder="7"
+                  placeholder="10"
                   disabled={isLoading}
                 />
               </div>
