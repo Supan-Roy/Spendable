@@ -15,7 +15,7 @@ The application features 5 main pages accessible from the persistent top navigat
    - Ingested multi-channel financial transaction activity stream with pagination, search, category filters, and ISO 8601 UTC timestamp formatting.
 
 3. **Forecast (`ForecastPage.tsx`)**:
-   - 30-day cash flow runway trajectory chart, LightGBM projected minimum balance drawdowns, and DBSCAN recurring bill dates.
+   - 30-day cash flow runway trajectory chart, HistGradientBoosting projected minimum balance drawdowns, and recurring commitment dates.
 
 4. **Simulate (`SimulatePage.tsx`)**:
    - What-If Scenario Engine supporting 5 scenario types (`ONE_TIME_EXPENSE`, `ADDITIONAL_INCOME`, `ADDITIONAL_COMMITMENT`, `SPENDING_REDUCTION`, `INCOME_DELAY`).
@@ -24,7 +24,7 @@ The application features 5 main pages accessible from the persistent top navigat
 
 5. **Inspect ⚡ (`InspectPage.tsx`)**:
    - Hackathon system visualizer showing the end-to-end 5-stage processing pipeline in a connected 2-row rounded flow layout.
-   - Deep-dive cards detailing XGBoost, LightGBM, DBSCAN hyperparameters, and 100% code-enforced financial math boundaries (0 Gemini API calls consumed).
+   - Deep-dive cards detailing HistGradientBoostingRegressor parameters, point-in-time regularity scoring, and code-enforced financial math boundaries (0 Gemini API calls consumed).
 
 ---
 
