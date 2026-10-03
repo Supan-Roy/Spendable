@@ -5,9 +5,10 @@
   "description": "Spendable - AI-powered personal financial liquidity intelligence platform",
   "scripts": {
     "dev:docker": "docker compose up -d postgres",
-    "dev:backend": "cd backend && ..\\venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --port 8000",
+    "dev:backend": "cd backend && ..\\venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --reload-dir app --port 8000",
     "dev:frontend": "pnpm --prefix frontend dev",
-    "dev": "docker compose up -d postgres && concurrently -n \"BACKEND,FRONTEND\" -c \"yellow,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+    "dev": "docker compose up -d postgres && concurrently --restart-tries 100 --restart-delay 1000 -n \"BACKEND,FRONTEND\" -c \"yellow,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+
     "build": "pnpm --prefix frontend build",
     "test": "venv\\Scripts\\pytest.exe backend\\tests",
     "docker:up": "docker compose up -d",
