@@ -118,9 +118,9 @@ def seed_sample_data_for_user(account_id: str, db: Session) -> dict:
     ref_seq = 1000
 
     for year, month in [
-        (2025, 3), (2025, 4), (2025, 5), (2025, 6),
-        (2025, 7), (2025, 8), (2025, 9), (2025, 10),
-        (2025, 11), (2025, 12), (2026, 1), (2026, 2)
+        (2025, 10), (2025, 11), (2025, 12), (2026, 1),
+        (2026, 2), (2026, 3), (2026, 4), (2026, 5),
+        (2026, 6), (2026, 7), (2026, 8), (2026, 9)
     ]:
         m_dt = datetime(year, month, 1, 10, 0, tzinfo=timezone.utc)
 
@@ -249,6 +249,25 @@ def seed_sample_data_for_user(account_id: str, db: Session) -> dict:
             balance_after=round(bal, 2),
             provenance=DataProvenance.SYNTHETIC,
         ))
+
+    # October 1, 2026 Current Month Salary Inflow
+    oct_dt = datetime(2026, 10, 1, 10, 0, tzinfo=timezone.utc)
+    bal += 85000.0
+    ref_seq += 1
+    activities.append(FinancialActivityModel(
+        account_id=user.account_id,
+        amount=85000.0,
+        currency="BDT",
+        direction=TransactionDirection.INFLOW,
+        activity_type=ActivityType.SALARY,
+        timestamp_utc=oct_dt,
+        category="SALARY",
+        channel="BANK_TRANSFER",
+        counterparty_name="Tech Innovations Ltd",
+        reference_id=f"ref_sample_{user.account_id}_{ref_seq}",
+        balance_after=round(bal, 2),
+        provenance=DataProvenance.SYNTHETIC,
+    ))
 
     db.add_all(activities)
     user.current_balance = round(bal, 2)

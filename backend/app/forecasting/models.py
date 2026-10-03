@@ -339,6 +339,8 @@ class CashFlowForecastModel:
 
     def _parse_datetime(self, val: str) -> datetime:
         try:
+            if not val:
+                return datetime(2026, 10, 3)
             return datetime.fromisoformat(str(val).replace("Z", "+00:00")).replace(tzinfo=None)
         except Exception:
-            return datetime.now()
+            return datetime(2026, 10, 3)

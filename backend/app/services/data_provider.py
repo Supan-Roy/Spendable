@@ -88,7 +88,7 @@ class SyntheticDataProvider(BaseDataProvider):
             row_match = df.iloc[0].to_dict()
 
         matched_user_id = str(row_match.get("account_id", row_match.get("user_id", "ACC-DEMO-001")))
-        matched_snapshot_time = str(row_match.get("snapshot_time", "2026-03-01T00:00:00"))
+        matched_snapshot_time = str(row_match.get("snapshot_time", "2026-10-03T00:00:00"))
         current_balance = float(row_match.get("current_balance", 0.0))
 
         # Predict forecast trajectory using trained model or heuristic fallback
