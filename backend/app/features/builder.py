@@ -177,9 +177,22 @@ class FeatureBuilder:
         else:
             trend_slope_30d = 0.0
 
+        # 8. Time of Day & Temporal Features
+        snapshot_hour = st_utc.hour
+        snapshot_dow = st_utc.weekday()
+        snapshot_is_weekend = 1 if snapshot_dow >= 5 else 0
+
+        outflow_hours = [self._parse_timestamp(a["timestamp_utc"]).hour for a in outflows_30d]
+        avg_outflow_hour_30d = float(np.mean(outflow_hours)) if outflow_hours else 12.0
+
         return {
             "account_id": account_id,
             "snapshot_time": st_utc.isoformat(),
+            # Temporal / Time Features
+            "snapshot_hour_of_day": snapshot_hour,
+            "snapshot_day_of_week": snapshot_dow,
+            "snapshot_is_weekend": snapshot_is_weekend,
+            "avg_outflow_hour_30d": round(avg_outflow_hour_30d, 2),
             # Liquidity
             "current_balance": round(current_balance, 2),
             "balance_min_7d": round(bal_min_7d, 2),
@@ -228,9 +241,14 @@ class FeatureBuilder:
 
     def _build_empty_feature_dict(self, snapshot_time: datetime) -> Dict[str, Any]:
         """Return zero default feature vector if no past transactions exist prior to snapshot."""
+        st_utc = self._parse_timestamp(snapshot_time)
         return {
             "account_id": self.user_activities[0]["account_id"] if self.user_activities else "UNKNOWN",
-            "snapshot_time": snapshot_time.isoformat(),
+            "snapshot_time": st_utc.isoformat(),
+            "snapshot_hour_of_day": st_utc.hour,
+            "snapshot_day_of_week": st_utc.weekday(),
+            "snapshot_is_weekend": 1 if st_utc.weekday() >= 5 else 0,
+            "avg_outflow_hour_30d": 12.0,
             "current_balance": 0.0,
             "balance_min_7d": 0.0,
             "balance_min_14d": 0.0,
