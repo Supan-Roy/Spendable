@@ -11,7 +11,13 @@ const getCachedActivityData = (accId?: string): SpendableActivityListResponse | 
   if (!accId) return null;
   try {
     const raw = localStorage.getItem(`${ACTIVITY_CACHE_KEY_PREFIX}${accId}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && JSON.stringify(parsed).includes('2026-01-27')) {
+      localStorage.removeItem(`${ACTIVITY_CACHE_KEY_PREFIX}${accId}`);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }

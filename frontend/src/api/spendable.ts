@@ -51,3 +51,19 @@ export async function postExplainApi(): Promise<GeminiExplanationData> {
     body: JSON.stringify({}),
   });
 }
+
+export async function postChatApi(
+  message: string,
+  chatHistory: import('./types').ChatMessage[] = [],
+  scenarioResult?: Record<string, any>
+): Promise<import('./types').ChatResponse> {
+  return apiFetch<import('./types').ChatResponse>('/chat', {
+    method: 'POST',
+    body: JSON.stringify({
+      message,
+      chat_history: chatHistory,
+      scenario_result: scenarioResult,
+    }),
+  });
+}
+

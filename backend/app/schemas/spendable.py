@@ -90,3 +90,24 @@ class ExplainRequest(BaseModel):
     user_id: Optional[str] = Field(None, description="Account identifier")
     snapshot_time: Optional[str] = Field(None, description="Snapshot timestamp")
     include_scenario: bool = Field(False, description="Whether to include current scenario result in explanation")
+
+
+class ChatMessage(BaseModel):
+    """Chat message object."""
+    role: str = Field(..., description="Role of the sender: 'user' or 'assistant'")
+    content: str = Field(..., description="Message text content")
+
+
+class ChatRequest(BaseModel):
+    """Payload model for POST /api/v1/chat Spendable AI chat endpoint."""
+    message: str = Field(..., description="User question or prompt")
+    chat_history: Optional[List[ChatMessage]] = Field(default_factory=list, description="Previous messages in chat session")
+    scenario_result: Optional[Dict[str, Any]] = Field(None, description="Active simulated scenario result context")
+
+
+class ChatResponse(BaseModel):
+    """API response model for POST /api/v1/chat Spendable AI chat endpoint."""
+    reply: str = Field(..., description="Spendable AI response text")
+    agent_name: str = Field("Spendable AI", description="Assistant identity name")
+    context_used: Optional[Dict[str, Any]] = Field(None, description="Summary of financial account context ingested")
+

@@ -167,3 +167,21 @@ export interface UserAccountResponse {
   current_balance: number;
   is_demo_account: boolean;
 }
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatRequest {
+  message: string;
+  chat_history?: ChatMessage[];
+  scenario_result?: Record<string, any>;
+}
+
+export interface ChatResponse {
+  reply: string;
+  agent_name: string;
+  context_used?: Record<string, any>;
+}
+

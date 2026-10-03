@@ -28,7 +28,13 @@ const getCachedOverviewData = (accId?: string): SpendableOverviewResponse | null
   if (!accId) return null;
   try {
     const raw = localStorage.getItem(`${OVERVIEW_CACHE_KEY_PREFIX}${accId}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.snapshot_time && (parsed.snapshot_time.includes('2026-01-27') || parsed.snapshot_time.includes('2026-03-01'))) {
+      localStorage.removeItem(`${OVERVIEW_CACHE_KEY_PREFIX}${accId}`);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }

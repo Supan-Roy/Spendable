@@ -76,6 +76,9 @@ class SyntheticDataProvider(BaseDataProvider):
         if df is None or len(df) == 0:
             raise ValueError("No snapshot dataset available in data provider.")
 
+        from datetime import datetime, timezone
+        now_iso = datetime.now(timezone.utc).isoformat()
+
         # Find matching row or fallback to first row
         row_match = None
         if user_id:
@@ -88,8 +91,12 @@ class SyntheticDataProvider(BaseDataProvider):
             row_match = df.iloc[0].to_dict()
 
         matched_user_id = str(row_match.get("account_id", row_match.get("user_id", "ACC-DEMO-001")))
-        matched_snapshot_time = str(row_match.get("snapshot_time", "2026-10-03T00:00:00"))
+        matched_snapshot_time = snapshot_time or now_iso
         current_balance = float(row_match.get("current_balance", 0.0))
+
+        # Update snapshot_time in features passed to forecast model
+        row_match["snapshot_time"] = matched_snapshot_time
+        row_match["snapshot_timestamp"] = matched_snapshot_time
 
         # Predict forecast trajectory using trained model or heuristic fallback
         forecast = self.forecast_model.predict_snapshot(row_match)
@@ -116,7 +123,7 @@ class SyntheticDataProvider(BaseDataProvider):
     def get_recent_activities(
         self, user_id: Optional[str] = None, limit: int = 50, offset: int = 0
     ) -> Dict[str, Any]:
-        """Retrieve observed transactions with pagination."""
+        """Retrieve observed transactions with pagination and dynamic real-time timestamp alignment."""
         if self._transactions_df is None or len(self._transactions_df) == 0:
             return {"total_count": 0, "limit": limit, "offset": offset, "activities": []}
 
@@ -125,15 +132,41 @@ class SyntheticDataProvider(BaseDataProvider):
             user_col = "account_id" if "account_id" in df.columns else "user_id"
             df = df[df[user_col] == user_id]
 
+        from datetime import datetime, timezone, timedelta
+        now_dt = datetime.now(timezone.utc)
+
+        # Calculate time shift delta to align latest historical transaction to real-time present
+        raw_col = "timestamp_utc" if "timestamp_utc" in df.columns else "timestamp"
+        raw_ts_list = df[raw_col].dropna().tolist()
+        shift_td = timedelta(days=0)
+        if raw_ts_list:
+            try:
+                latest_ts = max(datetime.fromisoformat(str(ts).replace("Z", "+00:00")) for ts in raw_ts_list if str(ts).strip())
+                if latest_ts.tzinfo is None:
+                    latest_ts = latest_ts.replace(tzinfo=timezone.utc)
+                if now_dt > latest_ts:
+                    shift_td = now_dt - latest_ts
+            except Exception:
+                pass
+
         total_count = len(df)
         paged_df = df.iloc[offset : offset + limit]
 
         activities = []
         for idx, row in paged_df.iterrows():
+            raw_ts_str = str(row.get("timestamp_utc", row.get("timestamp", "")))
+            try:
+                parsed_ts = datetime.fromisoformat(raw_ts_str.replace("Z", "+00:00"))
+                if parsed_ts.tzinfo is None:
+                    parsed_ts = parsed_ts.replace(tzinfo=timezone.utc)
+                final_ts = (parsed_ts + shift_td).isoformat()
+            except Exception:
+                final_ts = raw_ts_str if raw_ts_str else now_dt.isoformat()
+
             activities.append({
                 "transaction_id": str(row.get("transaction_id", f"tx_{idx}")),
                 "account_id": str(row.get("account_id", row.get("user_id", "ACC-DEMO-001"))),
-                "timestamp_utc": str(row.get("timestamp_utc", row.get("timestamp", ""))),
+                "timestamp_utc": final_ts,
                 "amount": float(row.get("amount", 0.0)),
                 "direction": str(row.get("direction", "OUTFLOW")),
                 "category": str(row.get("category", "GENERAL")),
@@ -182,6 +215,10 @@ class DatabaseDataProvider(BaseDataProvider):
         from app.models.account import UserAccount
         from app.models.activity import FinancialActivityModel
         from app.features.builder import FeatureBuilder
+        from datetime import datetime, timezone, timedelta
+
+        now_dt = datetime.now(timezone.utc)
+        now_iso = now_dt.isoformat()
 
         session = self.session_factory()
         try:
@@ -215,19 +252,16 @@ class DatabaseDataProvider(BaseDataProvider):
             )
 
             if not db_acts:
-                from datetime import datetime, timezone
-                now_dt = datetime.now(timezone.utc)
-                now_iso = now_dt.isoformat()
-                
                 builder = FeatureBuilder([])
                 empty_feats = builder._build_empty_feature_dict(now_dt)
                 empty_feats["account_id"] = account_id
                 empty_feats["current_balance"] = current_balance
+                empty_feats["snapshot_time"] = snapshot_time or now_iso
                 
                 empty_forecast = self.forecast_model.predict_snapshot(empty_feats)
                 return {
                     "user_id": account_id,
-                    "snapshot_time": now_iso,
+                    "snapshot_time": snapshot_time or now_iso,
                     "current_balance": current_balance,
                     "features": empty_feats,
                     "commitments": [],
@@ -255,11 +289,12 @@ class DatabaseDataProvider(BaseDataProvider):
             if snapshot_time:
                 snap_dt = FeatureBuilder._parse_timestamp(snapshot_time)
             else:
-                snap_dt = FeatureBuilder._parse_timestamp(act_dicts[-1]["timestamp_utc"])
+                snap_dt = now_dt
 
             builder = FeatureBuilder(act_dicts)
             features = builder.build_snapshot_features(snap_dt)
             features["current_balance"] = current_balance
+            features["snapshot_time"] = snap_dt.isoformat()
 
             commitments = self.recurring_detector.detect(act_dicts, snap_dt.isoformat())
             forecast = self.forecast_model.predict_snapshot(features)

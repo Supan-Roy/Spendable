@@ -17,7 +17,13 @@ const getCachedForecastData = (accId?: string): SpendableForecastResponse | null
   if (!accId) return null;
   try {
     const raw = localStorage.getItem(`${FORECAST_CACHE_KEY_PREFIX}${accId}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && JSON.stringify(parsed).includes('2026-01-27')) {
+      localStorage.removeItem(`${FORECAST_CACHE_KEY_PREFIX}${accId}`);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }

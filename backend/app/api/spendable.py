@@ -164,3 +164,44 @@ def explain_context(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate explanation: {str(e)}"
         )
+
+
+from app.schemas.spendable import ChatRequest, ChatResponse
+from app.explanation.spendable_ai_chat import SpendableAIChatEngine
+
+_chat_engine_instance: Optional[SpendableAIChatEngine] = None
+
+def get_chat_engine() -> SpendableAIChatEngine:
+    global _chat_engine_instance
+    if _chat_engine_instance is None:
+        _chat_engine_instance = SpendableAIChatEngine()
+    return _chat_engine_instance
+
+
+@router.post("/chat", response_model=ChatResponse)
+@router.post("/spendable/chat", response_model=ChatResponse)
+def chat_spendable_ai(
+    payload: ChatRequest,
+    current_account: UserAccount = Depends(get_current_account),
+    service: SpendableService = Depends(get_spendable_service),
+    chat_engine: SpendableAIChatEngine = Depends(get_chat_engine),
+):
+    """Chat with Spendable AI Assistant using real user account context and Gemini SDK."""
+    try:
+        uid = current_account.account_id
+        account_context = chat_engine.build_account_context(
+            service=service,
+            user_id=uid,
+            scenario_result=payload.scenario_result,
+        )
+        return chat_engine.answer(
+            user_message=payload.message,
+            chat_history=payload.chat_history or [],
+            account_context=account_context,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Spendable AI chat error: {str(e)}"
+        )
+
