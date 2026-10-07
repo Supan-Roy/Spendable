@@ -287,8 +287,8 @@ To address Phase 1 judge evaluation feedback, this section details our target-ge
 | **30-Day RMSE (BDT)** | ৳41,137.53 | ৳38,998.73 | **৳23,903.56** | **+38.7% variance reduction** |
 | **30-Day $R^2$ Score** | 0.9879 | 0.9891 | **0.9948** | **+0.57% higher fit** |
 
-### 3. Analysis of $R^2 = 0.9948$ & Synthetic Data Characteristics
-- **Mathematical Cause**: $R^2 = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}}$. In our 500-persona benchmark dataset, initial user balances span a wide dynamic range (৳7,800 to ৳1,327,700), making total sum of squares ($\text{SS}_{\text{tot}}$) extremely large. Simultaneously, residual error ($\text{SS}_{\text{res}}$) remains bounded (MAE ৳14,682), producing high numerical $R^2 > 0.99$.
+### 3. Analysis of R² = 0.9948 & Synthetic Data Characteristics
+- **Mathematical Cause**: R² = 1 - (SS_res / SS_tot). In our 500-persona benchmark dataset, initial user balances span a wide dynamic range (৳7,800 to ৳1,327,700), making the total sum of squares (SS_tot) extremely large relative to the residual sum of squares (SS_res). Simultaneously, forecast residual errors remain bounded (MAE = ৳14,682), producing a high numerical R² > 0.99.
 - **Synthetic Periodicity & Real-World Caveat**: Realistic synthetic generators model structured salary schedules and bill recurring intervals. While this validates algorithm capability on periodic data, real-world deployment will encounter unobserved cash activity and external bank accounts (acknowledged in our Limitations section).
 
 ### 4. Liquidity Pressure Classifier Evaluation ($F_1 = 86.75\%$)
