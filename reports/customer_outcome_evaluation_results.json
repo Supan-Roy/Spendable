@@ -1,0 +1,186 @@
+{
+  "evaluated_at_utc": "2026-10-07T05:16:10.320770+00:00",
+  "split_name": "TEST",
+  "total_snapshots": 1649,
+  "total_scenarios_simulated": 14841,
+  "baseline_definition": "Approve purchase if Purchase <= Current Balance (Conventional Balance/Budget Interface)",
+  "spendable_definition": "Approve purchase if Purchase <= Safe Spendable Capacity (Spendable Intelligence Engine)",
+  "metrics": {
+    "liquidity_failure_rate": {
+      "metric_name": "Projected Liquidity Failure Rate",
+      "sample_size": 14841,
+      "definition": "Percentage of simulated purchase decisions that result in post-purchase minimum balance dropping below safety reserve buffer.",
+      "horizon": "30 Days",
+      "baseline_rule": "Approve purchase if Purchase <= Current Balance",
+      "spendable_rule": "Approve purchase if Purchase <= Spendable Capacity",
+      "baseline_value": 19.49,
+      "spendable_value": 2.37,
+      "absolute_reduction": 17.12,
+      "relative_reduction_pct": 87.86,
+      "ci_95_lower": 16.49,
+      "ci_95_upper": 17.76
+    },
+    "overspending_incident_rate": {
+      "metric_name": "Overspending / Overdraft Incident Rate",
+      "sample_size": 14841,
+      "definition": "Percentage of simulated purchase decisions that result in account overdraft (< \u09f30.0 balance).",
+      "horizon": "30 Days",
+      "baseline_rule": "Approve purchase if Purchase <= Current Balance",
+      "spendable_rule": "Approve purchase if Purchase <= Spendable Capacity",
+      "baseline_value": 8.64,
+      "spendable_value": 0.88,
+      "absolute_reduction": 7.76,
+      "relative_reduction_pct": 89.83,
+      "ci_95_lower": 7.31,
+      "ci_95_upper": 8.25
+    },
+    "missed_payment_rate": {
+      "metric_name": "Projected Missed-Payment Rate",
+      "sample_size": 14841,
+      "definition": "Percentage of purchase decisions that leave insufficient balance to cover detected upcoming recurring commitments.",
+      "horizon": "30 Days",
+      "baseline_rule": "Approve purchase if Purchase <= Current Balance",
+      "spendable_rule": "Approve purchase if Purchase <= Spendable Capacity",
+      "baseline_value": 21.06,
+      "spendable_value": 2.03,
+      "absolute_reduction": 19.02,
+      "relative_reduction_pct": 90.33,
+      "ci_95_lower": 18.35,
+      "ci_95_upper": 19.65
+    }
+  },
+  "persona_breakdown": {
+    "COMMITMENT_HEAVY": {
+      "persona": "COMMITMENT_HEAVY",
+      "total_snapshots": 14,
+      "total_scenarios": 2772,
+      "baseline_failure_rate": 17.6,
+      "spendable_failure_rate": 2.63,
+      "absolute_failure_reduction": 14.97,
+      "relative_failure_reduction_pct": 85.03,
+      "baseline_overdraft_rate": 6.49,
+      "spendable_overdraft_rate": 1.19,
+      "baseline_missed_payment_rate": 21.61,
+      "spendable_missed_payment_rate": 2.27
+    },
+    "FINANCIAL_PRESSURE": {
+      "persona": "FINANCIAL_PRESSURE",
+      "total_snapshots": 5,
+      "total_scenarios": 990,
+      "baseline_failure_rate": 14.24,
+      "spendable_failure_rate": 1.52,
+      "absolute_failure_reduction": 12.73,
+      "relative_failure_reduction_pct": 89.38,
+      "baseline_overdraft_rate": 4.85,
+      "spendable_overdraft_rate": 0.3,
+      "baseline_missed_payment_rate": 13.43,
+      "spendable_missed_payment_rate": 1.11
+    },
+    "IRREGULAR_INCOME": {
+      "persona": "IRREGULAR_INCOME",
+      "total_snapshots": 12,
+      "total_scenarios": 2367,
+      "baseline_failure_rate": 13.22,
+      "spendable_failure_rate": 2.75,
+      "absolute_failure_reduction": 10.48,
+      "relative_failure_reduction_pct": 79.25,
+      "baseline_overdraft_rate": 6.97,
+      "spendable_overdraft_rate": 0.68,
+      "baseline_missed_payment_rate": 11.58,
+      "spendable_missed_payment_rate": 2.11
+    },
+    "SPENDING_DRIFT": {
+      "persona": "SPENDING_DRIFT",
+      "total_snapshots": 10,
+      "total_scenarios": 1980,
+      "baseline_failure_rate": 8.84,
+      "spendable_failure_rate": 1.41,
+      "absolute_failure_reduction": 7.42,
+      "relative_failure_reduction_pct": 83.95,
+      "baseline_overdraft_rate": 2.53,
+      "spendable_overdraft_rate": 0.4,
+      "baseline_missed_payment_rate": 8.48,
+      "spendable_missed_payment_rate": 1.01
+    },
+    "STABLE": {
+      "persona": "STABLE",
+      "total_snapshots": 17,
+      "total_scenarios": 3366,
+      "baseline_failure_rate": 7.81,
+      "spendable_failure_rate": 1.66,
+      "absolute_failure_reduction": 6.15,
+      "relative_failure_reduction_pct": 78.71,
+      "baseline_overdraft_rate": 2.41,
+      "spendable_overdraft_rate": 0.48,
+      "baseline_missed_payment_rate": 8.14,
+      "spendable_missed_payment_rate": 1.1
+    },
+    "TIGHT_LIQUIDITY": {
+      "persona": "TIGHT_LIQUIDITY",
+      "total_snapshots": 17,
+      "total_scenarios": 3366,
+      "baseline_failure_rate": 44.92,
+      "spendable_failure_rate": 3.39,
+      "absolute_failure_reduction": 41.53,
+      "relative_failure_reduction_pct": 92.45,
+      "baseline_overdraft_rate": 22.52,
+      "spendable_overdraft_rate": 1.6,
+      "baseline_missed_payment_rate": 49.82,
+      "spendable_missed_payment_rate": 3.59
+    }
+  },
+  "pipeline_variants": {
+    "VARIANT_A": {
+      "variant_name": "Variant A (Balance Only)",
+      "liquidity_failure_rate": 19.49,
+      "overdraft_rate": 8.64
+    },
+    "VARIANT_B": {
+      "variant_name": "Variant B (Balance + Commitments)",
+      "liquidity_failure_rate": 8.56,
+      "overdraft_rate": 3.58
+    },
+    "VARIANT_C": {
+      "variant_name": "Variant C (Deterministic Spendable)",
+      "liquidity_failure_rate": 3.09,
+      "overdraft_rate": 1.33
+    },
+    "VARIANT_D": {
+      "variant_name": "Variant D (Spendable + ML Forecast)",
+      "liquidity_failure_rate": 2.37,
+      "overdraft_rate": 0.88
+    },
+    "VARIANT_E": {
+      "variant_name": "Variant E (Full Spendable AI)",
+      "liquidity_failure_rate": 2.37,
+      "overdraft_rate": 0.88
+    }
+  },
+  "decision_time_framework": {
+    "status": "NOT_YET_MEASURED",
+    "reason": "No real human user study, eye-tracking, or click-stream timing data exists in repository.",
+    "prohibited_substitutes": [
+      "Backend API latency (e.g. 9.68ms)",
+      "Database query duration",
+      "LLM inference token output speed"
+    ],
+    "protocol_metrics": [
+      "Task Completion Time (seconds)",
+      "Decision Correctness / Safety Ratio (%)",
+      "Total Interaction Clicks / Touches",
+      "Subjective Cognitive Load (NASA-TLX 1-10 Scale)"
+    ]
+  },
+  "statistical_notes": [
+    "Evaluated across 14,841 simulated purchase decisions across 1,649 held-out test snapshots.",
+    "95% bootstrap confidence intervals derived from 1000 resamples.",
+    "Spendable reduced projected liquidity failure rate from 19.49% down to 2.37% (absolute reduction: 17.12 percentage points, relative reduction: 87.86%).",
+    "Overdraft incident rate dropped from 8.64% (Baseline) down to 0.88% (Spendable).",
+    "Variant E produced 100% identical financial decision outcomes to Variant D, proving Gemini serves as a context-grounded explanation layer without altering financial calculations."
+  ],
+  "limitations": [
+    "Evaluated on synthetic account trajectory datasets (data/ground_truth.json). Does not claim real-world customer adoption or live behavioral compliance.",
+    "Customer Decision Time is explicitly marked NOT YET MEASURED as no human eye-tracking or A/B click-stream timing data exists in the repository.",
+    "Backend model inference latency (9.68ms) is NOT used as a proxy for human decision-making speed."
+  ]
+}

@@ -101,6 +101,30 @@ We also compared the naive formulation (`Balance - Commitments - Drawdown - Safe
 - **Production Formulation (Candidate A)**: Mean Spendable **৳310,712.70**, Zero Spendable Rate **14.55%**, Safety Breach Rate **29.29%**.
 - **Double-Protection Penalty Avoided**: The production formulation avoids double-penalizing overlapping bill obligations and forecasted minimum balance drawdowns, restoring an average of **৳4,927.66 per snapshot** in user liquidity without compromising financial safety.
 
+#### 4. Empirical Customer Outcome Impact Evaluation (14,841 Simulated Purchase Scenarios)
+
+To answer whether Spendable's technical forecasting and safe-to-spend intelligence translate into measurable customer financial outcome improvements over conventional balance/budget tools, we evaluated **14,841 controlled purchase scenarios** across **1,649 held-out test snapshots** (`reports/customer_outcome_evaluation_results.json`).
+
+##### Outcome Comparison (Conventional Baseline vs. Spendable Engine):
+- **Baseline Rule**: Approve purchase if $\text{Purchase} \le \text{Current Balance}$ (Conventional Balance/Budget Interface).
+- **Spendable Rule**: Approve purchase if $\text{Purchase} \le \text{Safe Spendable Capacity}$ (Spendable Intelligence Engine).
+
+| Metric | Conventional Baseline | Spendable Engine | Absolute Reduction | Relative Reduction | 95% Bootstrap Confidence Interval |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Projected Liquidity Failure Rate** | **19.49%** | **2.37%** | **17.12%** | **87.86%** | **[16.49%, 17.76%]** |
+| **Overspending / Overdraft Incident Rate** | **8.64%** | **0.88%** | **7.76%** | **89.83%** | **[7.31%, 8.25%]** |
+| **Projected Missed-Payment Rate** | **21.06%** | **2.03%** | **19.02%** | **90.33%** | **[18.35%, 19.65%]** |
+
+##### Persona-Level Outcome Breakdown:
+- **TIGHT_LIQUIDITY** (17 test accounts): Baseline Liquidity Failure Rate **44.92%** $\rightarrow$ Spendable **3.39%** (**41.53% absolute reduction**, **92.45% relative reduction**).
+- **COMMITMENT_HEAVY** (14 test accounts): Baseline Liquidity Failure Rate **17.60%** $\rightarrow$ Spendable **2.63%** (**14.97% absolute reduction**, **85.03% relative reduction**).
+- **FINANCIAL_PRESSURE** (5 test accounts): Baseline Liquidity Failure Rate **14.24%** $\rightarrow$ Spendable **1.52%** (**12.73% absolute reduction**, **89.38% relative reduction**).
+- **IRREGULAR_INCOME** (12 test accounts): Baseline Liquidity Failure Rate **13.22%** $\rightarrow$ Spendable **2.75%** (**10.48% absolute reduction**, **79.25% relative reduction**).
+
+##### Customer Decision Time & Interaction Status:
+- **Status**: **`NOT_YET_MEASURED` (No human user study data available)**.
+- **Protocol**: We do NOT substitute backend API latency (9.68ms) for human decision-making speed. We have implemented a standardized A/B testing protocol schema (`CustomerDecisionInteractionFramework` in `backend/app/analysis/customer_outcome.py`) for future user eye-tracking and click-stream trials measuring task completion time, decision correctness, interaction clicks, and subjective cognitive load.
+
 ---
 
 ## 🌐 Live Deployment URL
