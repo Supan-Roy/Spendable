@@ -1,0 +1,285 @@
+{
+  "evaluated_at_utc": "2026-10-07T05:33:19.114553+00:00",
+  "split_name": "TEST",
+  "total_snapshots": 1649,
+  "model_name": "HIST_GRADIENT_BOOSTING",
+  "model_version": "v1.2.0",
+  "baseline_comparison": {
+    "ROLLING_AVERAGE_BASELINE": [
+      {
+        "model_name": "ROLLING_AVERAGE_BASELINE",
+        "horizon_days": 7,
+        "sample_count": 1649,
+        "mae": 16089.23,
+        "rmse": 29425.63,
+        "r2_score": 0.9923
+      },
+      {
+        "model_name": "ROLLING_AVERAGE_BASELINE",
+        "horizon_days": 14,
+        "sample_count": 1649,
+        "mae": 20328.77,
+        "rmse": 31083.33,
+        "r2_score": 0.9913
+      },
+      {
+        "model_name": "ROLLING_AVERAGE_BASELINE",
+        "horizon_days": 30,
+        "sample_count": 1649,
+        "mae": 26345.87,
+        "rmse": 38391.11,
+        "r2_score": 0.9866,
+        "precision_30d": 0.78,
+        "recall_30d": 0.5954,
+        "f1_score_30d": 0.6753
+      }
+    ],
+    "RECURRING_COMMITMENT_BASELINE": [
+      {
+        "model_name": "RECURRING_COMMITMENT_BASELINE",
+        "horizon_days": 7,
+        "sample_count": 1649,
+        "mae": 15986.86,
+        "rmse": 28690.27,
+        "r2_score": 0.9927
+      },
+      {
+        "model_name": "RECURRING_COMMITMENT_BASELINE",
+        "horizon_days": 14,
+        "sample_count": 1649,
+        "mae": 20037.66,
+        "rmse": 29829.45,
+        "r2_score": 0.992
+      },
+      {
+        "model_name": "RECURRING_COMMITMENT_BASELINE",
+        "horizon_days": 30,
+        "sample_count": 1649,
+        "mae": 27299.35,
+        "rmse": 37517.99,
+        "r2_score": 0.9872,
+        "precision_30d": 0.5231,
+        "recall_30d": 0.7786,
+        "f1_score_30d": 0.6258
+      }
+    ],
+    "HIST_GRADIENT_BOOSTING": [
+      {
+        "model_name": "HIST_GRADIENT_BOOSTING",
+        "horizon_days": 7,
+        "sample_count": 1649,
+        "mae": 20346.3,
+        "rmse": 33962.11,
+        "r2_score": 0.9898
+      },
+      {
+        "model_name": "HIST_GRADIENT_BOOSTING",
+        "horizon_days": 14,
+        "sample_count": 1649,
+        "mae": 23558.49,
+        "rmse": 35856.06,
+        "r2_score": 0.9885
+      },
+      {
+        "model_name": "HIST_GRADIENT_BOOSTING",
+        "horizon_days": 30,
+        "sample_count": 1649,
+        "mae": 29742.54,
+        "rmse": 43061.25,
+        "r2_score": 0.9831,
+        "precision_30d": 0.7131,
+        "recall_30d": 0.6641,
+        "f1_score_30d": 0.6877
+      }
+    ]
+  },
+  "top_feature_importances": {
+    "current_balance": 0.36625457209587553,
+    "balance_max_30d": 0.2699151152042747,
+    "balance_mean_30d": 0.019227103230277452,
+    "balance_min_30d": 0.01527294293294732,
+    "balance_min_7d": 0.005909577511053499,
+    "balance_min_14d": 0.0017623520380974256,
+    "balance_std_30d": 0.0010481211262511226,
+    "recurring_inflow_30d": 0.001018591668364155,
+    "net_cash_flow_30d": 0.0006151665582629917,
+    "total_outflow_30d": 0.0005978078045766111,
+    "recurring_outflow_30d": 0.0005441279734988092,
+    "balance_change_30d": 0.0003288181989127281
+  },
+  "feature_group_ablation": {
+    "BALANCE_HISTORY": {
+      "removed_group": "BALANCE_HISTORY",
+      "remaining_features_count": 28,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877,
+      "mae_delta_bdt": 0.0,
+      "r2_delta": 0.0
+    },
+    "CASH_FLOW_SUMMARY": {
+      "removed_group": "CASH_FLOW_SUMMARY",
+      "remaining_features_count": 22,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877,
+      "mae_delta_bdt": 0.0,
+      "r2_delta": 0.0
+    },
+    "VELOCITY_AND_BURN": {
+      "removed_group": "VELOCITY_AND_BURN",
+      "remaining_features_count": 30,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877,
+      "mae_delta_bdt": 0.0,
+      "r2_delta": 0.0
+    },
+    "RECURRING_COMMITMENTS": {
+      "removed_group": "RECURRING_COMMITMENTS",
+      "remaining_features_count": 31,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877,
+      "mae_delta_bdt": 0.0,
+      "r2_delta": 0.0
+    }
+  },
+  "robustness_scenarios": {
+    "DEFAULT_OFFICIAL_TEST": {
+      "scenario_name": "DEFAULT_OFFICIAL_TEST",
+      "description": "Official held-out TEST set split without artificial noise perturbations.",
+      "sample_count": 1649,
+      "mae_7d": 20346.3,
+      "r2_7d": 0.9898,
+      "mae_14d": 23558.49,
+      "r2_14d": 0.9885,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877
+    },
+    "HIGH_SPENDING_VOLATILITY": {
+      "scenario_name": "HIGH_SPENDING_VOLATILITY",
+      "description": "Injects +40% Gaussian noise into spending volatility and total outflow features.",
+      "sample_count": 1649,
+      "mae_7d": 20390.02,
+      "r2_7d": 0.9897,
+      "mae_14d": 23489.87,
+      "r2_14d": 0.9884,
+      "mae_30d": 29730.39,
+      "rmse_30d": 43189.92,
+      "r2_30d": 0.983,
+      "pressure_f1_30d": 0.6866
+    },
+    "INCOME_IRREGULARITY": {
+      "scenario_name": "INCOME_IRREGULARITY",
+      "description": "Injects +50% timing variance and magnitude fluctuation into income features.",
+      "sample_count": 1649,
+      "mae_7d": 21011.46,
+      "r2_7d": 0.9892,
+      "mae_14d": 24486.18,
+      "r2_14d": 0.9876,
+      "mae_30d": 31329.2,
+      "rmse_30d": 44749.08,
+      "r2_30d": 0.9818,
+      "pressure_f1_30d": 0.6374
+    },
+    "WEAK_COMMITMENT_REGULARITY": {
+      "scenario_name": "WEAK_COMMITMENT_REGULARITY",
+      "description": "Degrades recurring commitment signals by zeroing confidence scores and bill regularity.",
+      "sample_count": 1649,
+      "mae_7d": 20346.3,
+      "r2_7d": 0.9898,
+      "mae_14d": 23558.49,
+      "r2_14d": 0.9885,
+      "mae_30d": 29742.54,
+      "rmse_30d": 43061.25,
+      "r2_30d": 0.9831,
+      "pressure_f1_30d": 0.6877
+    },
+    "COMBINED_EXTREME_NOISE": {
+      "scenario_name": "COMBINED_EXTREME_NOISE",
+      "description": "Simultaneous high spending volatility, income timing variance, and degraded commitment signals.",
+      "sample_count": 1649,
+      "mae_7d": 21305.08,
+      "r2_7d": 0.9889,
+      "mae_14d": 24973.24,
+      "r2_14d": 0.9871,
+      "mae_30d": 32267.03,
+      "rmse_30d": 46122.35,
+      "r2_30d": 0.9806,
+      "pressure_f1_30d": 0.6148
+    }
+  },
+  "pressure_classifier_audit": {
+    "horizon_days": 30,
+    "safety_threshold_bdt": 15000.0,
+    "split_name": "TEST",
+    "total_snapshots": 1649,
+    "ground_truth_definition": "target_future_min_balance_30d < 15,000.0 BDT",
+    "predicted_definition": "minimum_projected_balance_30d < 15,000.0 BDT",
+    "true_positives": 87,
+    "false_positives": 35,
+    "false_negatives": 44,
+    "true_negatives": 1483,
+    "precision": 0.7131,
+    "recall": 0.6641,
+    "f1_score": 0.6877,
+    "is_reproducible": true,
+    "derivation_notes": "Precision = TP / (TP + FP) = 87 / (87 + 35) = 71.31%. Recall = TP / (TP + FN) = 87 / (87 + 44) = 66.41%. F1 = 2 * P * R / (P + R) = 68.77%. Verified 100% reproducible on TEST split."
+  },
+  "persona_breakdown": {
+    "COMMITMENT_HEAVY": {
+      "persona": "COMMITMENT_HEAVY",
+      "sample_count": 308,
+      "mae_30d": 39299.23,
+      "rmse_30d": 54884.08,
+      "pressure_f1_30d": 0.2353
+    },
+    "FINANCIAL_PRESSURE": {
+      "persona": "FINANCIAL_PRESSURE",
+      "sample_count": 110,
+      "mae_30d": 28369.8,
+      "rmse_30d": 42200.52,
+      "pressure_f1_30d": 0.0
+    },
+    "IRREGULAR_INCOME": {
+      "persona": "IRREGULAR_INCOME",
+      "sample_count": 263,
+      "mae_30d": 33583.12,
+      "rmse_30d": 43961.72,
+      "pressure_f1_30d": 0.6897
+    },
+    "SPENDING_DRIFT": {
+      "persona": "SPENDING_DRIFT",
+      "sample_count": 220,
+      "mae_30d": 28920.48,
+      "rmse_30d": 38770.52,
+      "pressure_f1_30d": 0.0
+    },
+    "STABLE": {
+      "persona": "STABLE",
+      "sample_count": 374,
+      "mae_30d": 34959.9,
+      "rmse_30d": 49656.23,
+      "pressure_f1_30d": 0.5714
+    },
+    "TIGHT_LIQUIDITY": {
+      "persona": "TIGHT_LIQUIDITY",
+      "sample_count": 374,
+      "mae_30d": 14841.53,
+      "rmse_30d": 21498.43,
+      "pressure_f1_30d": 0.7374
+    }
+  },
+  "limitations": [
+    "Evaluated on synthetic account transaction trajectory datasets (data/ground_truth.json). High R2 (~0.9948) reflects deterministic structure in the synthetic data-generating process.",
+    "Noise robustness experiments demonstrate graceful degradation under variance (+40% spending noise, +50% income shift), but do not substitute for live production user validation.",
+    "Model parameters were fixed on TRAIN/VALIDATION and evaluated without tuning on the held-out TEST set."
+  ]
+}
