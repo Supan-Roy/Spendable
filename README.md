@@ -264,6 +264,52 @@ graph TD
     SpendableAI --> UI
 ```
 
+## 🧠 Machine Learning Methodology & Deep Evaluation (Phase 1 Judge Feedback Response)
+
+To address Phase 1 judge evaluation feedback, this section details our target-generation pipeline, leakage-safe feature engineering, baseline performance comparisons across all horizons, high $R^2$ analysis, feature importances, and the exact mathematical derivation of the **Liquidity Pressure Classifier F1 = 86.75%**.
+
+### 1. Target Generation Pipeline & Strict Point-in-Time Observability
+- **Leakage-Safe Cutoff ($T$)**: Features are computed strictly using observable transaction records up to snapshot timestamp $T$ ($t \le T$). Ground-truth target metrics are calculated exclusively from forward window transactions $[T + 1, T + H]$ (for forecast horizons $H \in \{7, 14, 30\}$ days).
+- **Target Definitions**:
+  - `minimum_projected_balance` ($B_{\text{min}, H}$): $\min_{t \in [T+1, T+H]} \text{Balance}(t)$.
+  - `expected_net_cash_flow` ($N_{H}$): $\sum_{t \in [T+1, T+H]} \text{Inflows}(t) - \sum_{t \in [T+1, T+H]} \text{Outflows}(t)$.
+  - `liquidity_pressure_flag` ($P_{30\text{d}}$): Binary classification target $I(B_{\text{min}, 30\text{d}} < \text{Safety Threshold} \, [\text{৳15,000}])$.
+
+### 2. Multi-Horizon Baseline Comparison (Held-Out Test Set: 1,649 Evaluation Snapshots)
+
+| Horizon / Metric | Rolling Average Baseline | Recurring Commitment Baseline | HistGradientBoosting (Ours) | Performance Delta |
+| :--- | :---: | :---: | :---: | :---: |
+| **7-Day MAE (BDT)** | ৳16,972.14 | ৳16,842.70 | **৳13,982.08** | **+17.0% error reduction** |
+| **7-Day $R^2$ Score** | 0.9923 | 0.9926 | **0.9946** | **+0.23% higher fit** |
+| **14-Day MAE (BDT)** | ৳22,148.81 | ৳21,926.65 | **৳13,907.12** | **+36.6% error reduction** |
+| **14-Day $R^2$ Score** | 0.9913 | 0.9919 | **0.9951** | **+0.32% higher fit** |
+| **30-Day MAE (BDT)** | ৳28,418.56 | ৳27,750.43 | **৳14,682.01** | **+47.1% error reduction** |
+| **30-Day RMSE (BDT)** | ৳41,137.53 | ৳38,998.73 | **৳23,903.56** | **+38.7% variance reduction** |
+| **30-Day $R^2$ Score** | 0.9879 | 0.9891 | **0.9948** | **+0.57% higher fit** |
+
+### 3. Analysis of $R^2 = 0.9948$ & Synthetic Data Characteristics
+- **Mathematical Cause**: $R^2 = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}}$. In our 500-persona benchmark dataset, initial user balances span a wide dynamic range (৳7,800 to ৳1,327,700), making total sum of squares ($\text{SS}_{\text{tot}}$) extremely large. Simultaneously, residual error ($\text{SS}_{\text{res}}$) remains bounded (MAE ৳14,682), producing high numerical $R^2 > 0.99$.
+- **Synthetic Periodicity & Real-World Caveat**: Realistic synthetic generators model structured salary schedules and bill recurring intervals. While this validates algorithm capability on periodic data, real-world deployment will encounter unobserved cash activity and external bank accounts (acknowledged in our Limitations section).
+
+### 4. Liquidity Pressure Classifier Evaluation ($F_1 = 86.75\%$)
+- **Classification Objective**: Evaluates binary risk detection for predicting whether a user's minimum balance drops below the ৳15,000 safety threshold over the next 30 days.
+- **Confusion Matrix & Metrics (1,649 Held-Out Test Snapshots)**:
+  - True Positives (TP): 108 | False Positives (FP): 10 | False Negatives (FN): 23 | True Negatives (TN): 1,508
+  - **Precision**: $\frac{108}{108 + 10} = 91.53\%$
+  - **Recall**: $\frac{108}{108 + 23} = 82.44\%$
+  - **F1-Score**: $2 \times \frac{0.9153 \times 0.8244}{0.9153 + 0.8244} = 86.75\%$
+- **High-Vulnerability Persona Sub-Group**: On the `TIGHT_LIQUIDITY` persona sub-population (374 test snapshots), the model achieves **$F_1 = 95.45\%$** (MAE ৳3,149.90, RMSE ৳4,896.80), demonstrating high warning accuracy on financially vulnerable profiles.
+
+### 5. Feature Importance Rankings (38-Feature Store)
+1. `current_balance`: Baseline account liquid cash position.
+2. `balance_min_30d`: Historical 30-day balance floor indicator.
+3. `burn_rate_daily_30d`: Average daily cash expenditure velocity.
+4. `recurring_outflow_30d`: Detected upcoming contractual bill commitments.
+5. `net_cash_flow_30d`: Historical 30-day net cash flow trajectory.
+6. `discretionary_outflow_ratio`: Ratio of non-essential spending vs total outflows.
+
+---
+
 ### Model Performance Summary (Held-Out Test Set)
 
 | Module | Evaluated Metric | Test Result | Technical Definition |
