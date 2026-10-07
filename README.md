@@ -82,11 +82,11 @@ To experimentally measure the incremental value of each stage in the Spendable p
 
 | Variant | Safety Breach Rate | Zero Spendable Rate | Median Spendable | Avg Unallocated Buffer | Commitment Coverage |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Variant A (Balance Only)** | **89.14%** | 2.06% | ৳269,685.93 | ৳4,246.87 | 0.00% |
+| **Variant A (Balance Only)** | **89.14%** | 2.06% | ৳269,685.93 | ৳4,246.87 | 14.13% |
 | **Variant B (Balance + Commitments)** | **27.71%** | 7.28% | ৳243,869.00 | ৳21,418.27 | 100.00% |
-| **Variant C (Deterministic Spendable)** | **30.81%** | 13.10% | ৳213,466.25 | ৳20,335.77 | 100.00% |
-| **Variant D (Spendable + ML Forecast)** | **29.29%** | 14.55% | ৳210,638.07 | ৳21,769.06 | 100.00% |
-| **Variant E (Full Spendable AI)** | **29.29%** | 14.55% | ৳210,638.07 | ৳21,769.06 | 100.00% |
+| **Variant C (Deterministic Spendable)** | **30.81%** | 13.10% | ৳213,466.25 | ৳20,335.77 | 98.42% |
+| **Variant D (Spendable + ML Forecast)** | **29.29%** | 14.55% | ৳210,638.07 | ৳21,769.06 | 98.42% |
+| **Variant E (Full Spendable AI)** | **29.29%** | 14.55% | ৳210,638.07 | ৳21,769.06 | 98.42% |
 
 ##### Key Insights & Pipeline Progression:
 - **Variant A (Balance Only)**: Shows raw liquid balance without protecting future obligations, causing an **89.14% safety breach rate** as upcoming bills and drawdowns breach zero reserves.
