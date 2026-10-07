@@ -415,6 +415,29 @@ To bridge prototype deployability to bank-grade infrastructure, the target enter
 
 ---
 
+### Responsible AI, Governance & Security Architecture (Phase 1 Judge Feedback Response)
+
+To address Phase 1 judge feedback regarding Responsible AI safeguards, data privacy, and production security controls, this section details implemented architectural protections alongside required post-hackathon enterprise production-hardening milestones.
+
+#### 1. Implemented Responsible AI Safeguards & Governance
+* **Strict Separation of Deterministic Finance & LLM Layer**: The core financial engine (`backend/app/engine/`), recurring bill detector (`backend/app/recurring/`), and ML cash-flow forecaster (`backend/app/forecasting/`) compute all financial metrics deterministically in Python. Google Gemini (`backend/app/explanation/`) acts strictly as a **read-only natural language synthesizer**—it takes pre-calculated JSON metrics as grounded context to generate explanations. Gemini **cannot calculate financial numbers, modify financial outputs, or alter balance values**.
+* **Zero Autonomous Payment Execution**: Spendable operates purely as a decision-support and financial guidance system. The architecture contains **zero payment execution APIs**, payment gateway webhooks, or autonomous fund transfer capabilities.
+* **Context Grounding & Hallucination Defense**: Spendable AI system prompts strictly ground responses in computed user metrics (`current_balance`, `safe_spendable_capacity`, `detected_commitments`, `forecast_min_balance`). Prompts explicitly instruct the LLM to output uncertainty warnings when forecast confidence bands widen or balance floors drop below safety thresholds.
+* **Deterministic Fallback Engine**: If the Gemini API is unconfigured, unreachable, or rate-limited, Spendable automatically activates a **Rule-Based Deterministic Synthesizer** to deliver verified textual advice from computed facts, guaranteeing 100% uptime and zero reliance on external LLMs.
+* **Account-Scoped Data Context**: API endpoints enforce strict query parameter scoping by `account_id`, ensuring user requests retrieve only snapshot data associated with the active session context.
+
+#### 2. Enterprise Production-Hardening Roadmap (Not Yet Implemented / Post-Hackathon Scope)
+As noted by judges regarding the development prototype and public demo environment, the following production security controls are **explicitly planned for enterprise production deployment**:
+
+* **Non-Placeholder Secret Management**: Transitioning from local `.env` development configurations (`SECRET_KEY=your_secret_key_placeholder...`) to enterprise secret vaults (AWS Secrets Manager / HashiCorp Vault).
+* **Signed Authorization & Session Management**: Replacing hackathon demo persona session selectors with signed OAuth2 / JWT bearer tokens and Role-Based Access Control (RBAC).
+* **Financial Snapshot Audit Logging**: Implementing immutable append-only audit tables logging all read and write operations on financial snapshots (`account_id`, `timestamp`, `ip_address`, `endpoint`).
+* **Adversarial Prompt-Injection Regression Testing**: Establishing automated regression test suites (using GARAK / OWASP Top 10 for LLMs) to continuously stress-test Gemini system prompts against jailbreak attempts and prompt injections.
+* **Distributed API Rate Limiting**: Deploying token-bucket rate limiters (`Redis` + FastAPI `slowapi`) to protect backend endpoints against DDoS and API scraping.
+* **Multi-Tenant Cryptographic Isolation Testing**: Implementing automated tenant-isolation test cases verifying zero cross-account data exposure across database queries.
+
+---
+
 ## 📁 Repository Directory Structure
 
 ```
