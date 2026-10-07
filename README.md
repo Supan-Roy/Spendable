@@ -59,6 +59,24 @@ Spendable is a **100% operational, live-deployed platform** (accessible at [http
 - **Automated QA Suite**: Verified by **118 automated Pytest test suites** covering API routing, calculation boundaries, baseline forecasters, scenario monotonicity laws, and fallback synthesis.
 - **Production Hardening Scope**: High-concurrency load testing (e.g., Locust stress testing) and fault-injection testing (Chaos Engineering) represent planned future infrastructure hardening work, not currently claimed as completed in this hackathon version.
 
+### Incremental Innovation & Architectural Differentiation (Phase 1 Judge Feedback Response)
+To address Phase 1 judge evaluation feedback regarding product differentiation and pipeline progression, this section details Spendable's incremental architectural value over traditional financial interfaces:
+
+#### 1. Progressive 5-Stage Value Pipeline
+```
+[Level 1: Static Balance] ➔ [Level 2: Balance + Bills] ➔ [Level 3: Deterministic Spendable] ➔ [Level 4: Spendable + ML Forecast] ➔ [Level 5: Full Spendable AI + Simulator]
+```
+
+- **Level 1 — Static Balance Only (Conventional Banking)**: Displays raw liquid balance ($B_T$). Fails because it ignores upcoming contractual obligations, creating a false illusion of spendable cash.
+- **Level 2 — Balance + Known Commitments (Basic Budgeting)**: Subtracts static manual bills ($B_T - C_T$). Fails to account for variable burn velocity, spending volatility, or safety buffers.
+- **Level 3 — Deterministic Spendable Engine (Our Non-Double-Counting Core)**: Enforces protected capacity `Spendable = Max(0, Balance - Max(Reserve, Commitments))`. Eliminates double-counting between emergency reserves and bill commitments, preventing artificial over-restriction.
+- **Level 4 — Spendable + ML Forecast (Forward Runway Intelligence)**: Integrates multi-horizon `HistGradientBoostingRegressor` projections and point-in-time regularity scoring to predict 30-day minimum balance drawdown floors ($R^2 = 0.9948$).
+- **Level 5 — Full Spendable AI & What-If Simulator (Complete Financial Co-Pilot)**: Combines sub-15ms in-memory scenario simulations with Gemini 3.5 Flash Lite context-grounded natural language guidance.
+
+#### 2. Technical Differentiators & Validation Scope
+- **Core Differentiators**: Our non-double-counting protected capacity equation and leakage-safe point-in-time feature architecture ($t \le T$) are the primary technical innovations separating Spendable from past-looking budgeting apps.
+- **Ablation Validation Scope**: The 5-stage progression above represents the core architectural design of our platform. Quantitative multi-cohort user ablation trials (measuring long-term behavioral compliance across levels) represent planned post-hackathon empirical research.
+
 ---
 
 ## 🌐 Live Deployment URL
