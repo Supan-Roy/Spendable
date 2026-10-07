@@ -9,7 +9,15 @@ from app.database import get_db
 from app.models.account import UserAccount
 from app.auth import hash_password, verify_password, create_access_token, get_current_account
 
+from app.audit import audit_logger
+from app.rate_limiter import RateLimiter
+
 router = APIRouter(prefix="/auth", tags=["Authentication & User Accounts"])
+
+# Rate limiters for authentication endpoints
+auth_register_limiter = RateLimiter(max_requests=10, window_seconds=60, name="auth_register")
+auth_login_limiter = RateLimiter(max_requests=20, window_seconds=60, name="auth_login")
+auth_demo_limiter = RateLimiter(max_requests=30, window_seconds=60, name="auth_demo_login")
 
 
 class RegisterRequest(BaseModel):
@@ -41,15 +49,22 @@ class UserAccountResponse(BaseModel):
     is_demo_account: bool = False
 
 
-@router.post("/register", response_model=AuthTokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=AuthTokenResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(auth_register_limiter)],
+)
 def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new normal user account."""
     clean_username = payload.username.strip().lower()
     if not clean_username or not payload.password:
+        audit_logger.log_event("AUTH_REGISTER_FAILED", detail="Missing username or password")
         raise HTTPException(status_code=400, detail="Username and password are required")
 
     existing = db.query(UserAccount).filter(UserAccount.username == clean_username).first()
     if existing:
+        audit_logger.log_event("AUTH_REGISTER_FAILED", detail=f"Username '{clean_username}' taken")
         raise HTTPException(status_code=400, detail=f"Username '{clean_username}' is already taken")
 
     # Generate unique account ID
@@ -70,6 +85,7 @@ def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
     db.refresh(user_obj)
 
     token = create_access_token({"sub": user_obj.account_id, "username": user_obj.username})
+    audit_logger.log_event("AUTH_REGISTER_SUCCESS", account_id=user_obj.account_id, detail=f"Registered user '{clean_username}'")
 
     return AuthTokenResponse(
         access_token=token,
@@ -80,16 +96,22 @@ def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=AuthTokenResponse)
+@router.post(
+    "/login",
+    response_model=AuthTokenResponse,
+    dependencies=[Depends(auth_login_limiter)],
+)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     """Authenticate with username and password."""
     clean_username = payload.username.strip().lower()
     user = db.query(UserAccount).filter(UserAccount.username == clean_username).first()
 
     if not user or not user.password_hash or not verify_password(payload.password, user.password_hash):
+        audit_logger.log_event("AUTH_LOGIN_FAILED", detail=f"Invalid credentials for '{clean_username}'")
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     token = create_access_token({"sub": user.account_id, "username": user.username})
+    audit_logger.log_event("AUTH_LOGIN_SUCCESS", account_id=user.account_id, detail=f"User '{clean_username}' logged in")
 
     return AuthTokenResponse(
         access_token=token,
@@ -100,7 +122,11 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/demo-login/{account_identifier}", response_model=AuthTokenResponse)
+@router.post(
+    "/demo-login/{account_identifier}",
+    response_model=AuthTokenResponse,
+    dependencies=[Depends(auth_demo_limiter)],
+)
 def demo_login(account_identifier: str, db: Session = Depends(get_db)):
     """Authenticate cleanly as one of the 5 permanent hackathon demo accounts."""
     ident = account_identifier.strip().lower()
@@ -117,12 +143,14 @@ def demo_login(account_identifier: str, db: Session = Depends(get_db)):
     )
 
     if not user:
+        audit_logger.log_event("DEMO_LOGIN_FAILED", detail=f"Demo account '{account_identifier}' not found")
         raise HTTPException(
             status_code=404,
             detail=f"Demo account '{account_identifier}' not found. Please run seed script.",
         )
 
     token = create_access_token({"sub": user.account_id, "username": user.username})
+    audit_logger.log_event("DEMO_LOGIN_SUCCESS", account_id=user.account_id, detail=f"Demo login for '{account_identifier}'")
 
     return AuthTokenResponse(
         access_token=token,

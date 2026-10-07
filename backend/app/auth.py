@@ -62,26 +62,41 @@ def decode_access_token(token: str) -> Dict[str, Any]:
         )
 
 
+from app.audit import audit_logger
+
+
 def get_current_account(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_bearer),
     db: Session = Depends(get_db),
 ) -> UserAccount:
     """Dependency for resolving authenticated UserAccount from JWT Bearer header.
     
-    If no token is provided, falls back to the default Supan demo account.
+    Strictly validates JWT tokens when provided. If no token header is provided,
+    falls back to the default Supan demo account for unauthenticated demo access.
     """
     if credentials and credentials.credentials:
-        try:
-            payload = decode_access_token(credentials.credentials)
-            account_id = payload.get("sub") or payload.get("account_id")
-            if account_id:
-                account = db.query(UserAccount).filter(UserAccount.account_id == account_id).first()
-                if account:
-                    return account
-        except Exception:
-            pass
+        # User provided an authorization header - decode and validate strictly
+        payload = decode_access_token(credentials.credentials)  # Raises HTTP 401 if expired/invalid
+        account_id = payload.get("sub") or payload.get("account_id")
+        if not account_id:
+            audit_logger.log_event(event_type="AUTH_TOKEN_INVALID", detail="Token missing sub/account_id claim")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication token: missing account claim",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        account = db.query(UserAccount).filter(UserAccount.account_id == account_id).first()
+        if not account:
+            audit_logger.log_event(event_type="AUTH_ACCOUNT_NOT_FOUND", detail=f"Token account '{account_id}' not found in DB")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Account associated with authentication token does not exist",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return account
 
-    # Default fallback to Supan demo account on first visit / unauthenticated public demo request
+    # Default fallback to Supan demo account on unauthenticated public demo request
     try:
         default_account = db.query(UserAccount).filter(UserAccount.account_id == "acc_supan").first()
         if not default_account:

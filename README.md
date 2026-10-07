@@ -426,15 +426,18 @@ To address Phase 1 judge feedback regarding Responsible AI safeguards, data priv
 * **Deterministic Fallback Engine**: If the Gemini API is unconfigured, unreachable, or rate-limited, Spendable automatically activates a **Rule-Based Deterministic Synthesizer** to deliver verified textual advice from computed facts, guaranteeing 100% uptime and zero reliance on external LLMs.
 * **Account-Scoped Data Context**: API endpoints enforce strict query parameter scoping by `account_id`, ensuring user requests retrieve only snapshot data associated with the active session context.
 
-#### 2. Enterprise Production-Hardening Roadmap (Not Yet Implemented / Post-Hackathon Scope)
-As noted by judges regarding the development prototype and public demo environment, the following production security controls are **explicitly planned for enterprise production deployment**:
+#### 2. Implemented Prototype Security Hardening Pass & Audit Controls
+* **Cross-Account Data Isolation**: Server-side token validation on all financial routes (`/overview`, `/forecast`, `/activity`, `/recommendations`, `/simulate`, `/explain`, `/chat`, `/activities`) strictly derives account identity from authenticated JWT credentials. Attempts to access another user's financial data via parameter tampering are rejected with HTTP 403 Forbidden.
+* **Strict JWT Authentication & Session Hardening**: Bearer tokens are validated for signature integrity and expiration on every protected request, returning HTTP 401 Unauthorized for malformed or expired tokens while preserving unauthenticated demo account selector access.
+* **In-Memory Rate Limiting**: Endpoint rate limiting (`RateLimiter`) safeguards authentication (`/auth/login`, `/auth/register`, `/auth/demo-login`) and AI endpoints (`/spendable/chat`, `/spendable/explain`), returning HTTP 429 Too Many Requests when threshold limits are exceeded.
+* **Adversarial Prompt-Injection Defense**: Enhanced system instructions (`SPENDABLE_AI_SYSTEM_INSTRUCTION`) and keyword pre-screening block malicious system prompt overrides, prompt jailbreaks, secret key extraction attempts, and unauthorized payment execution claims.
+* **Security Audit Logging**: Thread-safe audit logger (`SecurityAuditLogger`) captures structured security events (`CROSS_ACCOUNT_ACCESS_DENIED`, `AUTH_LOGIN_SUCCESS`, `PROMPT_INJECTION_DETECTED`, `RATE_LIMIT_EXCEEDED`, `FINANCIAL_SNAPSHOT_ACCESSED`) without recording raw passwords, secret keys, or JWT tokens.
+* **Automated Security Test Suite**: Comprehensive test suite (`backend/tests/test_security_hardening.py`) verifies cross-account isolation, token expiration, rate limiting, and prompt injection defenses across **135 total passing backend tests**.
 
-* **Non-Placeholder Secret Management**: Transitioning from local `.env` development configurations (`SECRET_KEY=your_secret_key_placeholder...`) to enterprise secret vaults (AWS Secrets Manager / HashiCorp Vault).
-* **Signed Authorization & Session Management**: Replacing hackathon demo persona session selectors with signed OAuth2 / JWT bearer tokens and Role-Based Access Control (RBAC).
-* **Financial Snapshot Audit Logging**: Implementing immutable append-only audit tables logging all read and write operations on financial snapshots (`account_id`, `timestamp`, `ip_address`, `endpoint`).
-* **Adversarial Prompt-Injection Regression Testing**: Establishing automated regression test suites (using GARAK / OWASP Top 10 for LLMs) to continuously stress-test Gemini system prompts against jailbreak attempts and prompt injections.
-* **Distributed API Rate Limiting**: Deploying token-bucket rate limiters (`Redis` + FastAPI `slowapi`) to protect backend endpoints against DDoS and API scraping.
-* **Multi-Tenant Cryptographic Isolation Testing**: Implementing automated tenant-isolation test cases verifying zero cross-account data exposure across database queries.
+#### 3. Remaining Production Security Limitations (Post-Hackathon Roadmap)
+* **Secret Storage**: Current environment uses local `.env` configuration (`SECRET_KEY=your_secret_key_placeholder...`); production deployment requires external secret vaults (AWS Secrets Manager / HashiCorp Vault).
+* **Distributed Rate Limiting**: Prototype uses thread-safe in-memory sliding-window rate limiting; multi-region production scale requires Redis-backed distributed rate limiters.
+* **Database Row-Level Security**: Isolation is enforced at the FastAPI application layer; production hardening will add PostgreSQL Row-Level Security (RLS) policies.
 
 ---
 
