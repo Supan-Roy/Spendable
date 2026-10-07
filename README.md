@@ -21,7 +21,7 @@ $$\text{Spendable} = \max\left(0, \text{Current Balance} - \max(\text{Safety Res
 By combining point-in-time machine learning cash-flow forecasting, automated recurring commitment detection, What-If scenario simulation, and responsible Spendable AI guidance, Spendable empowers users to achieve true financial independence and confidence.
 
 ### Problem Validation (Macro Context)
-Empirical data from the **World Bank Global Findex Database 2025** (Bangladesh Microdata 2024; variables `fin45`, `fin24a`, `fin24b`) highlights widespread financial-liquidity vulnerability:
+Empirical data from the [World Bank Global Findex Database 2025](https://microdata.worldbank.org/catalog/7869/data-dictionary/F1?file_name=Findex_Microdata_2025_updateBangladesh) (Bangladesh Microdata 2024; variables `fin45`, `fin24a`, `fin24b`) highlights widespread financial-liquidity vulnerability:
 - **62.7%**: State their greatest financial worry is having insufficient money for routine monthly expenses such as food, housing, or bills (`fin45`).
 - **93.8%**: Report that raising emergency funds within 30 days would be very or somewhat difficult (`fin24a`).
 - **60.4%**: Could cover essential living expenses for one month or less if their primary source of income disappeared (`fin24b`).
