@@ -63,7 +63,7 @@ class SpendableAIChatEngine:
         if model_name is not None:
             self.model_name = model_name
         else:
-            self.model_name = os.environ.get("GEMINI_MODEL") or getattr(settings, "GEMINI_MODEL", "gemini-3.5-flash-lite")
+            self.model_name = os.environ.get("GEMINI_MODEL") or getattr(settings, "GEMINI_MODEL", "gemini-2.5-flash")
 
     def build_account_context(
         self,
@@ -161,6 +161,12 @@ class SpendableAIChatEngine:
         if not self.api_key or self.api_key.strip() == "":
             return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn)
 
+        # Candidate models attempt sequence
+        candidate_models = [self.model_name]
+        for fallback_m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            if fallback_m not in candidate_models:
+                candidate_models.append(fallback_m)
+
         try:
             from google import genai
             from google.genai import types
@@ -187,24 +193,30 @@ USER QUESTION:
 {user_message}
 """
 
-            response = client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SPENDABLE_AI_SYSTEM_INSTRUCTION,
-                    temperature=0.3,
-                ),
-            )
+            last_error = None
+            for m_name in candidate_models:
+                try:
+                    response = client.models.generate_content(
+                        model=m_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=SPENDABLE_AI_SYSTEM_INSTRUCTION,
+                            temperature=0.3,
+                        ),
+                    )
 
-            reply_text = response.text or ""
-            if not reply_text.strip():
-                return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn)
+                    reply_text = response.text or ""
+                    if reply_text.strip():
+                        return ChatResponse(
+                            reply=reply_text.strip(),
+                            agent_name="Spendable AI",
+                            context_used=account_context,
+                        )
+                except Exception as ex:
+                    last_error = str(ex)
+                    continue
 
-            return ChatResponse(
-                reply=reply_text.strip(),
-                agent_name="Spendable AI",
-                context_used=account_context,
-            )
+            return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn, error_str=last_error)
         except Exception as e:
             # Fallback if Gemini API call fails or hits capacity limits
             return self._generate_fallback(user_message, account_context, is_first_turn=is_first_turn, error_str=str(e))

@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # AI Service settings (Gemini API integration)
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
 
     # JWT Authentication settings
     JWT_SECRET: str = "spendable-demo-jwt-secret-key-change-in-production"

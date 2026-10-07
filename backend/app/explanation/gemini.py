@@ -33,7 +33,7 @@ class ExplanationGenerator:
         if model_name is not None:
             self.model_name = model_name
         else:
-            self.model_name = os.environ.get("GEMINI_MODEL") or getattr(settings, "GEMINI_MODEL", "gemini-3.5-flash-lite")
+            self.model_name = os.environ.get("GEMINI_MODEL") or getattr(settings, "GEMINI_MODEL", "gemini-2.5-flash")
 
     def build_context(
         self,
@@ -90,41 +90,50 @@ class ExplanationGenerator:
             if now - cached_time < ExplanationGenerator._cache_ttl:
                 return cached_resp
 
-        try:
-            from google import genai
-            from google.genai import types
+        # Model attempt candidates
+        candidate_models = [self.model_name]
+        for fallback_m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            if fallback_m not in candidate_models:
+                candidate_models.append(fallback_m)
 
-            client = genai.Client(api_key=self.api_key)
-            prompt = build_explanation_prompt(context)
+        from google import genai
+        from google.genai import types
 
-            response = client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_INSTRUCTION,
-                    response_mime_type="application/json",
-                    temperature=0.2,
-                ),
-            )
+        client = genai.Client(api_key=self.api_key)
+        prompt = build_explanation_prompt(context)
 
-            text = response.text or ""
-            parsed = json.loads(text)
-            
-            res = GeminiExplanationResponse(
-                summary=str(parsed.get("summary", "")),
-                why=[str(x) for x in parsed.get("why", [])],
-                key_factors=[str(x) for x in parsed.get("key_factors", [])],
-                recommendations=[str(x) for x in parsed.get("recommendations", [])],
-                scenario_explanation=parsed.get("scenario_explanation"),
-                disclaimer=str(parsed.get("disclaimer", "Based on observed account activity.")),
-                is_fallback=False,
-            )
+        for m_name in candidate_models:
+            try:
+                response = client.models.generate_content(
+                    model=m_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_INSTRUCTION,
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    ),
+                )
 
-            ExplanationGenerator._cache[cache_key] = (now, res)
-            return res
-        except Exception:
-            # On any API error, rate limit, or invalid response JSON -> Fallback
-            return self.generate_fallback_explanation(context)
+                text = response.text or ""
+                parsed = json.loads(text)
+                
+                res = GeminiExplanationResponse(
+                    summary=str(parsed.get("summary", "")),
+                    why=[str(x) for x in parsed.get("why", [])],
+                    key_factors=[str(x) for x in parsed.get("key_factors", [])],
+                    recommendations=[str(x) for x in parsed.get("recommendations", [])],
+                    scenario_explanation=parsed.get("scenario_explanation"),
+                    disclaimer=str(parsed.get("disclaimer", "Based on observed account activity.")),
+                    is_fallback=False,
+                )
+
+                ExplanationGenerator._cache[cache_key] = (now, res)
+                return res
+            except Exception:
+                continue
+
+        # On any API error, rate limit, or invalid response JSON -> Fallback
+        return self.generate_fallback_explanation(context)
 
     def generate_fallback_explanation(
         self,
