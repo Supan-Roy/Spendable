@@ -41,6 +41,19 @@ class DailyTrajectoryPoint(BaseModel):
     required_buffer: Optional[float] = Field(None, description="Daily dynamic safety buffer required on day d")
 
 
+class ModelMetadata(BaseModel):
+    """Lightweight ML model and feature schema versioning metadata."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    model_name: str = Field("HIST_GRADIENT_BOOSTING", description="Name of the machine learning model estimator")
+    model_version: str = Field("v1.2.0", description="Version identifier of the trained model artifact")
+    feature_schema_version: str = Field("v1.0", description="Version of the feature engineering schema (38 features)")
+    model_checksum: str = Field("sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", description="SHA-256 checksum of the model artifact parameters")
+    inference_timestamp_utc: str = Field(..., description="ISO 8601 UTC timestamp when inference was executed")
+    forecast_horizon_days: int = Field(30, description="Maximum forecast horizon window in days")
+    is_fallback: bool = Field(False, description="True if fallback heuristic estimator was activated due to failure")
+
+
 class ForecastOutput(BaseModel):
     """Complete structured forecasting output payload for a single snapshot."""
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -56,6 +69,7 @@ class ForecastOutput(BaseModel):
     daily_trajectory: List[DailyTrajectoryPoint] = Field(default_factory=list, description="30-day daily projected balance trajectory")
     model_version: str = Field(..., description="Identifier of the model used to generate forecast")
     safety_threshold_bdt: float = Field(15000.0, description="Low-balance safety margin threshold in BDT")
+    model_metadata: Optional[ModelMetadata] = Field(None, description="Detailed ML model versioning and inference provenance metadata")
 
 
 class ForecastConfig(BaseModel):

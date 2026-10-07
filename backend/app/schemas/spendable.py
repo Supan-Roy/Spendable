@@ -32,6 +32,9 @@ class SpendableOverviewResponse(BaseModel):
     explanation_summary: Optional[str] = Field(None, description="Human-readable explanation summary")
 
 
+from app.forecasting.schema import HorizonForecast, DailyTrajectoryPoint, ModelMetadata
+
+
 class SpendableForecastResponse(BaseModel):
     """API response model for GET /api/v1/forecast multi-horizon endpoint."""
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -46,6 +49,8 @@ class SpendableForecastResponse(BaseModel):
     
     daily_trajectory: List[DailyTrajectoryPoint] = Field(default_factory=list, description="Daily projected balance points")
     safety_threshold_bdt: float = Field(15000.0, description="Low-balance safety threshold")
+    model_version: str = Field("HIST_GRADIENT_BOOSTING", description="Model version identifier")
+    model_metadata: Optional[ModelMetadata] = Field(None, description="Detailed model provenance metadata")
 
 
 class SpendableActivityItem(BaseModel):

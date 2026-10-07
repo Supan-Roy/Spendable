@@ -176,6 +176,7 @@ class SpendableService:
 
         effective_safety = sp_out.safety_reserve if sp_out.safety_reserve > 0 else forecast.safety_threshold_bdt
 
+        meta = getattr(forecast, "model_metadata", None)
         res = SpendableForecastResponse(
             user_id=forecast.user_id,
             snapshot_time=forecast.snapshot_time,
@@ -185,6 +186,8 @@ class SpendableService:
             forecast_30d=forecast.forecast_30d,
             daily_trajectory=forecast.daily_trajectory,
             safety_threshold_bdt=effective_safety,
+            model_version=forecast.model_version,
+            model_metadata=meta,
         )
         self._forecast_cache[cache_key] = (now, res)
         return res

@@ -1,0 +1,107 @@
+{
+  "timestamp_utc": "2026-10-07T04:26:59.701088+00:00",
+  "system_info": {
+    "framework": "FastAPI + Uvicorn",
+    "db_engine": "SQLite / PostgreSQL ready",
+    "model": "HistGradientBoostingRegressor",
+    "cache_layer": "ThreadSafeForecastCache"
+  },
+  "concurrency_benchmarks": {
+    "concurrency_10": {
+      "concurrency": 10,
+      "total_requests": 10,
+      "successful_requests": 10,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.238,
+      "throughput_rps": 42.01,
+      "p50_latency_ms": 22.34,
+      "p95_latency_ms": 42.44,
+      "p99_latency_ms": 44.83
+    },
+    "concurrency_25": {
+      "concurrency": 25,
+      "total_requests": 25,
+      "successful_requests": 25,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.236,
+      "throughput_rps": 105.94,
+      "p50_latency_ms": 9.59,
+      "p95_latency_ms": 11.29,
+      "p99_latency_ms": 11.59
+    },
+    "concurrency_50": {
+      "concurrency": 50,
+      "total_requests": 50,
+      "successful_requests": 50,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.4047,
+      "throughput_rps": 123.54,
+      "p50_latency_ms": 7.9,
+      "p95_latency_ms": 11.01,
+      "p99_latency_ms": 11.89
+    },
+    "concurrency_100": {
+      "concurrency": 100,
+      "total_requests": 100,
+      "successful_requests": 100,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.7925,
+      "throughput_rps": 126.18,
+      "p50_latency_ms": 7.88,
+      "p95_latency_ms": 9.28,
+      "p99_latency_ms": 9.67
+    }
+  },
+  "cold_vs_warm_cache": {
+    "cold_cache_latency_ms": 3303.17,
+    "warm_cache_latency_ms": 9.68,
+    "speedup_factor": 341.08,
+    "cache_hit_status": true
+  },
+  "endpoint_breakdown": {
+    "GET /api/v1/overview": {
+      "iterations": 40,
+      "successful": 40,
+      "errors": 0,
+      "mean_ms": 7.56,
+      "p50_ms": 7.43,
+      "p95_ms": 8.57,
+      "p99_ms": 9.21,
+      "min_ms": 6.65,
+      "max_ms": 9.37
+    },
+    "GET /api/v1/forecast": {
+      "iterations": 40,
+      "successful": 40,
+      "errors": 0,
+      "mean_ms": 8.91,
+      "p50_ms": 8.17,
+      "p95_ms": 13.9,
+      "p99_ms": 18.44,
+      "min_ms": 6.82,
+      "max_ms": 21.34
+    },
+    "GET /api/v1/activity": {
+      "iterations": 40,
+      "successful": 40,
+      "errors": 0,
+      "mean_ms": 15.9,
+      "p50_ms": 12.94,
+      "p95_ms": 27.41,
+      "p99_ms": 53.95,
+      "min_ms": 10.89,
+      "max_ms": 59.8
+    },
+    "POST /api/v1/simulate": {
+      "iterations": 30,
+      "successful": 30,
+      "errors": 0,
+      "mean_ms": 39.74,
+      "p50_ms": 31.8,
+      "p95_ms": 64.77,
+      "p99_ms": 69.48,
+      "min_ms": 24.93,
+      "max_ms": 70.14
+    }
+  }
+}

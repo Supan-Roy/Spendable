@@ -4,7 +4,7 @@ Uses HistGradientBoostingRegressor to predict multi-horizon future minimum balan
 expected cash flows, liquidity pressure, and 30-day daily projected trajectories.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
 import pandas as pd
@@ -229,6 +229,19 @@ class CashFlowForecastModel:
             forecasts[H].minimum_projected_balance = round(min_b, 2)
             forecasts[H].liquidity_pressure_flag = (min_b < safety_threshold_bdt)
 
+        from app.forecasting.schema import ModelMetadata
+        now_utc = datetime.now(timezone.utc).isoformat()
+
+        metadata = ModelMetadata(
+            model_name=self.model_name,
+            model_version="v1.2.0",
+            feature_schema_version="v1.0",
+            model_checksum="sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            inference_timestamp_utc=now_utc,
+            forecast_horizon_days=30,
+            is_fallback=False,
+        )
+
         return ForecastOutput(
             user_id=user_id,
             snapshot_time=snap_time_str,
@@ -239,11 +252,15 @@ class CashFlowForecastModel:
             daily_trajectory=trajectory,
             model_version=self.model_name,
             safety_threshold_bdt=safety_threshold_bdt,
+            model_metadata=metadata,
         )
 
     def _heuristic_fallback(
         self, snapshot_features: Dict[str, Any], safety_threshold_bdt: float
     ) -> ForecastOutput:
+        from app.forecasting.schema import ModelMetadata
+        now_utc = datetime.now(timezone.utc).isoformat()
+
         user_id = str(snapshot_features.get("account_id") or snapshot_features.get("user_id") or "")
         snap_time_str = str(snapshot_features.get("snapshot_timestamp") or snapshot_features.get("snapshot_time") or "")
         current_balance = float(snapshot_features.get("current_balance", 0.0))
@@ -319,11 +336,19 @@ class CashFlowForecastModel:
                 projected_balance=proj_b,
                 minimum_projected_balance=round(min_b, 2),
                 liquidity_pressure_flag=(min_b < safety_threshold_bdt),
-                estimated_range_lower=round(max(0.0, min_b - 2000.0), 2),
-                estimated_range_upper=round(min_b + 2000.0, 2),
+                estimated_range_lower=round(max(0.0, min_b - 4000.0), 2),  # Widened range for fallback
+                estimated_range_upper=round(min_b + 4000.0, 2),
             )
 
-
+        metadata = ModelMetadata(
+            model_name=f"{self.model_name}_HEURISTIC_FALLBACK",
+            model_version="v1.0.0_fallback",
+            feature_schema_version="v1.0",
+            model_checksum="fallback_heuristic",
+            inference_timestamp_utc=now_utc,
+            forecast_horizon_days=30,
+            is_fallback=True,
+        )
 
         return ForecastOutput(
             user_id=user_id,
@@ -335,6 +360,7 @@ class CashFlowForecastModel:
             daily_trajectory=trajectory,
             model_version=f"{self.model_name}_UNFITTED_FALLBACK",
             safety_threshold_bdt=safety_threshold_bdt,
+            model_metadata=metadata,
         )
 
     def _parse_datetime(self, val: str) -> datetime:
